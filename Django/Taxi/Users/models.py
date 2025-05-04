@@ -27,4 +27,4 @@ class usersDataModel(models.Model):
     UserAddress = models.CharField(max_length=200, default='')
 
     def __str__(self):
-        return str(self.UserC.username)
+        return str(self.UserMobileNo)
