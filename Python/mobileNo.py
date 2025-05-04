@@ -9,3 +9,5 @@ if len(mobileNo) == 10:
 
     if len(CheckMobileNo) == 10: print('Pass')
     else: print('Fail')
+
+else: print('Please Enter a Valid Mobile No')
