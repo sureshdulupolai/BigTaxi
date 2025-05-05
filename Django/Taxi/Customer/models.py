@@ -8,6 +8,6 @@ class cutomerDataModel(models.Model):
     userName = models.CharField(max_length=100, default='Big Taxi User')
     userImage = models.ImageField(default='customer/default/logo.png', upload_to='customer/exist/', max_length=1000)
     description = models.CharField(max_length=2000, default='No Description!')
-    
+
     def __str__(self):
         return str((self.UDM, self.totalTripCount))
