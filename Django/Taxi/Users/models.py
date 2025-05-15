@@ -25,6 +25,7 @@ class usersDataModel(models.Model):
     UserCity = models.CharField(max_length=100, default='')
     UserPincode = models.CharField(max_length=20, default='')
     UserAddress = models.CharField(max_length=200, default='')
+    UserPass = models.CharField(max_length=1000, default='password')
 
     def __str__(self):
         return str(self.UserMobileNo)
