@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 
+# bigtaxi.com
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('Driver.urls')),
+    path('home/', include('taxi_app.urls')),
+    path('ls/', include('Driver.urls')),
+
+    # if path not match then it will direct goes to bigtaxi.com = home page (localhost:8000) = (localhost:8000/bigtaxi.com)
+    path('', lambda request: redirect('home/', permanent=False)),
 ]

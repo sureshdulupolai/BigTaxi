@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Users',
     'Driver',
     'Customer',
+    'taxi_app',
 ]
 
 MIDDLEWARE = [
