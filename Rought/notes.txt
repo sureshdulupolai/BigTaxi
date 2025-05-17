@@ -1,0 +1,16 @@
+- change secret code after every 6 months in driver.views, developer signup
+- change coupon code after every 6 months, first coupon code get free, to driver, after that 6 months, driver complete 15 trip after that he will get for 6 month again
+
+- banner page with 160 charges, for 5 days
+- doanation page
+- help page, if customer need urgent taxi then it will show to ervery one
+* create a button where driver, click on yes, to get customer no, if user not take trip aur driver not take trip then driver, will get 40rs panelty
+* create a model for it helpCustomerArgent(), statuscode, from, to, date and time
+* create a views where you can check, any driver is doing wrong with big taxi or not, if yes then deactive the id
+
+- create a pass option, inside from to where with price list, allows some more trips
+- where a taxi driver get a perment job in this
+
+- get chat with us on query(AI) : take user statusCode and give data according to customer need
+
+- review to our app page
