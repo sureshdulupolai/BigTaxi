@@ -97,7 +97,8 @@ def driverSignUpFunctionBaseView(request):
                 DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDRIVER'
 
                 if len(DMS) > 0:
-                    lastCode, lstOfUsername = DMS.last().CouponCode, [DataIn.DriverName.lower() for DataIn in DMS]
+                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != 'BIGTAXICUSTOMER'], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != 'BIGTAXICUSTOMER']
+                    lastCode = codeLst[len(codeLst) - 1]
 
                     if request.user.username in lstOfUsername:
                         messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
@@ -155,7 +156,8 @@ def developerSignUpFunctionBaseView(request):
             DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDEVELOPER'
 
             if len(DMS) > 0:
-                lastCode, lstOfUsername = DMS.last().CouponCode, [DataIn.DriverName.lower() for DataIn in DMS]
+                codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != 'BIGTAXICUSTOMER'], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != 'BIGTAXICUSTOMER']
+                lastCode = codeLst[len(codeLst) - 1]
 
                 if request.user.username in lstOfUsername:
                     messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
