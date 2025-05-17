@@ -88,19 +88,30 @@ def driverSignUpFunctionBaseView(request):
         username = 'sonu'; email = 'sonu@gmail.com'; password1 = 'krish123'; password2 = 'krish123'; mobileNo = 9820646789
         strMobileNo = str(mobileNo)
 
-        if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
+        if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
             if password1 == password2:
                 user = User.objects.create_user(username=username, email=email, password=password2)
                 user.save()
 
-                DMS = DriverModelStore.objects.all()
+                # CouponCode Name Define
+                DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDRIVER'
+
                 if len(DMS) > 0:
-                    lastCode = DMS.last()
+                    lastCode, lstOfUsername = DMS.last().CouponCode, [DataIn.DriverName.lower() for DataIn in DMS]
+
+                    if request.user.username in lstOfUsername:
+                        messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
+
+                    else:
+                        oldCode = ''
+                        for LC in lastCode: 
+                            if LC.isdigit(): oldCode += LC
+                        newCode = CodeName + str((int(oldCode) + 1))
 
                 else:
-                    Name = 'DRIVERBIGTAXI'; Number = 10001; Code = Name + str(Number)
+                    Number = 10001; newCode = CodeName + str(Number)
 
-                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = Code)
+                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
                 UDM.save()
 
                 driverDataModel(VUDM = UDM, VehicleName = 'BMW', VehicleCustomerLimit = 4, Vehicle = '4 Wheeler Car', VehicleNo = 'MH 03 2006').save()
@@ -116,12 +127,12 @@ def customerSignUpFunctionBaseView(request):
     username = 'ashish'; email = 'ashish@gmail.com'; password1 = 'krish123'; password2 = 'krish123'; mobileNo = 9820646901
     strMobileNo = str(mobileNo)
     
-    if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
+    if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
         if password1 == password2:
             user = User.objects.create_user(username=username, email=email, password=password2)
             user.save()
 
-            UDM = usersDataModel(ULink = user, UserCategory = 'Customer', UserMobileNo = mobileNo, UserPass = password2)
+            UDM = usersDataModel(ULink = user, UserCategory = 'Customer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = 'BIGTAXICUSTOMER')
             UDM.save()
 
             cutomerDataModel(UDM = UDM).save()
@@ -136,12 +147,29 @@ def developerSignUpFunctionBaseView(request):
     username = 'ashish'; email = 'ashish@gmail.com'; password1 = 'krish123'; password2 = 'krish123'; mobileNo = 9820646901
     strMobileNo = str(mobileNo)
     
-    if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
+    if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
         if password1 == password2:
             user = User.objects.create_user(username=username, email=email, password=password2)
             user.save()
 
-            UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2)
+            DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDEVELOPER'
+
+            if len(DMS) > 0:
+                lastCode, lstOfUsername = DMS.last().CouponCode, [DataIn.DriverName.lower() for DataIn in DMS]
+
+                if request.user.username in lstOfUsername:
+                    messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
+
+                else:
+                    oldCode = ''
+                    for LC in lastCode: 
+                        if LC.isdigit(): oldCode += LC
+                    newCode = CodeName + str((int(oldCode) + 1))
+
+            else:
+                Number = 10001; newCode = CodeName + str(Number)
+
+            UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
             UDM.save()
     
         else:
