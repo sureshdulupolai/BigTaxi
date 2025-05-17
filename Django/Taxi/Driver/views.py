@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 # from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from Driver.models import driverDataModel
+from Driver.models import driverDataModel, DriverModelStore
 from Users.models import usersDataModel
 from Customer.models import cutomerDataModel
 
@@ -93,7 +93,14 @@ def driverSignUpFunctionBaseView(request):
                 user = User.objects.create_user(username=username, email=email, password=password2)
                 user.save()
 
-                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2)
+                DMS = DriverModelStore.objects.all()
+                if len(DMS) > 0:
+                    lastCode = DMS.last()
+
+                else:
+                    Name = 'DRIVERBIGTAXI'; Number = 10001; Code = Name + str(Number)
+
+                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = Code)
                 UDM.save()
 
                 driverDataModel(VUDM = UDM, VehicleName = 'BMW', VehicleCustomerLimit = 4, Vehicle = '4 Wheeler Car', VehicleNo = 'MH 03 2006').save()

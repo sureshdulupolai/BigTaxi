@@ -19,3 +19,13 @@ class driveDataStore(models.Model):
 
     def __str__(self):
         return str((self.driver.ULink.username))
+    
+# for ID Checking
+class DriverModelStore(models.Model):
+    CouponCode = models.CharField(max_length=50)
+    DriverName = models.CharField(max_length=1000)
+    Date = models.DateField()
+    Time = models.TimeField()
+
+    def __str__(self):
+        return str((self.CouponCode, self.DriverName))
