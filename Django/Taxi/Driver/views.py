@@ -116,7 +116,7 @@ def driverSignUpFunctionBaseView(request):
                 UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
                 UDM.save()
 
-                DriverModelStore(CouponCode = newCode, DriverName = request.user.username).save()
+                DriverModelStore(CouponCode = newCode, DriverName = username).save()
 
                 driverDataModel(VUDM = UDM, VehicleName = 'BMW', VehicleCustomerLimit = 4, Vehicle = '4 Wheeler Car', VehicleNo = 'MH 03 2006').save()
 
@@ -148,42 +148,47 @@ def customerSignUpFunctionBaseView(request):
     return render(request, 'signup/cutomerSignUp.html')
 
 def developerSignUpFunctionBaseView(request):
-    username = 'ashish'; email = 'ashish@gmail.com'; password1 = 'krish123'; password2 = 'krish123'; mobileNo = 9820646901
+    username = 'ashish'; email = 'ashish@gmail.com'; password1 = 'krish123'; password2 = 'krish123'; mobileNo = 9820646901; sc = ''
     strMobileNo = str(mobileNo)
+    # Big Taxi PersonalCode Secret Granted Successfull, change after every 6 months
+    secretCode = 'BIGTAXIMUOD106463SECRETGS'
     
-    if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
-        if password1 == password2:
-            user = User.objects.create_user(username=username, email=email, password=password2)
-            user.save()
+    if sc == secretCode:
+        if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and strMobileNo[0] in [6, 7, 8, 9]:
+            if password1 == password2:
+                user = User.objects.create_user(username=username, email=email, password=password2)
+                user.save()
 
-            DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXIDRIVER'
-            # CouponCode Name Define
-            CodeName = 'BIGTAXIDEVELOPER'
+                DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXIDRIVER'
+                # CouponCode Name Define
+                CodeName = 'BIGTAXIDEVELOPER'
 
-            if len(DMS) > 0:
-                codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]
-                lastCode = codeLst[len(codeLst) - 1]
+                if len(DMS) > 0:
+                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]
+                    lastCode = codeLst[len(codeLst) - 1]
 
-                if request.user.username in lstOfUsername:
-                    messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
+                    if request.user.username in lstOfUsername:
+                        messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
+
+                    else:
+                        oldCode = ''
+                        for LC in lastCode: 
+                            if LC.isdigit(): oldCode += LC
+                        newCode = CodeName + str((int(oldCode) + 1))
 
                 else:
-                    oldCode = ''
-                    for LC in lastCode: 
-                        if LC.isdigit(): oldCode += LC
-                    newCode = CodeName + str((int(oldCode) + 1))
+                    Number = 50064; newCode = CodeName + str(Number)
 
+                UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
+                UDM.save()
+
+                DriverModelStore(CouponCode = newCode, DriverName = username).save()
+        
             else:
-                Number = 50064; newCode = CodeName + str(Number)
-
-            UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
-            UDM.save()
-
-            DriverModelStore(CouponCode = newCode, DriverName = request.user.username).save()
-    
+                messages.warning(request, 'Password is Not Matched!')
         else:
-            messages.warning(request, 'Password is Not Matched!')
+            messages.warning(request, 'Enter Correct Mobile No!, Again.')
     else:
-        messages.warning(request, 'Enter Correct Mobile No!, Again.')
+        messages.warning(request, 'Secrect Code Is Not Matched For Developer Tools Login')
 
     return render(request, 'signup/developerSignUp.html')
