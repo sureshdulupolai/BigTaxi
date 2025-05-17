@@ -34,6 +34,7 @@ class TaxiOnFinish(models.Model):
     statusCode = models.CharField(max_length=50)
     taxiDriver = models.CharField(max_length=500)
     taxiCustomer = models.CharField(max_length=500)
+    totalPassanger = models.CharField(max_length=10)
     taxiFrom = models.CharField(max_length=4000)
     taxiTo = models.CharField(max_length=4000)
     taxiStartTime = models.CharField(max_length=100)
@@ -42,6 +43,7 @@ class TaxiOnFinish(models.Model):
     fairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
     fairTaxiPriceTaken = models.CharField(max_length=40)
+    
 
     def __str__(self):
         return str((self.statusCode, self.taxiDate))
@@ -50,6 +52,7 @@ class TaxiOnRunning(models.Model):
     statusCode = models.CharField(max_length=50)
     taxiDriverName = models.CharField(500)
     taxiCustomerName = models.CharField(max_length=500)
+    totalPassanger = models.CharField(max_length=10)
     taxiRunningFrom = models.CharField(max_length=4000)
     taxiRunningTo = models.CharField(max_length=4000)
     taxiStartTime = models.CharField(max_length=100)
@@ -64,6 +67,7 @@ class TaxiOnCancel(models.Model):
     statusCode = models.CharField(max_length=100)
     DriverName = models.CharField(max_length=500)
     CustomerName = models.CharField(max_length=500)
+    totalPassanger = models.CharField(max_length=10)
     fairPrice = models.CharField(max_length=40)
     taxiFrom = models.CharField(max_length=4000)
     taxiTo = models.CharField(max_length=4000)
