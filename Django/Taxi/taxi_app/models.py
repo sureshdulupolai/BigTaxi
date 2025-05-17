@@ -43,10 +43,30 @@ class TaxiOnFinish(models.Model):
     fairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
     fairTaxiPriceTaken = models.CharField(max_length=40)
-    
+    driverReview = models.CharField(max_length=5000)
+    driverRating = models.IntegerField()
 
     def __str__(self):
         return str((self.statusCode, self.taxiDate))
+    
+class PaymentManagement(models.Model):
+    statusCode = models.CharField(max_length=50)
+    fairTaken = models.CharField(max_length=20)
+    dateOfFairTaken = models.DateField()
+    timeOfFairTaken = models.TimeField()
+
+    def __str__(self):
+        return str((self.fairTaken, self.dateOfFairTaken))
+    
+class FinishReviewByCustomer(models.Model):
+    statusCode = models.CharField(max_length=50)
+    customerReview = models.CharField(max_length=5000, default='')
+    rating = models.IntegerField()
+    date = models.DateField()
+    time = models.TimeField()
+
+    def __str__(self):
+        return self.statusCode
     
 class TaxiOnRunning(models.Model):
     statusCode = models.CharField(max_length=50)
@@ -73,10 +93,26 @@ class TaxiOnCancel(models.Model):
     taxiTo = models.CharField(max_length=4000)
     onCancelArea = models.CharField(max_length=4000)
     review = models.CharField(max_length=5000)
-    cancelImage = models.ImageField(upload_to='cancelReportImage/Report/', default='cancelReportImage/default/default.jpg')
+    cancelImage = models.ImageField(upload_to='cancelReportImage/Report/', default='cancelReportImage/default/default.jpeg')
 
     def __str__(self):
-        if self.cancelImage.name != 'cancelReportImage/default/default.jpg':
+        # Try ( self.cancelImage.name != '' )
+        if self.cancelImage != 'cancelReportImage/default/default.jpeg':
             return str((self.statusCode, 'Image'))
         else:
             return str((self.statusCode, 'No Image'))
+
+# Management Feild Of Big Taxi
+# -----------------------------------------------------------------------------------------------------------------
+class ManagementModel(models.Model):
+    totalFairPrice = models.CharField(max_length=1000)
+    totalAmountTakenByUs = models.CharField(max_length=1000)
+    totalAmountShouldBeReturn = models.CharField(max_length=1000)
+    totalTripCount = models.CharField(max_length=30)
+    monthOfTotal = models.CharField(max_length=50)
+    yearOfTotal = models.CharField(max_length=5)
+    dateOfChecking = models.DateField()
+    timeOfChecking = models.TimeField()
+
+    def __str__(self):
+        return str((self.monthOfTotal, self.totalFairPrice, self.totalTripCount))
