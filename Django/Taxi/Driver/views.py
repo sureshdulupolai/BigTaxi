@@ -93,11 +93,12 @@ def driverSignUpFunctionBaseView(request):
                 user = User.objects.create_user(username=username, email=email, password=password2)
                 user.save()
 
+                DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXICUSTOMER'
                 # CouponCode Name Define
-                DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDRIVER'
+                CodeName = 'BIGTAXIDRIVER'
 
                 if len(DMS) > 0:
-                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != 'BIGTAXICUSTOMER'], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != 'BIGTAXICUSTOMER']
+                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]
                     lastCode = codeLst[len(codeLst) - 1]
 
                     if request.user.username in lstOfUsername:
@@ -153,10 +154,12 @@ def developerSignUpFunctionBaseView(request):
             user = User.objects.create_user(username=username, email=email, password=password2)
             user.save()
 
-            DMS = DriverModelStore.objects.all(); CodeName = 'BIGTAXIDEVELOPER'
+            DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXICUSTOMER'
+            # CouponCode Name Define
+            CodeName = 'BIGTAXIDEVELOPER'
 
             if len(DMS) > 0:
-                codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != 'BIGTAXICUSTOMER'], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != 'BIGTAXICUSTOMER']
+                codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]
                 lastCode = codeLst[len(codeLst) - 1]
 
                 if request.user.username in lstOfUsername:
