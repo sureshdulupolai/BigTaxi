@@ -14,9 +14,10 @@ Supports any running road vehicle including taxis, trucks, bikes, cars, and cycl
 
 👨‍✈️ **Driver Login and Referral System:**  
 Drivers can log in to accept rides. A special referral code is given:
-- Only after completing **15 trips**
+- Only for first time driver and developer get code free
 - Valid for **6 months**
-- After 6 months, another 20 trips are required to get a new code
+- After 6 months, another 15 trips are required to get a new code
+- developer get free code
 - Ensures **fair pricing**, and **no extra charges** are deducted from drivers
 
 🧭 **Trip Management System:**  
