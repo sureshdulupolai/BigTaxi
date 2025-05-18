@@ -17,50 +17,75 @@
       text-align: center;
     }
     h4 { color: #28a745; margin-bottom: 1.5rem; }
+    .like-name{
+      color: gray;
+    }
+    .eye-top{
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="form-section mb-4">
     <h4>BigTaxi Driver Signup</h4>
-    <form>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3 text-start">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" required>
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label">Gmail</label>
+        <input type="text" class="form-control" name="gmail" required>
+      </div>
+
       <div class="mb-3 text-start">
         <label class="form-label">Mobile Number</label>
-        <input type="number" class="form-control" required>
+        <input type="number" class="form-control" name="mobileNo" required>
       </div>
+
       <div class="mb-3 text-start">
+        <label class="form-label">Vechicle Brand Name <span class="like-name">(BMW, Skooda)</span></label>
+        <input type="text" class="form-control" name="vechicleName" required>
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label">Vechicle Passenger Limit</label>
+        <input type="number" class="form-control" name="vechiclePassengerLimit" required>
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label">Vehicle Type</label>
+        <select class="form-select" name="vehicleType" required>
+          <option value="" disabled>Select Vehicle Type</option>
+          <option value="bicycle">Bicycle</option>
+          <option value="motor bike">Motor Bike</option>
+          <option value="4 wheeler">4 Wheeler</option>
+          <option value="more than 4 wheeler">More than 4 Wheeler</option>
+        </select>
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label">Vechicle No</label>
+        <input type="text" class="form-control" name="vechicleNo" required>
+      </div>
+
+      <div class="mb-3 text-start position-relative">
         <label class="form-label">Password</label>
-        <input type="password" class="form-control" required>
+        <input type="password" class="form-control" name="password1" id="password1" required>
+        <button type="button" class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2 eye-top" onclick="togglePassword('password1')">👁️</button>
       </div>
-      <div class="mb-3 text-start">
+
+      <div class="mb-3 text-start position-relative">
         <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
+        <input type="password" class="form-control" name="password2" id="password2" required>
+        <button type="button" class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2 eye-top" onclick="togglePassword('password2')">👁️</button>
       </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
-      <div class="mb-3 text-start">
-        <label class="form-label">Confirm Password</label>
-        <input type="password" class="form-control" required>
-      </div>
+
       <button type="submit" class="btn btn-success w-100">Sign Up</button>
+
     </form>
   </div>
 </div>

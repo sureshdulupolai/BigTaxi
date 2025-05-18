@@ -17,22 +17,29 @@
       text-align: center;
     }
     h4 { color: #007bff; margin-bottom: 1.5rem; }
+    .eye-top{
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="form-section">
     <h4>BigTaxi Driver Login</h4>
-    <form>
+    <form method="POST">
       {% csrf_token %}
+
       <div class="mb-3 text-start">
         <label class="form-label">Mobile Number</label>
         <input type="number" class="form-control" name="mobileNo" required>
       </div>
-      <div class="mb-3 text-start">
+
+      <div class="mb-3 text-start position-relative">
         <label class="form-label">Password</label>
-        <input type="password" class="form-control" name="password1" required>
+        <input type="password" class="form-control" name="password1" id="password1" required>
+        <button type="button" class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2 eye-top" onclick="togglePassword('password1')">👁️</button>
       </div>
+
       <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
   </div>
