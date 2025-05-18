@@ -11,7 +11,7 @@ def driverLoginFunctionBaseView(request):
     if request.method == 'POST':
         UDM = usersDataModel.objects.filter(UserCategory = 'Driver')
         userMobileNo = int(request.POST.get('mobileNo'))
-        userPass = request.POST.get('userPassword')
+        userPass = request.POST.get('password1')
 
         strMobileNo = str(userMobileNo)
         if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and (strMobileNo[0] in [6, 7, 8, 9]):
@@ -35,7 +35,7 @@ def customerLoginFunctionBaseView(request):
     if request.method == 'POST':
         UDM = usersDataModel.objects.filter(UserCategory = 'Customer')
         userMobileNo = int(request.POST.get('mobileNo'))
-        userPass = request.POST.get('userPassword')
+        userPass = request.POST.get('password1')
 
         strMobileNo = str(userMobileNo)
         if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and (strMobileNo[0] in [6, 7, 8, 9]):
@@ -59,7 +59,7 @@ def developerLoginFunctionBaseView(request):
     if request.method == 'POST':
         UDM = usersDataModel.objects.filter(UserCategory = 'Developer')
         userMobileNo = int(request.POST.get('mobileNo'))
-        userPass = request.POST.get('userPassword')
+        userPass = request.POST.get('password1')
 
         strMobileNo = str(userMobileNo)
         if (strMobileNo == '000000000') and (len(strMobileNo) == 10) and (strMobileNo[0] in [6, 7, 8, 9]):

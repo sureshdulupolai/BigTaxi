@@ -24,13 +24,14 @@
   <div class="form-section">
     <h4>BigTaxi Driver Login</h4>
     <form>
+      {% csrf_token %}
       <div class="mb-3 text-start">
         <label class="form-label">Mobile Number</label>
-        <input type="number" class="form-control" required>
+        <input type="number" class="form-control" name="mobileNo" required>
       </div>
       <div class="mb-3 text-start">
         <label class="form-label">Password</label>
-        <input type="password" class="form-control" required>
+        <input type="password" class="form-control" name="password1" required>
       </div>
       <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>
