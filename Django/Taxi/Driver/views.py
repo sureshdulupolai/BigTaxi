@@ -82,7 +82,7 @@ def driverSignUpFunctionBaseView(request):
     if request.method == "POST":
         # request.POST.get('')
         username = request.POST.get('username'); email = request.POST.get('gmail'); password1 = request.POST.get('password1'); password2 = request.POST.get('password2'); mobileNo = request.POST.get('mobileNo'); strMobileNo = str(mobileNo)
-        vName = request.POST.get('vechicleName'); vCustomerLimit = abs(request.POST.get('vechiclePassengerLimit')); vNo = request.POST.get('vechicleNo'); vType = request.POST.get('vehicleType')
+        vName = request.POST.get('vechicleName'); vCustomerLimit = abs(int(request.POST.get('vechiclePassengerLimit'))); vNo = request.POST.get('vechicleNo'); vType = request.POST.get('vehicleType')
         UDM = usersDataModel.objects.all(); continueData = True; userData = User.objects.all()
 
         for UD in userData:
@@ -93,8 +93,8 @@ def driverSignUpFunctionBaseView(request):
                 if str(UDM1.UserMobileNo) == str(mobileNo): continueData = False
 
             if continueData:
-                if int(vCustomerLimit) != 0:
-                    if (vType in ['bicycle', 'motor bike']) and (int(vCustomerLimit) == 1) or ((vType == '4 wheeler') and (int(vCustomerLimit) <= 10)) or ((vType == 'more than 4 wheeler') and (int(vCustomerLimit) <= 20)):
+                if vCustomerLimit != 0:
+                    if (vType in ['bicycle', 'motor bike']) and (vCustomerLimit == 1) or ((vType == '4 wheeler') and (vCustomerLimit <= 10)) or ((vType == 'more than 4 wheeler') and (vCustomerLimit <= 20)):
                         if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and (int(strMobileNo[0]) in [6, 7, 8, 9]):
                             if password1 == password2:
                                 user = User.objects.create_user(username=username, email=email, password=password2)
@@ -125,7 +125,7 @@ def driverSignUpFunctionBaseView(request):
 
                                 DriverModelStore(CouponCode = newCode, DriverName = username).save()
 
-                                driverDataModel(VUDM = UDM, VehicleName = vName, VehicleCustomerLimit = vCustomerLimit, Vehicle = vType, VehicleNo = vNo).save()
+                                driverDataModel(VUDM = UDM, VehicleName = vName, VehicleCustomerLimit = str(vCustomerLimit), Vehicle = vType, VehicleNo = vNo).save()
                                 messages.success(request ,'Successfully signup into \'BigTaxi\' driver department.')
                                 return render(request, 'signup/driverSignUp.html')
                             
