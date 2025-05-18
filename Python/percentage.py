@@ -11,8 +11,8 @@ for j in lst:
 
 percentage = (totalReview / maxReview) * 100; firstData, secondData = math.modf(percentage)
 
-if round(firstData, 2) > 0.49: roundOfPer = math.ceil(percentage) + 10
-else: roundOfPer = math.floor(percentage) + 20
+if round(firstData, 2) > 0.49: roundOfPer = math.ceil(percentage)
+else: roundOfPer = math.floor(percentage)
 
 # print(roundOfPer)
 if roundOfPer >= 0 and roundOfPer <= 20: starPrinting(NumberOfStar=1)
