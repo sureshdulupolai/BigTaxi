@@ -8,8 +8,8 @@ class TaxiAvailable(models.Model):
     diverId = models.ForeignKey(usersDataModel, on_delete=models.CASCADE)
     currentLocation = models.CharField(max_length=2000)
     pincode = models.CharField(max_length=20, default=' ')
-    taxiDate = models.DateField()
-    taxiTime = models.TimeField()
+    taxiDate = models.DateField(auto_now_add=True)
+    taxiTime = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return str((self.taxiAvaId, self.taxiDate ,self.taxiTime))
@@ -22,8 +22,8 @@ class TaxiTimeOver(models.Model):
     taxiCityAndLoc = models.CharField(max_length=2100)
     avaPincode = models.CharField(max_length=20, default=' ')
     dateAndTime = models.CharField(max_length=100)
-    toDate = models.DateField()
-    toTime = models.TimeField()
+    toDate = models.DateField(auto_now_add=True)
+    toTime = models.TimeField(auto_now_add=True)
     toDriverName = models.CharField(max_length=500)
     toStatus = models.CharField(choices=statusOfTaxiData, default='Failed')
 
@@ -38,8 +38,8 @@ class TaxiOnFinish(models.Model):
     taxiFrom = models.CharField(max_length=4000)
     taxiTo = models.CharField(max_length=4000)
     taxiStartTime = models.CharField(max_length=100)
-    taxiFinishTime = models.TimeField()
-    taxiDate = models.DateField()
+    taxiFinishTime = models.TimeField(auto_now_add=True)
+    taxiDate = models.DateField(auto_now_add=True)
     fairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
     fairTaxiPriceTaken = models.CharField(max_length=40)
@@ -52,8 +52,8 @@ class TaxiOnFinish(models.Model):
 class PaymentManagement(models.Model):
     statusCode = models.CharField(max_length=50)
     fairTaken = models.CharField(max_length=20)
-    dateOfFairTaken = models.DateField()
-    timeOfFairTaken = models.TimeField()
+    dateOfFairTaken = models.DateField(auto_now_add=True)
+    timeOfFairTaken = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return str((self.fairTaken, self.dateOfFairTaken))
@@ -62,8 +62,8 @@ class FinishReviewByCustomer(models.Model):
     statusCode = models.CharField(max_length=50)
     customerReview = models.CharField(max_length=5000, default='')
     rating = models.IntegerField()
-    date = models.DateField()
-    time = models.TimeField()
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return self.statusCode
@@ -111,8 +111,8 @@ class ManagementModel(models.Model):
     totalTripCount = models.CharField(max_length=30)
     monthOfTotal = models.CharField(max_length=50)
     yearOfTotal = models.CharField(max_length=5)
-    dateOfChecking = models.DateField()
-    timeOfChecking = models.TimeField()
+    dateOfChecking = models.DateField(auto_now_add=True)
+    timeOfChecking = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return str((self.monthOfTotal, self.totalFairPrice, self.totalTripCount))

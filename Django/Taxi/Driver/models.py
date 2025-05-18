@@ -24,8 +24,8 @@ class driveDataStore(models.Model):
 class DriverModelStore(models.Model):
     CouponCode = models.CharField(max_length=50)
     DriverName = models.CharField(max_length=1000)
-    Date = models.DateField()
-    Time = models.TimeField()
+    Date = models.DateField(auto_now_add=True)
+    Time = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return str((self.CouponCode, self.DriverName))
