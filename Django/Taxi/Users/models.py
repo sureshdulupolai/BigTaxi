@@ -17,6 +17,7 @@ class usersDataModel(models.Model):
     ]
 
     ULink = models.ForeignKey(User, on_delete=models.CASCADE)
+    UserCode = models.CharField(max_length=100, default='BIGTAXICODE1006463')
     UserCategory = models.CharField(choices=UserC, default='Customer')
     UserMobileNo = models.CharField(max_length=11)
     UserGender = models.CharField(max_length=100, default='Not Check')

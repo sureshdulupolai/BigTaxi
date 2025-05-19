@@ -27,7 +27,7 @@
   <div class="form-section">
     <h4>BigTaxi Customer Signup</h4>
     <form method="POST">
-
+      {% csrf_token %}
       <div class="mb-3 text-start">
         <label class="form-label">Username</label>
         <input type="text" class="form-control" name="username" required>

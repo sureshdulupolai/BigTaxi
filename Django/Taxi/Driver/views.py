@@ -120,7 +120,11 @@ def driverSignUpFunctionBaseView(request):
                                 else:
                                     Number = 10063; newCode = CodeName + str(Number)
 
-                                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
+                                oldCodelst = usersDataModel.objects.all(); oldCodeData = [UD101.UserCode for UD101 in oldCodelst]; oldCodeBar = oldCodeData[len(oldCodeData) - 1]; oldNo = ''; nameOfCode = 'BIGTAXICODE'
+                                for OC in oldCodeBar:
+                                    if OC.isdigit(): oldNo += OC
+                                newCodeNo = str(int(oldNo) + 1); successfullGenerateNewCode = nameOfCode + newCodeNo
+                                UDM = usersDataModel(ULink = user, UserCategory = 'Driver', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode, UserCode = successfullGenerateNewCode)
                                 UDM.save()
 
                                 DriverModelStore(CouponCode = newCode, DriverName = username).save()
@@ -138,11 +142,12 @@ def driverSignUpFunctionBaseView(request):
                             return render(request, 'signup/driverSignUp.html')
                         
                     else:
-                        # create a template for "more" add information to sigup in developer tool, in html
-                        return render(request, 'signup/driverSignUp.html')
+                        messages.warning(request, '{} does not have right\'s to take {} passenger, read informations to signup!'.format(vType, vCustomerLimit))
+                        return render(request, 'more/readinformations.html')
                 else:
-                    messages.warning(request, 'Passeger limit is Zero. Then you need to signup in driver department.')
-
+                    messages.warning(request, 'Passeger limit is Zero. Then why you need to signup in driver department.')
+                    return render(request, 'signup/driverSignUp.html')
+                
             else:
                 messages.warning(request, 'Mobile No, already Exist "{}".'.format(strMobileNo))
                 return render(request, 'signup/driverSignUp.html')
@@ -170,7 +175,11 @@ def customerSignUpFunctionBaseView(request):
                         user = User.objects.create_user(username=username, email=email, password=password2)
                         user.save()
 
-                        UDM = usersDataModel(ULink = user, UserCategory = 'Customer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = 'BIGTAXICUSTOMER')
+                        oldCodelst = usersDataModel.objects.all(); oldCodeData = [UD101.UserCode for UD101 in oldCodelst]; oldCodeBar = oldCodeData[len(oldCodeData) - 1]; oldNo = ''; nameOfCode = 'BIGTAXICODE'
+                        for OC in oldCodeBar:
+                            if OC.isdigit(): oldNo += OC
+                        newCodeNo = str(int(oldNo) + 1); successfullGenerateNewCode = nameOfCode + newCodeNo
+                        UDM = usersDataModel(ULink = user, UserCategory = 'Customer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = 'BIGTAXICUSTOMER', UserCode = successfullGenerateNewCode)
                         UDM.save()
 
                         cutomerDataModel(UDM = UDM).save()
@@ -193,6 +202,7 @@ def customerSignUpFunctionBaseView(request):
     return render(request, 'signup/cutomerSignUp.html')
 
 def developerSignUpFunctionBaseView(request):
+
     if request.method == 'POST':
         username = request.POST.get('username'); email = request.POST.get('gmail'); password1 = request.POST.get('password1'); password2 = request.POST.get('password2'); mobileNo = request.POST.get('mobileNo'); sc = request.POST.get('secretCode'); strMobileNo = str(mobileNo)
         # Big Taxi PersonalCode Secret Granted Successfull, change after every 6 months
@@ -233,12 +243,18 @@ def developerSignUpFunctionBaseView(request):
                             else:
                                 Number = 50064; newCode = CodeName + str(Number)
 
-                            UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode)
+                            oldCodelst = usersDataModel.objects.all(); oldCodeData = [UD101.UserCode for UD101 in oldCodelst]; oldCodeBar = oldCodeData[len(oldCodeData) - 1]; oldNo = ''; nameOfCode = 'BIGTAXICODE'
+                            for OC in oldCodeBar:
+                                if OC.isdigit(): oldNo += OC
+                            newCodeNo = str(int(oldNo) + 1); successfullGenerateNewCode = nameOfCode + newCodeNo
+                            UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode, UserCode = successfullGenerateNewCode)
                             UDM.save()
 
                             DriverModelStore(CouponCode = newCode, DriverName = username).save()
                             messages.success(request, 'Successfully signup into \'BigTaxi\' developer department')
-                            return render(request, 'signup/developerSignUp.html')
+                            # return render(request, 'signup/developerSignUp.html')
+                            # http://localhost:8000/ls/driver/signup/ : url bug
+                            return redirect('driver:inforamtion')
                         
                         else:
                             messages.warning(request, 'Password is Not Matched!')
@@ -257,3 +273,10 @@ def developerSignUpFunctionBaseView(request):
             return render(request, 'signup/developerSignUp.html')
 
     return render(request, 'signup/developerSignUp.html')
+
+def moreInformationsFunctionBaseView(request):
+    messages.warning(request, 'error is to check, vechicle informations')
+    return render(request, 'more/readInformations.html')
+
+def pageNotFoundFunctionsBaseView(request):
+    return render(request, 'more/pageNotFound.html')

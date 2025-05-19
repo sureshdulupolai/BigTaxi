@@ -13,4 +13,7 @@ urlpatterns = [
     path('login/', views.customerLoginFunctionBaseView, name='customerLogin'),
     path('driver/login/', views.driverLoginFunctionBaseView, name='driverLogin'),
     path('developer/login/', views.developerLoginFunctionBaseView, name='developerLogin'),
+
+    path('more-information/', views.moreInformationsFunctionBaseView, name='inforamtion'),
+    path('page-not-found/', views.pageNotFoundFunctionsBaseView),
 ]
