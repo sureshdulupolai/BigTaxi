@@ -1,0 +1,71 @@
+Bilkul! Python me OpenAI ChatGPT ko integrate karna aajkal bahut asaan hai. Main simple steps aur code example deta hoon, jisse tum apne Python program me chatbot bana sakte ho — jisme tum question doge aur chatbot jawab dega.
+
+---
+
+### Step 1: OpenAI API key lo
+
+* Pehle OpenAI ki website pe jao: [https://platform.openai.com/](https://platform.openai.com/)
+* Account banao (free tier available hai)
+* API key generate karo (ye ek secret key hoti hai, use kisi ke saath share mat karna)
+
+---
+
+### Step 2: Python me OpenAI library install karo
+
+Terminal/PowerShell me ye command chalao:
+
+```bash
+pip install openai
+```
+
+---
+
+### Step 3: Simple Python code likho ChatGPT se baat karne ke liye
+
+```python
+import openai
+
+# Apni OpenAI API key yahan daalo
+openai.api_key = "your_openai_api_key_here"
+
+def ask_question(question):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # ya "gpt-4" agar paid access hai
+        messages=[
+            {"role": "user", "content": question}
+        ]
+    )
+    # ChatGPT ka reply
+    answer = response['choices'][0]['message']['content']
+    return answer
+
+# User se question input lena
+user_question = input("Apna question pucho: ")
+reply = ask_question(user_question)
+print("ChatGPT ka jawab:", reply)
+```
+
+---
+
+### Step 4: Run karo aur test karo
+
+* Python file save karo (jaise `chatgpt_test.py`)
+* Run karo terminal se:
+
+```bash
+python chatgpt_test.py
+```
+
+* Fir prompt me apna question type karo, ChatGPT ka jawab turant milega.
+
+---
+
+### Important Tips:
+
+* API key ko kabhi GitHub ya public jagah upload mat karna.
+* Free plan me 3-4 baar daily use kar sakte ho, uske baad wait karna padega.
+* Agar error aaye to check karo ki API key sahi hai ya nahi.
+
+---
+
+Agar chaho toh main tumhe isme aur advanced features (jaise conversation history rakhna, multiple questions, ya file inputs) bhi sikha sakta hoon. Batao?

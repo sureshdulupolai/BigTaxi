@@ -2,14 +2,21 @@ from django.db import models
 from Users.models import usersDataModel
 
 # Create your models here.
+class TaxiBarCode(models.Model):
+    barCode = models.CharField(max_length=100)
+    data = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+
 class TaxiAvailable(models.Model):
     taxiAvaId = models.CharField(max_length=50)
     taxiCity = models.CharField(max_length=500)
-    diverId = models.ForeignKey(usersDataModel, on_delete=models.CASCADE)
+    customerId = models.ForeignKey(usersDataModel, on_delete=models.CASCADE)
     currentLocation = models.CharField(max_length=2000)
+    taxiPassenger = models.IntegerField(default=1)
     pincode = models.CharField(max_length=20, default=' ')
     taxiDate = models.DateField(auto_now_add=True)
     taxiTime = models.TimeField(auto_now_add=True)
+    
 
     def __str__(self):
         return str((self.taxiAvaId, self.taxiDate ,self.taxiTime))

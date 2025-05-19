@@ -1,0 +1,13 @@
+from django.contrib.auth.models import User
+from Users.models import usersDataModel
+
+
+def navbar(request):
+    if request.user.is_authenticated: 
+        checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
+        userCategoryis = UDM.UserCategory
+        userBarCodeAccessis = UDM.UserCode
+        return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis}
+    
+    else:
+        return {'userCategoryis' : None, 'userBarCodeAccessis' : None}

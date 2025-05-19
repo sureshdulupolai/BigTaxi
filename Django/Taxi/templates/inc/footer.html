@@ -30,6 +30,11 @@
         <h5 class="fw-bold">Customer</h5>
         <span class="d-block mb-1"><a href="{% url 'driver:customerLogin' %}" class="a-footer-tag">Login</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:customerSignup' %}" class="a-footer-tag">Signup</a></span>
+        {% if user.is_authenticated %}
+            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Book Taxi</a></span>
+        {% else %}
+            <span class="d-block mb-1 un-login">Book Taxi</span>
+        {% endif %}
       </div>
 
       <!-- Driver Column -->
@@ -37,6 +42,11 @@
         <h5 class="fw-bold">Driver</h5>
         <span class="d-block mb-1"><a href="{% url 'driver:driverLogin' %}" class="a-footer-tag">Login</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:driverSignup' %}" class="a-footer-tag">Signup</a></span>
+        {% if user.is_authenticated %}
+            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Taxi Rent</a></span>
+        {% else %}
+            <span class="d-block mb-1 un-login">Taxi Rent</span>
+        {% endif %}
       </div>
 
       <!-- Developer Column -->
@@ -44,10 +54,15 @@
         <h5 class="fw-bold">Developer</h5>
         <span class="d-block mb-1"><a href="{% url 'driver:developerLogin' %}" class="a-footer-tag">Login</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:developerSigup' %}" class="a-footer-tag">Signup</a></span>
+        {% if user.is_authenticated %}
+            <span class="d-block mb-1"><a href="{% url 'taxi_app:review' %}" class="a-footer-tag">Data access</a></span>
+        {% else %}
+            <span class="d-block mb-1 un-login">Data access</span>
+        {% endif %}
       </div>
 
       <!-- Big Taxi Column with right margin -->
-      <div class="col-6 col-md-2 mb-4 mt-4">
+      <div class="col-6 col-md-2 mb-4">
         <h5 class="fw-bold">Big Taxi</h5>
         <span class="d-block mb-1"><a href="{% url 'taxi_app:home' %}" class="a-footer-tag">Home</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:inforamtion' %}" class="a-footer-tag">More Information</a></span>
