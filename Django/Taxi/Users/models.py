@@ -28,6 +28,7 @@ class usersDataModel(models.Model):
     UserAddress = models.CharField(max_length=200, default='')
     UserPass = models.CharField(max_length=1000, default='password')
     CouponCode = models.CharField(max_length=50, null=True, blank=True)
+    UProfileImage = models.ImageField(upload_to='profile/main/', default='profile/default/default.png')
 
     def __str__(self):
         return str(self.UserMobileNo)
