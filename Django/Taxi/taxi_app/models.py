@@ -7,17 +7,18 @@ class TaxiBarCode(models.Model):
     data = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now_add=True)
 
-class TaxiAvailable(models.Model):
+class PinTaxiAvailable(models.Model):
     taxiAvaId = models.CharField(max_length=50)
     taxiCity = models.CharField(max_length=500)
     customerId = models.ForeignKey(usersDataModel, on_delete=models.CASCADE)
     currentLocation = models.CharField(max_length=2000)
+    toLocation = models.CharField(max_length=2000, default='No Area Found!')
     taxiPassenger = models.IntegerField(default=1)
     pincode = models.CharField(max_length=20, default=' ')
+    couponCodeWas = models.CharField(max_length=100, default='Customer Not Have Coupon')
     taxiDate = models.DateField(auto_now_add=True)
     taxiTime = models.TimeField(auto_now_add=True)
     
-
     def __str__(self):
         return str((self.taxiAvaId, self.taxiDate ,self.taxiTime))
     
