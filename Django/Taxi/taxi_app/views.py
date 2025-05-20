@@ -45,41 +45,46 @@ def pinTaxiFunctionBaseView(request):
         else:
             valueOfPin = False
             dataOfPin = False
-        
-        # post method
-        if request.method == 'POST':
-            uCityEnter = request.POST.get('uCity'); uCurrentLocationEnter = request.POST.get('uCurrentLocation'); uPincodeEnter = request.POST.get('uPincode'); uTaxiPassengerEnter = abs(int(request.POST.get('uTaxiPassenger'))); uCouponCodeEnter = request.POST.get('uCouponCode'); uVerifyStatusEnter = request.POST.get('uVerifyStatus'); uBarCodeEnter = request.POST.get('uBarCode')
-            if uVerifyStatusEnter == "Driver":
-                uCouponCode = usersDataModel.objects.get(UserCode = uBarCodeEnter)
-                uCouponCodeEnter = uCouponCode.CouponCode
 
-            else:
-                if uCouponCodeEnter: pass
-                else: uCouponCodeEnter = 'Customer Not Have Coupon'
-
-            if uTaxiPassengerEnter > 0:
-                checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
-                CodeNameTaxiAva = 'TAXIAVALIABLE'; CodeNo = 101; TBC = TaxiBarCode.objects.all()
-                
-                if len(TBC) > 0:
-                    barLst = [TBCData.barCode for TBCData in TBC]; oldBarCode = barLst[len(barLst) - 1]; newCodes = ''
-                    for i in oldBarCode:
-                        if i.isdigit(): newCodes += i
-                    newBarCode = CodeNameTaxiAva + str(int(newCodes) + 1)
+        if len(dataPresentLst) < 2:
+            DataShow = True
+            # post method
+            if request.method == 'POST':
+                uCityEnter = request.POST.get('uCity'); uCurrentLocationEnter = request.POST.get('uCurrentLocation'); uPincodeEnter = request.POST.get('uPincode'); uTaxiPassengerEnter = abs(int(request.POST.get('uTaxiPassenger'))); uCouponCodeEnter = request.POST.get('uCouponCode'); uVerifyStatusEnter = request.POST.get('uVerifyStatus'); uBarCodeEnter = request.POST.get('uBarCode')
+                if uVerifyStatusEnter == "Driver":
+                    uCouponCode = usersDataModel.objects.get(UserCode = uBarCodeEnter)
+                    uCouponCodeEnter = uCouponCode.CouponCode
 
                 else:
-                    newBarCode = CodeNameTaxiAva + str(CodeNo)
-                
-                PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter).save()
-                TaxiBarCode(barCode = newBarCode).save()
+                    if uCouponCodeEnter: pass
+                    else: uCouponCodeEnter = 'Customer Not Have Coupon'
 
-                return HttpResponse('SuccessFull Added to Pin Taxi')
-            
-            else:
-                messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi')
-                return render(request, 'main/pinTaxi.html')
+                if uTaxiPassengerEnter > 0:
+                    checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
+                    CodeNameTaxiAva = 'TAXIAVALIABLE'; CodeNo = 101; TBC = TaxiBarCode.objects.all()
+                    
+                    if len(TBC) > 0:
+                        barLst = [TBCData.barCode for TBCData in TBC]; oldBarCode = barLst[len(barLst) - 1]; newCodes = ''
+                        for i in oldBarCode:
+                            if i.isdigit(): newCodes += i
+                        newBarCode = CodeNameTaxiAva + str(int(newCodes) + 1)
+
+                    else:
+                        newBarCode = CodeNameTaxiAva + str(CodeNo)
+                    
+                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter).save()
+                    TaxiBarCode(barCode = newBarCode).save()
+
+                    return HttpResponse('SuccessFull Added to Pin Taxi')
+                
+                else:
+                    messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi')
+                    return render(request, 'main/pinTaxi.html')
         
-        context = {'valueOfPin' : valueOfPin, 'dataOfPin' : dataOfPin, 'usernames' : usernames}
+        else:
+            DataShow = False
+            
+        context = {'valueOfPin' : valueOfPin, 'dataOfPin' : dataOfPin, 'usernames' : usernames, 'DataShow' : DataShow}
         return render(request, 'main/pinTaxi.html', context)
 
     else:
