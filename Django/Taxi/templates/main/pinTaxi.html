@@ -1,4 +1,3 @@
-<!-- customer_login.html -->
 {% extends 'base.html' %}
 {% block body %}
 <style>
@@ -18,18 +17,33 @@
   .w-pin-taxi{
     width: 45% !important;
   }
-  
   .button-home:hover{
     background-color: gold;
   }
   .button-home-red:hover{
-    color: red;
     color: white;
+    background-color: red;
   }
   .taxi-passenger-limit-text{
     color: gray;
   }
+  #map {
+      height: 300px;
+      width: 100%;
+      display: none;
+      margin-top: 10px;
+      touch-action: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+  }
+  #confirm-btn {
+      display: none;
+      margin-top: 10px;
+  }
 </style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 {% if DataShow %}
   <div class="container mb-4">
@@ -60,17 +74,37 @@
 
         <div class="mb-3 text-start position-relative">
           <label class="form-label">Current Location Address :</label>
-          <input type="text" class="form-control" name="uCurrentLocation" placeholder="enter your current address*" required>
+          <input type="text" class="form-control" name="uCurrentLocation" id="currentLocationUser" placeholder="enter your current address*" required>
+
+          <!-- Search Button -->
+          <button type="button" id="search-current-location-btn" class="btn btn-outline-secondary mt-2 ms-2">Search Location</button>
+
+          <!-- Map Button -->
+          <button type="button" id="open-current-map-btn" class="btn btn-outline-primary mt-2">Select Location on Map</button>
+
+          <!-- Map Div -->
+          <div id="currentMap" style="display: none; height: 300px; margin-top: 10px;"></div>
+
+          <!-- Confirm Button -->
+          <button type="button" id="confirm-current-btn" class="btn btn-success mt-2" style="display: none;">Use This Location</button>
         </div>
+
 
         <div class="mb-3 text-start position-relative">
           <label class="form-label">To Location Address :</label>
-          <input type="text" class="form-control" name="uLastLocation" placeholder="enter your last destination*" required>
+          <input type="text" class="form-control" name="uLastLocation" id="toLocationInput" placeholder="enter your last destination*" required>
+          
+          <!-- New Search button -->
+          <button type="button" id="search-location-btn" class="btn btn-outline-secondary mt-2 ms-2">Search Location</button>
+
+          <button type="button" id="open-map-btn" class="btn btn-outline-primary mt-2">Select Location on Map</button>
+          <div id="map"></div>
+          <button type="button" id="confirm-btn" class="btn btn-success mt-2">Use This Location</button>
         </div>
 
         <div class="mb-3 text-start position-relative">
           <label class="form-label">Pincode :</label>
-          <input type="number" class="form-control" name="uPincode" placeholder="enter your pincode*" required>
+          <input type="number" class="form-control" name="uPincode" id="pincodeInput" placeholder="enter your pincode*" required>
         </div>
 
         {% if userCategoryis == 'Customer' %}
@@ -103,20 +137,16 @@
 </div>
 {% endif %}
 
-
-  {% if valueOfPin %}
+{% if valueOfPin %}
     {% for DP in dataOfPin %}
-      <!-- Main Profile Card -->
       <div class="container-xxl my-3">
       <div class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap">
         
-        <!-- Profile Image -->
         <div class="me-4 mb-3 mb-md-0">
           <img src="/media/{{ profileImage }}" alt="User Profile"
               class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
         </div>
         
-        <!-- User Info -->
         <div class="me-auto">
           <h4 class="mb-1">{{ usernames }}</span></h4>
           <p class="text-muted mb-0">from: {{ DP.currentLocation|truncatewords:7 }}, {{ DP.taxiCity }}</p>
@@ -124,7 +154,6 @@
           <p class="text-muted mb-0">passenger: {{ DP.taxiPassenger }}</p>
         </div>
         
-        <!-- Book Taxi Button -->
         <div class="mt-3 mt-md-0">
           <a href="#" class="btn btn-info">Edit</a>
           <a href="#" class="btn btn-warning button-home">Check Status</a>
@@ -134,47 +163,178 @@
       </div>
     </div>
     {% endfor %}
-    {% endif %}
+{% endif %}
 
 <script>
   fetch('https://ipapi.co/json/')
   .then(res => res.json())
   .then(data => {
-    console.log("City:", data.city);
-    console.log("State:", data.region);
-    // input field ke value mein city set karo
     document.getElementById('user-city').value = data.city;
   })
   .catch(err => console.error('Error fetching city:', err));
 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
+  // Destination Map
+  let destMap, destMarker, destLatLng = null;
+  const destMapDiv = document.getElementById('map');
+  const destConfirmBtn = document.getElementById('confirm-btn');
 
-      console.log("Latitude:", lat);
-      console.log("Longitude:", lon);
+  document.getElementById('open-map-btn').addEventListener('click', () => {
+    destMapDiv.style.display = 'block';
+    destConfirmBtn.style.display = 'inline-block';
 
-      // Reverse Geocoding from OpenStreetMap
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
-        .then(res => res.json())
-        .then(data => {
-          const address = data.display_name;
-          const pincode = data.address.postcode;
+    if (!destMap) {
+      destMap = L.map('map').setView([22.5937, 78.9629], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(destMap);
 
-          console.log("Full Address:", address);
-          console.log("Pincode:", pincode);
-        })
-        .catch(err => console.error("Error in reverse geocoding:", err));
-    },
-    function (error) {
-      console.error("Error getting location:", error.message);
+      destMap.on('click', function(e) {
+        destLatLng = e.latlng;
+        if (destMarker) {
+          destMarker.setLatLng(destLatLng);
+        } else {
+          destMarker = L.marker(destLatLng).addTo(destMap);
+        }
+      });
     }
-  );
-} else {
-  console.log("Geolocation is not supported by this browser.");
-}
+  });
 
+  destConfirmBtn.addEventListener('click', () => {
+    if (!destLatLng) return alert('Please select destination location on the map.');
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${destLatLng.lat}&lon=${destLatLng.lng}`)
+      .then(res => res.json())
+      .then(data => {
+        const address = data.display_name;
+        const pincode = data.address.postcode || '';
+        document.getElementById('toLocationInput').value = address;
+        if (pincode) document.getElementById('pincodeInput').value = pincode;
+        alert('Destination location selected!');
+      });
+  });
+
+  // Current Location Map
+  let currentMap, currentMarker, currentLatLng = null;
+  const currentMapDiv = document.getElementById('currentMap');
+  const currentConfirmBtn = document.getElementById('confirm-current-btn');
+
+  document.getElementById('open-current-map-btn').addEventListener('click', () => {
+    currentMapDiv.style.display = 'block';
+    currentConfirmBtn.style.display = 'inline-block';
+
+    if (!currentMap) {
+      currentMap = L.map('currentMap').setView([22.5937, 78.9629], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(currentMap);
+
+      currentMap.on('click', function(e) {
+        currentLatLng = e.latlng;
+        if (currentMarker) {
+          currentMarker.setLatLng(currentLatLng);
+        } else {
+          currentMarker = L.marker(currentLatLng).addTo(currentMap);
+        }
+      });
+    }
+  });
+
+  currentConfirmBtn.addEventListener('click', () => {
+    if (!currentLatLng) return alert('Please select current location on the map.');
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLatLng.lat}&lon=${currentLatLng.lng}`)
+      .then(res => res.json())
+      .then(data => {
+        const address = data.display_name;
+        document.getElementById('currentLocationUser').value = address;
+        alert('Current location selected!');
+      });
+  });
+
+  // Search current address manually
+  document.getElementById('search-current-location-btn').addEventListener('click', () => {
+    const address = document.getElementById('currentLocationUser').value.trim();
+    if (!address) return alert('Please enter your current address.');
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+      .then(res => res.json())
+      .then(results => {
+        if (results && results.length > 0) {
+          const { lat, lon } = results[0];
+          currentMapDiv.style.display = 'block';
+          currentConfirmBtn.style.display = 'inline-block';
+
+          if (!currentMap) {
+            currentMap = L.map('currentMap').setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(currentMap);
+
+            currentMap.on('click', function(e) {
+              currentLatLng = e.latlng;
+              if (currentMarker) {
+                currentMarker.setLatLng(currentLatLng);
+              } else {
+                currentMarker = L.marker(currentLatLng).addTo(currentMap);
+              }
+            });
+          } else {
+            currentMap.setView([lat, lon], 15);
+            if (currentMarker) {
+              currentMarker.setLatLng([lat, lon]);
+            } else {
+              currentMarker = L.marker([lat, lon]).addTo(currentMap);
+            }
+            currentLatLng = { lat, lng: lon };
+          }
+        } else {
+          alert("Address not found.");
+        }
+      });
+  });
+
+  // Search destination manually
+  document.getElementById('search-location-btn').addEventListener('click', () => {
+    const address = document.getElementById('toLocationInput').value.trim();
+    if (!address) return alert('Please enter your destination address.');
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+      .then(res => res.json())
+      .then(results => {
+        if (results && results.length > 0) {
+          const { lat, lon } = results[0];
+          destMapDiv.style.display = 'block';
+          destConfirmBtn.style.display = 'inline-block';
+
+          if (!destMap) {
+            destMap = L.map('map').setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(destMap);
+
+            destMap.on('click', function(e) {
+              destLatLng = e.latlng;
+              if (destMarker) {
+                destMarker.setLatLng(destLatLng);
+              } else {
+                destMarker = L.marker(destLatLng).addTo(destMap);
+              }
+            });
+          } else {
+            destMap.setView([lat, lon], 15);
+            if (destMarker) {
+              destMarker.setLatLng([lat, lon]);
+            } else {
+              destMarker = L.marker([lat, lon]).addTo(destMap);
+            }
+            destLatLng = { lat, lng: lon };
+          }
+        } else {
+          alert("Destination address not found.");
+        }
+      });
+  });
 </script>
+
+
 {% endblock %}
