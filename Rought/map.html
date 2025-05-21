@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Location - Free Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            display: none;
+            margin-top: 10px;
+            touch-action: auto;
+        }
+        #confirm-btn {
+            display: none;
+            margin-top: 10px;
+        }
+        input {
+            margin: 5px 5px 5px 0;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Free Map - Select Your Location</h2>
+
+<input type="text" id="pincode-box" placeholder="Enter Pincode (e.g. 400072)">
+<input type="text" id="search-box" placeholder="Enter Area (e.g. Sakinaka Mumbai)">
+<button onclick="searchLocation()">Find Location on Map</button>
+
+<div id="map"></div>
+<button id="confirm-btn" onclick="confirmLocation()">Use This Location</button>
+
+<script>
+    let map;
+    let marker;
+    let selectedLatLng = null;
+
+    const indiaBounds = [
+        [6.4627, 68.1097],
+        [35.5133, 97.3954]
+    ];
+
+    function openMap() {
+        document.getElementById('map').style.display = 'block';
+        document.getElementById('confirm-btn').style.display = 'inline';
+
+        if (!map) {
+            map = L.map('map', {
+                center: [22.5937, 78.9629],
+                zoom: 5,
+                minZoom: 4,
+                maxZoom: 18,
+                dragging: true,
+                scrollWheelZoom: true,
+                keyboard: true,
+                wheelPxPerZoomLevel: 50
+            });
+
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19,
+            }).addTo(map);
+
+            map.on('click', function (e) {
+                selectedLatLng = e.latlng;
+                if (marker) {
+                    marker.setLatLng(selectedLatLng);
+                } else {
+                    marker = L.marker(selectedLatLng).addTo(map);
+                }
+            });
+        }
+    }
+
+    function searchLocation() {
+    const area = document.getElementById('search-box').value.trim();
+    const pincode = document.getElementById('pincode-box').value.trim();
+
+    if (!area && !pincode) {
+        return alert("Please enter Area or Pincode at least");
+    }
+
+    let fullQuery = '';
+    if (pincode && !area) {
+        fullQuery = `${pincode}, India`;
+    } else if (area && !pincode) {
+        fullQuery = `${area}, India`;
+    } else {
+        fullQuery = `${area}, ${pincode}, India`;
+    }
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                selectedLatLng = { lat, lng: lon };
+
+                openMap();
+
+                map.setView(selectedLatLng, 15);
+                if (marker) {
+                    marker.setLatLng(selectedLatLng);
+                } else {
+                    marker = L.marker(selectedLatLng).addTo(map);
+                }
+
+                console.log("Found Location:", fullQuery, lat, lon);
+            } else {
+                alert("Location not found! Please try a different Pincode or Area.");
+            }
+        })
+        .catch(err => {
+            console.error("Search error:", err);
+            alert("Something went wrong while searching.");
+        });
+}
+
+
+    function confirmLocation() {
+        if (selectedLatLng) {
+            const lat = selectedLatLng.lat;
+            const lng = selectedLatLng.lng;
+
+            console.log("Latitude:", lat);
+            console.log("Longitude:", lng);
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name;
+                    console.log("Selected Address:", address);
+                    alert("Location selected! Check console.");
+                })
+                .catch(err => {
+                    console.error("Error fetching address:", err);
+                });
+        } else {
+            alert("Please select a location on the map.");
+        }
+    }
+</script>
+
+</body>
+</html>
