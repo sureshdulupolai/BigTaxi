@@ -1,0 +1,44 @@
+body {
+  background-color: #f8fafc;
+}
+.form-section {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+  text-align: center;
+}
+h4 {
+  color: #007bff;
+  margin-bottom: 1.5rem;
+}
+.eye-top {
+  margin-top: 16px;
+}
+.w-pin-taxi {
+  width: 45% !important;
+}
+.button-home:hover {
+  background-color: gold;
+}
+.button-home-red:hover {
+  color: white;
+  background-color: red;
+}
+.taxi-passenger-limit-text {
+  color: gray;
+}
+#map {
+  height: 300px;
+  width: 100%;
+  display: none;
+  margin-top: 10px;
+  touch-action: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+#confirm-btn {
+  display: none;
+  margin-top: 10px;
+}

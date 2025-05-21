@@ -18,6 +18,7 @@ class PinTaxiAvailable(models.Model):
     couponCodeWas = models.CharField(max_length=100, default='Customer Not Have Coupon')
     taxiDate = models.DateField(auto_now_add=True)
     taxiTime = models.TimeField(auto_now_add=True)
+    taxiDateAndTimeByUser = models.CharField(max_length=100, default='none')
     
     def __str__(self):
         return str((self.taxiAvaId, self.taxiDate ,self.taxiTime))

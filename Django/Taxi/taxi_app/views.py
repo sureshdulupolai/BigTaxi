@@ -3,6 +3,7 @@ from taxi_app.models import TaxiBarCode, PinTaxiAvailable
 from django.contrib.auth.models import User
 from Users.models import usersDataModel
 from django.contrib import messages
+from datetime import datetime
 
 # Create your views here.
 def HomePageForTaxiAppViewFunction(request):
@@ -45,7 +46,7 @@ def pinTaxiFunctionBaseView(request):
             DataShow = True
             # post method
             if request.method == 'POST':
-                uCityEnter = request.POST.get('uCity'); uCurrentLocationEnter = request.POST.get('uCurrentLocation'); uPincodeEnter = request.POST.get('uPincode'); uTaxiPassengerEnter = abs(int(request.POST.get('uTaxiPassenger'))); uCouponCodeEnter = request.POST.get('uCouponCode'); uVerifyStatusEnter = request.POST.get('uVerifyStatus'); uBarCodeEnter = request.POST.get('uBarCode'); uLastLocationEnter = request.POST.get('uLastLocation')
+                uCityEnter = request.POST.get('uCity'); uCurrentLocationEnter = request.POST.get('uCurrentLocation'); uPincodeEnter = request.POST.get('uPincode'); uTaxiPassengerEnter = abs(int(request.POST.get('uTaxiPassenger'))); uCouponCodeEnter = request.POST.get('uCouponCode'); uVerifyStatusEnter = request.POST.get('uVerifyStatus'); uBarCodeEnter = request.POST.get('uBarCode'); uLastLocationEnter = request.POST.get('uLastLocation'); utaxiDateAndTimeByUserEnter = request.POST.get('utaxiDateAndTimeByUser')
                 if uVerifyStatusEnter == "Driver":
                     uCouponCode = usersDataModel.objects.get(UserCode = uBarCodeEnter)
                     uCouponCodeEnter = uCouponCode.CouponCode
@@ -53,6 +54,13 @@ def pinTaxiFunctionBaseView(request):
                 else:
                     if uCouponCodeEnter: pass
                     else: uCouponCodeEnter = 'Customer Not Have Coupon'
+
+                # Convert to desired format: "2025-05-29 11:30AM"
+                if utaxiDateAndTimeByUserEnter:
+                    dt_obj = datetime.strptime(utaxiDateAndTimeByUserEnter, "%Y-%m-%dT%H:%M")
+                    formatted_datetime = dt_obj.strftime("%Y-%m-%d %I:%M%p")  # %I = 12-hour, %p = AM/PM
+                else:
+                    formatted_datetime = "none"
 
                 if uTaxiPassengerEnter > 0:
                     checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
@@ -67,10 +75,10 @@ def pinTaxiFunctionBaseView(request):
                     else:
                         newBarCode = CodeNameTaxiAva + str(CodeNo)
                     
-                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter).save()
+                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter, taxiDateAndTimeByUser = formatted_datetime).save()
                     TaxiBarCode(barCode = newBarCode).save()
 
-                    return HttpResponse('SuccessFull Added to Pin Taxi')
+                    return redirect('taxi_app:pinTaxi')
                 
                 else:
                     messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi')
