@@ -11,15 +11,18 @@
     <div class="ms-auto d-flex align-items-center">
       {% if user.is_authenticated %}
           {% if userCategoryis == 'Customer' %}
-            <a href="#" class="me-3">Profile</a>
+            <!-- <a href="#" class="me-3">Profile</a> -->
+             <a href="#" class="me-3">Customer</a>
             <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3">PinTaxi</a>
             <a href="#" class="me-3">ArgentTaxi</a>
           {% elif userCategoryis == 'Driver' %}
-            <a href="#" class="me-3">Profile</a>
+            <!-- <a href="#" class="me-3">Profile</a> -->
+            <a href="#" class="me-3">Driver</a>
             <a href="#" class="me-3">PinTaxi</a>
             <a href="#" class="me-3">ArgentTaxi</a>
           {% elif userCategoryis == 'Developer' %}
-            <a href="#" class="me-3">Profile</a>
+            <!-- <a href="#" class="me-3">Profile</a> -->
+             <a href="#" class="me-3">Developer</a>
             <a href="#" class="me-3">TaxiSuggest</a>
             <a href="#" class="me-3">ArgentTaxi</a>
             <a href="#" class="me-3">Informations</a>

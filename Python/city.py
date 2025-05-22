@@ -6113,14 +6113,19 @@ ct = 'mumbai'
 st = 'maharashtra'
 continueOne = True
 
-for Data in OD:
-    if (ct == Data['name'].lower()) and (st == Data['state'].lower()):
-        continueOne = False
-        break
-    else:
-        continue
+# for Data in OD:
+#     if (ct == Data['name'].lower()) and (st == Data['state'].lower()):
+#         continueOne = False
+#         break
+#     else:
+#         continue
 
-if continueOne == True:
-    print('Hi')
-else:
-    print('SuccessFull')
+# if continueOne == True:
+#     print('Hi')
+# else:
+#     print('SuccessFull')
+
+lst = []
+for AllCity in OD:
+    lst += [AllCity['name']]
+print(lst)

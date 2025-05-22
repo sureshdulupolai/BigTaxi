@@ -25,7 +25,7 @@
       {% csrf_token %}
 
       <div class="mb-3 text-start position-relative">
-        <label class="form-label">Passenger :</label>
+        <label class="form-label">Passenger:</label>
         <input
           type="number"
           class="form-control"
@@ -37,7 +37,7 @@
       </div>
 
       <div class="mb-3 text-start position-relative">
-        <label class="form-label">Current Location Address :</label>
+        <label class="form-label">Current Location Address:</label>
         <input
           type="text"
           class="form-control"
@@ -83,7 +83,7 @@
       </div>
 
       <div class="mb-3 text-start position-relative">
-        <label class="form-label">To Location Address :</label>
+        <label class="form-label">To Location Address:</label>
         <input
           type="text"
           class="form-control"
@@ -116,7 +116,15 @@
       </div>
 
       <div class="mb-3 text-start position-relative">
-        <label class="form-label">Pincode :</label>
+        <label class="form-label">Travel City From:</label>
+        <input
+          type="text"
+          class="form-control"
+          name="uCity"
+          id="user-city"
+          value=""
+          placeholder="Select your starting location from the map. It will be filled automatically, but please make sure to verify the city as well*"
+        />
         <input
           type="number"
           class="form-control"
@@ -142,7 +150,7 @@
 
       {% if userCategoryis == 'Customer' %}
       <div class="mb-3 text-start position-relative">
-        <label class="form-label">Coupon Code :</label>
+        <label class="form-label">Coupon Code:</label>
         <input
           type="text"
           class="form-control"
@@ -181,15 +189,6 @@
         hidden
       />
       {% endif %}
-
-      <input
-        type="text"
-        class="form-control"
-        name="uCity"
-        id="user-city"
-        value=""
-        hidden
-      />
 
       <div class="w-100 d-flex justify-content-center gap-5">
         <a href="{% url 'taxi_app:home' %}" class="btn btn-primary w-pin-taxi"
@@ -242,6 +241,6 @@
 </div>
 {% endfor %} {% endif %}
 
-<script src="../../static/js/city.js"></script>
+<!-- <script src="../../static/js/city.js"></script> -->
 <script src="../../static/js/pinTaxi.js"></script>
 {% endblock %}

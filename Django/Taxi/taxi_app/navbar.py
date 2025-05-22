@@ -7,7 +7,6 @@ def navbar(request):
         checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
         userCategoryis = UDM.UserCategory
         userBarCodeAccessis = UDM.UserCode
-        userCouponCodeis = UDM.CouponCode
         return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis}
     
     else:

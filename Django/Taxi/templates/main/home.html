@@ -1,33 +1,162 @@
-{% extends 'base.html' %}
-{% block body %}
+{% extends 'base.html' %} {% block body %}
 <style>
-  .button-home:hover{
+  .button-home:hover {
     background-color: rgb(0, 108, 0);
     border: 1px solid white;
     color: white;
   }
 </style>
-  <!-- Main Profile Card -->
-  <div class="container-xxl my-3">
-  <div class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap">
-    
+<div
+  class="bg-light border-bottom d-flex justify-content-between align-items-center px-3 py-2"
+  style="height: 45px"
+>
+  <div class="d-flex align-items-center mt-1 mb-1">
+    <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+    <span id="current-location-text" class="fw-medium"
+      >Mumbai, Maharashtra</span
+    >
+    <input
+      type="text"
+      id="edit-location-input"
+      class="form-control form-control-sm d-none ms-2"
+      style="max-width: 250px"
+      placeholder="Enter new location"
+    />
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1 mb-1">
+    <button class="btn btn-sm btn-outline-secondary" id="change-location-btn">
+      Change
+    </button>
+    <button class="btn btn-sm btn-success d-none" id="save-location-btn">
+      Save
+    </button>
+  </div>
+</div>
+
+<!-- Main Profile Card -->
+<div class="container-xxl my-3">
+  <div
+    class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap"
+  >
     <!-- Profile Image -->
     <div class="me-4 mb-3 mb-md-0">
-      <img src="" alt="User Profile"
-          class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+      <img
+        src=""
+        alt="User Profile"
+        class="rounded-circle"
+        style="width: 100px; height: 100px; object-fit: cover"
+      />
     </div>
-    
+
     <!-- User Info -->
     <div class="me-auto">
       <h4 class="mb-1">Username</h4>
-      <p class="text-muted mb-0">Where the driver is available: Andheri East, Mumbai</p>
+      <input
+        type="text"
+        name="uBarCodeHome"
+        value="{{ userBarCodeAccessis }}"
+        hidden
+      />
+      <input
+        type="text"
+        name="uCategoryHome"
+        value="{{ userCategoryis }}"
+        hidden
+      />
+      <!-- <input type="text" id="user-city" name="uCurrentLocation"> -->
+      <p class="text-muted mb-0">
+        Where the driver is available: Andheri East, Mumbai
+      </p>
     </div>
-    
+
     <!-- Book Taxi Button -->
     <div class="mt-3 mt-md-0">
       <a href="#" class="btn btn-warning button-home">Book Taxi</a>
     </div>
-
   </div>
 </div>
+
+<script>
+  const changeBtn = document.getElementById("change-location-btn");
+  const saveBtn = document.getElementById("save-location-btn");
+  const input = document.getElementById("edit-location-input");
+  const displayText = document.getElementById("current-location-text");
+
+
+  changeBtn.addEventListener("click", () => {
+    input.classList.remove("d-none");
+    saveBtn.classList.remove("d-none");
+    displayText.classList.add("d-none");
+    input.value = displayText.textContent.trim();
+    input.focus();
+  });
+
+  saveBtn.addEventListener("click", () => {
+    const newLocation = input.value.trim();
+    if (newLocation) {
+      displayText.textContent = newLocation;
+      
+      // Optionally send to backend via fetch()
+    }
+    input.classList.add("d-none");
+    saveBtn.classList.add("d-none");
+    displayText.classList.remove("d-none");
+  });
+
+
+
+
+  // Wait till page loads
+  window.addEventListener("load", function () {
+    // Step 1: Get GPS-based location
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        // Step 2: Use OpenStreetMap to get full address from lat/lon
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const state = data.address.state || "";
+            const city = data.address.city || data.address.town || data.address.village || "";
+            displayText.textContent = `${city}, ${state}`;
+            
+            // console.log("User state:", state);
+
+            // Step 3: Send to backend
+            const barcode = document.getElementsByName("uBarCodeHome")[0].value;
+            const category =
+              document.getElementsByName("uCategoryHome")[0].value;
+
+            if (category !== "None") {
+              fetch("/home/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({
+                  barcode: barcode,
+                  category: category,
+                  state: state,
+                }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log("Backend response:", data);
+                });
+            }
+          });
+      },
+      function (error) {
+        console.error("Location error:", error.message);
+        alert("Please allow location access for accurate state detection.");
+      }
+    );
+  });
+</script>
+
 {% endblock %}

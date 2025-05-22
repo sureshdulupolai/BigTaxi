@@ -4,9 +4,47 @@ from django.contrib.auth.models import User
 from Users.models import usersDataModel
 from django.contrib import messages
 from datetime import datetime
+from django.http import JsonResponse
+import json
+
 
 # Create your views here.
 def HomePageForTaxiAppViewFunction(request):
+    if request.method == "POST" and request.user.is_authenticated:
+        try:
+            
+            data = json.loads(request.body)
+            userBarCode = data.get('barcode')
+            userCategory = data.get('category')
+            userStateByWindow = data.get('state')
+
+            print(userStateByWindow, 'Current State')
+            if (userCategory != None) and userBarCode:
+                print('Code Access In Python')
+                userCurrentCity = usersDataModel.objects.get(UserCode = userBarCode).UserCity
+                if (userCurrentCity == '') and (userStateByWindow != ''):
+                    userCurrentCity = userStateByWindow
+
+            if userCategory == 'Driver':
+                print('Driver')
+                DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity = 1)
+                for DPTL in DataOfPinTaxiLst:
+                    print(DPTL.currentLocation)
+
+            elif userCategory == 'Customer':
+                pass
+            elif userCategory == 'Developer':
+                pass
+            else:
+                pass
+
+
+        except json.JSONDecodeError:
+            print("Invalid JSON received")
+
+        return JsonResponse({'status': 'received'})
+
+    # If GET, just render the page
     return render(request, 'main/home.html')
 
 def reviewPageFunctionBaseView(request):
