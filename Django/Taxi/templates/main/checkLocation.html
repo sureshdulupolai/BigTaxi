@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container mt-5">
+  <h2 class="mb-4">Submit Your Current Location for Taxi Service</h2>
+
+  <form id="myForm" method="POST">
+    {% csrf_token %}
+    <div id="locationAlert" style="margin-top: 10px; font-weight: bold; color: green;" class="mb-3"></div>
+
+    <!-- Category hidden -->
+    <input type="hidden" id="uCategoryHomeId" name="uCategoryHome" value="{{ userCategoryis }}" />
+
+    <!-- City input visible and editable -->
+    <div class="mb-3">
+      <label for="uCityId" class="form-label">City</label>
+      <input type="text" id="uCityId" name="uCity" value="" class="form-control" placeholder="Enter your city" />
+    </div>
+
+    <!-- State input visible and editable -->
+    <div class="mb-3">
+      <label for="uStateId" class="form-label">State</label>
+      <input type="text" id="uStateId" name="uState" value="" class="form-control" placeholder="Enter your state" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+<script>
+  window.addEventListener("load", function () {
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const city = data.address.city || data.address.town || data.address.village || "";
+            const state = data.address.state || "";
+
+            // Set form values
+            document.getElementById('uCityId').value = city;
+            document.getElementById('uStateId').value = state;
+
+            // Show alert message
+            document.getElementById('locationAlert').innerText = `By Default Location selected: ${city}, ${state}`;
+          });
+      },
+      function (error) {
+        alert("Please allow location access.");
+      }
+    );
+  });
+</script>
+{% endblock %}

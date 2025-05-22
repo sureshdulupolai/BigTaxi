@@ -13,7 +13,7 @@
   <div class="d-flex align-items-center mt-1 mb-1">
     <i class="bi bi-geo-alt-fill text-primary me-2"></i>
     <span id="current-location-text" class="fw-medium"
-      >Mumbai, Maharashtra</span
+      >{{ city }}, {{ state }}</span
     >
     <input
       type="text"
@@ -33,6 +33,9 @@
   </div>
 </div>
 
+
+{% if DataOfPinTaxiLst %}
+{% for DPT in DataOfPinTaxiLst %}
 <!-- Main Profile Card -->
 <div class="container-xxl my-3">
   <div
@@ -51,18 +54,6 @@
     <!-- User Info -->
     <div class="me-auto">
       <h4 class="mb-1">Username</h4>
-      <input
-        type="text"
-        name="uBarCodeHome"
-        value="{{ userBarCodeAccessis }}"
-        hidden
-      />
-      <input
-        type="text"
-        name="uCategoryHome"
-        value="{{ userCategoryis }}"
-        hidden
-      />
       <!-- <input type="text" id="user-city" name="uCurrentLocation"> -->
       <p class="text-muted mb-0">
         Where the driver is available: Andheri East, Mumbai
@@ -75,13 +66,19 @@
     </div>
   </div>
 </div>
-
+{% endfor %}
+{% else %}
+<div class="container mt-5">
+  <div class="alert text-center" id="else-block-driver">
+    
+  </div>
+</div>
+{% endif %}
 <script>
   const changeBtn = document.getElementById("change-location-btn");
   const saveBtn = document.getElementById("save-location-btn");
   const input = document.getElementById("edit-location-input");
   const displayText = document.getElementById("current-location-text");
-
 
   changeBtn.addEventListener("click", () => {
     input.classList.remove("d-none");
@@ -103,60 +100,6 @@
     displayText.classList.remove("d-none");
   });
 
-
-
-
-  // Wait till page loads
-  window.addEventListener("load", function () {
-    // Step 1: Get GPS-based location
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-
-        // Step 2: Use OpenStreetMap to get full address from lat/lon
-        fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            const state = data.address.state || "";
-            const city = data.address.city || data.address.town || data.address.village || "";
-            displayText.textContent = `${city}, ${state}`;
-            
-            // console.log("User state:", state);
-
-            // Step 3: Send to backend
-            const barcode = document.getElementsByName("uBarCodeHome")[0].value;
-            const category =
-              document.getElementsByName("uCategoryHome")[0].value;
-
-            if (category !== "None") {
-              fetch("/home/", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": "{{ csrf_token }}",
-                },
-                body: JSON.stringify({
-                  barcode: barcode,
-                  category: category,
-                  state: state,
-                }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log("Backend response:", data);
-                });
-            }
-          });
-      },
-      function (error) {
-        console.error("Location error:", error.message);
-        alert("Please allow location access for accurate state detection.");
-      }
-    );
-  });
 </script>
 
 {% endblock %}

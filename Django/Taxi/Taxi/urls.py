@@ -28,7 +28,8 @@ urlpatterns = [
     path('ls/', include('Driver.urls')),
 
     # if path not match then it will direct goes to bigtaxi.com = home page (localhost:8000) = (localhost:8000/bigtaxi.com)
-    path('', lambda request: redirect('home/', permanent=False)),
+    path('', lambda request: redirect('home/', permanent=False)),  # 👈 keep this
+    path('location/', lambda request: redirect('home/location/', permanent=False)),
 ]
 
 if settings.DEBUG:
