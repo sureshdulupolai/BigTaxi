@@ -27,8 +27,14 @@ def HomePageForTaxiAppViewFunction(request):
     context = navbar(request)
     city = context.get("userModelDataCityis")
     state = context.get("userModelDataStateis")
+    userCategory = context.get('userCategoryis')
     DataOfPinTaxiLst = []
-    
+
+    # if userCategory == 'Driver':
+    DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity=city)
+    if not DataOfPinTaxiLst:
+        DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=state)
+
     context = {
         'DataOfPinTaxiLst': DataOfPinTaxiLst,
         'city' : city.title(),
@@ -42,7 +48,7 @@ def locationPageFunctionViewBase(request):
         if request.user.is_authenticated:
             uModelData = User.objects.get(username = request.user.username); UDM_Model_Data = usersDataModel.objects.get(ULink = uModelData)
             UDM_Model_Data.UserCity = city; UDM_Model_Data.UserState = state; UDM_Model_Data.save()
-        return redirect('taxi_app:home', city=city, state=state)
+        return redirect('taxi_app:home')
     return render(request, 'main/checkLocation.html')
 
 # if request.method == "POST" and request.user.is_authenticated:
