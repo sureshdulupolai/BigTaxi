@@ -72,20 +72,23 @@ def locationPageFunctionViewBase(request):
         return redirect('taxi_app:home')
     return render(request, 'main/checkLocation.html')
 
+def PointCount(RarLst, values = 1):
+    return len([i.userStar for i in RarLst if int(i.userStar) == values])
 
 def reviewPageFunctionBaseView(request):
     if request.user.is_authenticated:
-        showData = True; uNameData = request.user.username
+        showData = True; buttonData = False; uNameData = request.user.username
         U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
         IMG = data.UProfileImage; userName = data.UProfileName
 
         RarLst = ReviewAndRating.objects.all()
-        newRar = [DataInRar for DataInRar in RarLst if uNameData == DataInRar.username]
-        if len(newRar) == 1: showData = False
-        
+        newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
+
+        if newRar: showData = False; buttonData = True
+
+    
         if request.method == 'POST':
-            userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating')
-            RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
+            userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating'); RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
             
             if len(RBCLst) != 0:
                 RBC = [DataInRBC for DataInRBC in RBCLst]; DataLst = str(RBC[len(RBC) - 1]); newCodes = ''
@@ -95,19 +98,52 @@ def reviewPageFunctionBaseView(request):
 
             else: noCode = 1064; barCodeCreate = CodeName + str(noCode)
 
-            ReviewAndRating(username = uNameData | 'none', userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter | 'Good Service Support', userStar = userStarEnter, userCategoryForRating = userCategoryForRatingEnter).save()
+            ReviewAndRating(username = uNameData, userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter or 'Good Service Support', userStar = userStarEnter, userCategoryForRating = str(userCategoryForRatingEnter)).save()
             ReviewBarcode(barCode = barCodeCreate).save()
 
             return redirect('taxi_app:review')
         
-        if len(RarLst) > 0:
-            newRar = newRar + [DataInRar for DataInRar in RarLst if uNameData != DataInRar.username]
-            
-        context = {'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : newRar}
+        if len(RarLst) > 0: newRar = newRar + [DataInRar for DataInRar in RarLst if uNameData != DataInRar.username]
+
+        operationUser = []
+        for i in newRar:
+            uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
+        fullReviewLst = zip(newRar, operationUser)
+
+        # review count 
+        CountData = [i.userStar for i in RarLst]; TotalReview = sum(CountData); TotalCount = len(CountData); 
+
+        if TotalCount != 0: averageStarRating = TotalReview / TotalCount; totalOutOf = round(averageStarRating, 1)
+        else: totalOutOf = 0
+
+        countFiveStar = PointCount(RarLst=RarLst, values=5); countFourStar = PointCount(RarLst=RarLst, values=4); countThreeStar = PointCount(RarLst=RarLst, values=3); countTwoStar = PointCount(RarLst=RarLst, values=2); countOneStar = PointCount(RarLst=RarLst, values=1)
+        
+        if TotalCount != 0: styleFive = countFiveStar / TotalCount * 100; styleFour = countFourStar / TotalCount * 100; styleThree = countThreeStar / TotalCount * 100; styleTwo = countTwoStar / TotalCount * 100; styleOne = countOneStar / TotalCount * 100
+        else: styleFive = 0; styleFour = 0; styleThree = 0; styleTwo = 0; styleOne = 0
+
+        context = { 'buttonData' : buttonData, 'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
+        
         return render(request, 'footer/review.html', context)
     
     else:
-        return redirect('driver:customerLogin')
+        showData = False; buttonData = False; RarLst = ReviewAndRating.objects.all(); newRar = [DataInRar for DataInRar in RarLst]; operationUser = []
+        for i in newRar:
+            uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
+        fullReviewLst = zip(newRar, operationUser)
+        # review count 
+        CountData = [i.userStar for i in RarLst]; TotalReview = sum(CountData); TotalCount = len(CountData); 
+
+        if TotalCount != 0: averageStarRating = TotalReview / TotalCount; totalOutOf = round(averageStarRating, 1)
+        else: totalOutOf = 0
+
+        countFiveStar = PointCount(RarLst=RarLst, values=5); countFourStar = PointCount(RarLst=RarLst, values=4); countThreeStar = PointCount(RarLst=RarLst, values=3); countTwoStar = PointCount(RarLst=RarLst, values=2); countOneStar = PointCount(RarLst=RarLst, values=1)
+        
+        if TotalCount != 0: styleFive = countFiveStar / TotalCount * 100; styleFour = countFourStar / TotalCount * 100; styleThree = countThreeStar / TotalCount * 100; styleTwo = countTwoStar / TotalCount * 100; styleOne = countOneStar / TotalCount * 100
+        else: styleFive = 0; styleFour = 0; styleThree = 0; styleTwo = 0; styleOne = 0
+        
+        messages.info(request, 'To post a review in BigTaxi. Login, Now!')
+        context = { 'buttonData' : buttonData, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
+        return render(request, 'footer/review.html', context)
 
 def PinFunction(dataPresentLst):
     dataOfPinLst = []

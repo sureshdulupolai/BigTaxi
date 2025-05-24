@@ -5,51 +5,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Review Post Page</title>
+  <link rel="stylesheet" href="../../static/css/review.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: #f8f9fa;
-    }
-    .review-box {
-      max-width: 700px;
-      margin: 50px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .star-rating {
-      font-size: 2rem;
-      direction: rtl;
-      display: inline-flex;
-    }
-    .star-rating input {
-      display: none;
-    }
-    .star-rating label {
-      color: #ccc;
-      cursor: pointer;
-    }
-    .star-rating input:checked ~ label,
-    .star-rating label:hover,
-    .star-rating label:hover ~ label {
-      color: orange;
-    }
-    .form-control:focus {
-      box-shadow: 0 1px 0 #007bff;
-      border-color: #007bff;
-    }
-    .rating-summary-bar {
-      height: 15px;
-      background: #ccc;
-      border-radius: 5px;
-    }
-    .rating-fill {
-      height: 15px;
-      background: #007bff;
-      border-radius: 5px;
-    }
-  </style>
 </head>
 <body>
 
@@ -85,7 +42,11 @@
 
         <div class="d-flex justify-content-end">
         <button type="button" class="btn btn-light me-2">Cancel</button>
-        <button type="submit" class="btn btn-primary">Post</button>
+        {% if user.is_authenticated %}
+          <button type="submit" class="btn btn-primary">Post</button>
+        {% else %}
+          <a href="{% url 'driver:customerLogin' %}" class="btn btn-primary">Post</a>
+        {% endif %}
         </div>
     </div>
     </form>
@@ -96,26 +57,52 @@
   <div class="container mb-5 mt-4">
     <div class="row">
       <div class="col-md-6">
-        <h1 class="fw-bold">4.9 <small class="fs-5">Out of 5 Stars</small></h1>
-        <div class="text-warning fs-4">★★★★★</div>
-        <p>Overall rating of <a href="#">8 1st-party reviews</a></p>
+        <h1 class="fw-bold">{{ totalOutOf }} <small class="fs-5">Out of 5 Stars</small></h1>
+        <div id="star-rating" class="text-warning fs-4"></div>
+
+        <p>Overall rating <a href="#">8 1st-party reviews</a></p>
 
         <!-- Rating Bars -->
         <div class="d-flex align-items-center">
           <div class="me-2">5 Stars</div>
           <div class="flex-grow-1 me-2 rating-summary-bar">
-            <div class="rating-fill" style="width: 90%;"></div>
+            <div class="rating-fill" style="width: {{ styleFive }}%;"></div>
           </div>
-          <div>7</div>
+          <div>{{ countFiveStar }}</div>
         </div>
+
         <div class="d-flex align-items-center">
           <div class="me-2">4 Stars</div>
           <div class="flex-grow-1 me-2 rating-summary-bar">
-            <div class="rating-fill" style="width: 10%;"></div>
+            <div class="rating-fill" style="width: {{ styleFour }}%;"></div>
           </div>
-          <div>1</div>
+          <div>{{ countFourStar }}</div>
         </div>
-        <!-- Optional: 3, 2, 1 Star rows -->
+
+        <div class="d-flex align-items-center">
+          <div class="me-2">4 Stars</div>
+          <div class="flex-grow-1 me-2 rating-summary-bar">
+            <div class="rating-fill" style="width: {{ styleThree }}%;"></div>
+          </div>
+          <div>{{ countThreeStar }}</div>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <div class="me-2">4 Stars</div>
+          <div class="flex-grow-1 me-2 rating-summary-bar">
+            <div class="rating-fill" style="width: {{ styleTwo }}%;"></div>
+          </div>
+          <div>{{ countTwoStar }}</div>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <div class="me-2">4 Stars</div>
+          <div class="flex-grow-1 me-2 rating-summary-bar">
+            <div class="rating-fill" style="width: {{ styleOne }}%;"></div>
+          </div>
+          <div>{{ countOneStar }}</div>
+        </div>
+        
       </div>
 
       <div class="col-md-6">
@@ -127,30 +114,58 @@
   <!-- User Review Cards -->
   <div class="container">
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        
     {% if Rar %}
-      <div class="col">
-        <div class="card h-100">
+      {% for Rar, DL in Rar %}
+        <div class="col">
+          <div class="card h-100 d-flex flex-column justify-content-between">
             <div class="card-body">
-            <div class="d-flex align-items-center mb-2">
+              <div class="d-flex align-items-center">
                 <div style="width: 40px; height: 40px; overflow: hidden; border-radius: 50%; margin-right: 10px;">
-                <img src="/media/{{ image }}" alt="User Image" style="width: 100%; height: 100%; object-fit: cover;">
+                  <img src="/media/{{ image }}" alt="User Image" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div>
-                <h6 class="card-title mb-0">Dwayne Dean</h6>
-                <small class="text-muted">1 month ago</small>
+                  <h6 class="card-title">{{ DL.0 }}</h6>
+                  <small class="text-muted">1 month ago</small>
                 </div>
-            </div>
-            <div class="text-warning mb-2">★★★★★</div>
-            <p class="card-text">The guys showed up on time, they were about their business. <a href="#" style="text-decoration: none;">Read more</a></p>
-            <p class="text-muted">Posted on <strong>BigTaxi</strong></p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+              </div>
 
+              <div class="text-warning">
+                {% for i in "12345"|make_list %}
+                  {% if forloop.counter <= DL.2 %}
+                    ★
+                  {% else %}
+                    ☆
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <p class="card-text">
+                <span class="short-text">{{ Rar.userReview|truncatewords:14 }}</span>
+                <span class="full-text d-none">{{ Rar.userReview }}</span>
+                <br class="toggle-break d-none">
+                <a href="#" class="toggle-text text-primary text-decoration-none">Read more</a>
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center">
+              <p class="text-muted mb-0">
+                Posted on <br><strong><a href="#">BigTaxi</a></strong>
+              </p>
+
+              {% if buttonData %}
+                <button class="btn btn-sm mt-4">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              {% endif %}
+            </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
     </div>
   </div>
+
+  <script src="../../static/js/review.js"></script>
 
 </body>
 </html>
