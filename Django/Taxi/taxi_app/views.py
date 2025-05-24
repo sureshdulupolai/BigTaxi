@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from taxi_app.models import TaxiBarCode, PinTaxiAvailable
 from django.contrib.auth.models import User
-from Users.models import usersDataModel
+from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode
 from django.contrib import messages
 from datetime import datetime
 from django.http import JsonResponse
@@ -24,13 +24,29 @@ def redirect_based_on_location(request):
 
 # Create your views here.
 def HomePageForTaxiAppViewFunction(request):
-    context = navbar(request)
-    city = context.get("userModelDataCityis")
-    state = context.get("userModelDataStateis")
-    userCategory = context.get('userCategoryis')
-    DataOfPinTaxiLst = []
+    if request.user.is_authenticated:
+        dataFromNavBar = navbar(request)
+        city = dataFromNavBar.get("userModelDataCityis")
+        state = dataFromNavBar.get("userModelDataStateis")
+        userCategory = dataFromNavBar.get('userCategoryis')
+        userBarCode = dataFromNavBar.get('userBarCodeAccessis')
+        DataOfPinTaxiLst = []
 
-    # if userCategory == 'Driver':
+        # if userCategory == 'Driver':
+        if request.method == "POST":
+            updateCity = request.POST.get('city')
+            updateState = request.POST.get('state')
+            UDM = usersDataModel.objects.get(UserCode = userBarCode)
+            UDM.UserCity = updateCity
+            UDM.UserState = updateState
+            UDM.save()
+
+            return redirect('taxi_app:home')
+        
+    else:
+        city = request.session.get('userDataCityis', 'defaultCity')
+        state = request.session.get('userDataStateis', 'defaultState')
+
     DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity=city)
     if not DataOfPinTaxiLst:
         DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=state)
@@ -42,45 +58,56 @@ def HomePageForTaxiAppViewFunction(request):
     }
     return render(request, 'main/home.html', context)
 
+
 def locationPageFunctionViewBase(request):
     if request.method == "POST":
         city = request.POST.get('uCity'); state = request.POST.get('uState')
         if request.user.is_authenticated:
             uModelData = User.objects.get(username = request.user.username); UDM_Model_Data = usersDataModel.objects.get(ULink = uModelData)
             UDM_Model_Data.UserCity = city; UDM_Model_Data.UserState = state; UDM_Model_Data.save()
+        else:
+            request.session['userDataCityis'] = city
+            request.session['userDataStateis'] = state
+
         return redirect('taxi_app:home')
     return render(request, 'main/checkLocation.html')
 
-# if request.method == "POST" and request.user.is_authenticated:
-    #     try:
-    #         data = json.loads(request.body)
-    #         userCategory = data.get('category')
-    #         userStateByWindow = data.get('state').lower()
-    #         userCityByWindow = data.get('city').lower()
-
-    #         if userCategory == 'Driver':
-    #             DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity=userCityByWindow)
-    #             if not DataOfPinTaxiLst:
-    #                 DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=userStateByWindow)
-    #                 valueCheckInJs = '1'
-    #                 print('Enter Lst')
-    #                 print(DataOfPinTaxiLst)
-    #         # For POST requests, better to return JSON response with data
-    #         # So frontend fetch can handle it easily
-    #         return JsonResponse({
-    #             'DataOfPinTaxiLst': list(DataOfPinTaxiLst.values()),  # convert queryset to list of dicts
-    #         })
-
-    #     except json.JSONDecodeError:
-    #         print("Invalid JSON received")
-    #         return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
 
 def reviewPageFunctionBaseView(request):
-    if request.user.is_authenticated: 
-        return HttpResponse('review page')
+    if request.user.is_authenticated:
+        showData = True; uNameData = request.user.username
+        U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
+        IMG = data.UProfileImage; userName = data.UProfileName
+
+        RarLst = ReviewAndRating.objects.all()
+        newRar = [DataInRar for DataInRar in RarLst if uNameData == DataInRar.username]
+        if len(newRar) == 1: showData = False
+        
+        if request.method == 'POST':
+            userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating')
+            RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
+            
+            if len(RBCLst) != 0:
+                RBC = [DataInRBC for DataInRBC in RBCLst]; DataLst = str(RBC[len(RBC) - 1]); newCodes = ''
+                for i in DataLst:
+                    if i.isdigit(): newCodes += i
+                barCodeCreate = CodeName + str(int(newCodes) + 1)
+
+            else: noCode = 1064; barCodeCreate = CodeName + str(noCode)
+
+            ReviewAndRating(username = uNameData | 'none', userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter | 'Good Service Support', userStar = userStarEnter, userCategoryForRating = userCategoryForRatingEnter).save()
+            ReviewBarcode(barCode = barCodeCreate).save()
+
+            return redirect('taxi_app:review')
+        
+        if len(RarLst) > 0:
+            newRar = newRar + [DataInRar for DataInRar in RarLst if uNameData != DataInRar.username]
+            
+        context = {'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : newRar}
+        return render(request, 'footer/review.html', context)
+    
     else:
-        return redirect('driver:login')
+        return redirect('driver:customerLogin')
 
 def PinFunction(dataPresentLst):
     dataOfPinLst = []

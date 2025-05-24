@@ -24,52 +24,62 @@
 <footer class="bg-white shadow-sm mt-5 py-3">
   <div class="container-xxl">
     <div class="row text-center text-md-start d-flex align-items-center justify-content-center ms-5">
+
+      <!-- Big Taxi Column with right margin -->
+      <div class="col-6 col-md-2 mb-2">
+        <h5 class="fw-bold">Big Taxi</h5>
+
+        {% if user.is_authenticated %}
+          <span class="d-block mb-1"><a href="{% url 'taxi_app:autoRedirect' %}" class="a-footer-tag">Home</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Review</a></span>
+          <span class="d-block mb-1"><a href="{% url 'driver:inforamtion' %}" class="a-footer-tag">More Information</a></span>
+          <span class="d-block mb-1"><a href="{% url 'driver:logOut' %}" class="a-footer-tag">Logout</a></span>
+        {% else %}
+          <span class="d-block mb-1"><a href="{% url 'taxi_app:lan' %}" class="a-footer-tag">Home</a></span>
+          <span class="d-block mb-1"><a href="{% url 'driver:inforamtion' %}" class="a-footer-tag">More Information</a></span>
+        {% endif %}
+      </div>
       
       <!-- Customer Column with left margin -->
-      <div class="col-6 col-md-2 mb-4 ms-md-3 ms-2">
+      <div class="col-6 col-md-2 mb-2 ms-md-3 ms-2">
         <h5 class="fw-bold">Customer</h5>
-        <span class="d-block mb-1"><a href="{% url 'driver:customerLogin' %}" class="a-footer-tag">Login</a></span>
-        <span class="d-block mb-1"><a href="{% url 'driver:customerSignup' %}" class="a-footer-tag">Signup</a></span>
+        
         {% if user.is_authenticated %}
+            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Pin Taxi</a></span>
+            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Pin Status</a></span>
             <span class="d-block mb-1"><a href="#" class="a-footer-tag">Book Taxi</a></span>
+            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Check Review</a></span>
         {% else %}
-            <span class="d-block mb-1 un-login">Book Taxi</span>
+          <span class="d-block mb-1"><a href="{% url 'driver:customerLogin' %}" class="a-footer-tag">Login</a></span>
+          <span class="d-block mb-1"><a href="{% url 'driver:customerSignup' %}" class="a-footer-tag">Signup</a></span>
         {% endif %}
       </div>
 
       <!-- Driver Column -->
-      <div class="col-6 col-md-2 mb-4">
+      <div class="col-6 col-md-2 mb-2">
         <h5 class="fw-bold">Driver</h5>
-        <span class="d-block mb-1"><a href="{% url 'driver:driverLogin' %}" class="a-footer-tag">Login</a></span>
-        <span class="d-block mb-1"><a href="{% url 'driver:driverSignup' %}" class="a-footer-tag">Signup</a></span>
+
         {% if user.is_authenticated %}
-            <span class="d-block mb-1"><a href="#" class="a-footer-tag">Taxi Rent</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Taxi Rent</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Taxi Call</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Accepted</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Check Review</a></span>
         {% else %}
-            <span class="d-block mb-1 un-login">Taxi Rent</span>
+          <span class="d-block mb-1"><a href="{% url 'driver:driverLogin' %}" class="a-footer-tag">Login</a></span>
+        <span class="d-block mb-1"><a href="{% url 'driver:driverSignup' %}" class="a-footer-tag">Signup</a></span>
         {% endif %}
       </div>
 
       <!-- Developer Column -->
-      <div class="col-6 col-md-2 mb-4">
+      <div class="col-6 col-md-2 mb-2">
         <h5 class="fw-bold">Developer</h5>
-        <span class="d-block mb-1"><a href="{% url 'driver:developerLogin' %}" class="a-footer-tag">Login</a></span>
+        
+        {% if user.is_authenticated %}
+          <span class="d-block mb-1"><a href="{% url 'taxi_app:review' %}" class="a-footer-tag">Data access</a></span>
+          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Check Review</a></span>
+        {% else %}
+          <span class="d-block mb-1"><a href="{% url 'driver:developerLogin' %}" class="a-footer-tag">Login</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:developerSigup' %}" class="a-footer-tag">Signup</a></span>
-        {% if user.is_authenticated %}
-            <span class="d-block mb-1"><a href="{% url 'taxi_app:review' %}" class="a-footer-tag">Data access</a></span>
-        {% else %}
-            <span class="d-block mb-1 un-login">Data access</span>
-        {% endif %}
-      </div>
-
-      <!-- Big Taxi Column with right margin -->
-      <div class="col-6 col-md-2 mb-4">
-        <h5 class="fw-bold">Big Taxi</h5>
-        <span class="d-block mb-1"><a href="#" class="a-footer-tag">Home</a></span>
-        <span class="d-block mb-1"><a href="{% url 'driver:inforamtion' %}" class="a-footer-tag">More Information</a></span>
-        {% if user.is_authenticated %}
-            <span class="d-block mb-1"><a href="{% url 'taxi_app:review' %}" class="a-footer-tag">Review</a></span>
-        {% else %}
-            <span class="d-block mb-1 un-login">Review</span>
         {% endif %}
       </div>
 

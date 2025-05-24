@@ -5,69 +5,103 @@
     border: 1px solid white;
     color: white;
   } */
+   .height-to-button-location{
+    height: 30px !important;
+   }
+   .text-inside-location-button{
+    position: relative;
+    top: -5px;
+   }
 </style>
-<div
-  class="bg-light border-bottom d-flex justify-content-between align-items-center px-3 py-2"
-  style="height: 45px"
->
-  <div class="d-flex align-items-center mt-1 mb-1">
-    <i class="bi bi-geo-alt-fill text-primary me-2"></i>
-    <span id="current-location-text" class="fw-medium"
-      >{{ city }}, {{ state }}</span
-    >
-    <input
-      type="text"
-      id="edit-location-input"
-      class="form-control form-control-sm d-none ms-2"
-      style="max-width: 250px"
-      placeholder="Enter new location"
-    />
+<form method="POST" action="" class="w-100">
+  {% csrf_token %}
+  <div
+    class="bg-light border-bottom d-flex justify-content-between align-items-center px-3 py-2"
+    style="height: 45px"
+  >
+    <div class="d-flex align-items-center mt-1 mb-1">
+      <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+      <span id="current-location-text" class="fw-medium">{{ city }}, {{ state }}</span>
+
+      <input
+        type="text"
+        name="city"
+        id="edit-location-input"
+        class="form-control form-control-sm d-none ms-2"
+        style="max-width: 300px"
+        placeholder="City"
+        value="{{ city }}"
+      />
+      <input
+        type="text"
+        name="state"
+        id="edit-state-input"
+        class="form-control form-control-sm d-none ms-2"
+        style="max-width: 200px"
+        placeholder="State"
+        value="{{ state }}"
+      />
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-1 mb-1">
+      {% if user.is_authenticated %}
+        <button type="button" class="btn btn-warning height-to-button-location" id="change-location-btn">
+          <span class="text-inside-location-button">
+            Change Location
+          </span>
+        </button>
+        <button type="submit" class="btn btn-sm btn-success d-none" id="save-location-btn">
+          Save
+        </button>
+      {% else %}
+        <a href="{% url 'taxi_app:lan' %}" class="btn btn-danger height-to-button-location">
+          <span class="text-inside-location-button">
+            Change Location
+          </span>
+        </a>
+      {% endif %}
+    </div>
   </div>
-  <div class="d-flex align-items-center gap-2 mt-1 mb-1">
-    <button class="btn btn-sm btn-outline-secondary" id="change-location-btn">
-      Change
-    </button>
-    <button class="btn btn-sm btn-success d-none" id="save-location-btn">
-      Save
-    </button>
-  </div>
-</div>
+</form>
 
 
 {% if DataOfPinTaxiLst %}
-{% for DPT in DataOfPinTaxiLst %}
-<!-- Main Profile Card -->
-<div class="container-xxl my-3">
-  <div
-    class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap"
-  >
-    <!-- Profile Image -->
-    <div class="me-4 mb-3 mb-md-0">
-      <img
-        src="../../media/customer/default/logo.png"
-        alt="User Profile"
-        class="rounded-circle"
-        style="width: 100px; height: 100px; object-fit: cover"
-      />
-    </div>
+  {% for DPT in DataOfPinTaxiLst %}
+  <!-- Main Profile Card -->
+  <div class="container-xxl my-3">
+    <div
+      class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap"
+    >
+      <!-- Profile Image -->
+      <div class="me-4 mb-3 mb-md-0">
+        <img
+          src="../../media/customer/default/logo.png"
+          alt="User Profile"
+          class="rounded-circle"
+          style="width: 100px; height: 100px; object-fit: cover"
+        />
+      </div>
 
-    <!-- User Info -->
-    <div class="me-auto">
-      <h4 class="mb-1">Username</h4>
-      <p class="text-muted mb-0">pick up: {{ DPT.currentLocation|truncatewords:16 }}</p>
-      <p class="text-muted mb-0">drop to: {{ DPT.toLocation|truncatewords:16 }}</p>
-      <p class="text-muted mb-0">passenger: {{ DPT.taxiPassenger }}</p>
-      <p class="text-muted mb-0">date & time: {{ DPT.taxiDateAndTimeByUser }}</p>
-    </div>
+      <!-- User Info -->
+      <div class="me-auto">
+        <h4 class="mb-1">Username</h4>
+        <p class="text-muted mb-0">pick up: {{ DPT.currentLocation|truncatewords:16 }}</p>
+        <p class="text-muted mb-0">drop to: {{ DPT.toLocation|truncatewords:16 }}</p>
+        <p class="text-muted mb-0">passenger: {{ DPT.taxiPassenger }}</p>
+        <p class="text-muted mb-0">date & time: {{ DPT.taxiDateAndTimeByUser }}</p>
+      </div>
 
-    <!-- Book Taxi Button -->
-    <div class="mt-3 mt-md-0">
-      <a href="#" class="btn btn-warning button-home">Accept</a>
-      <a href="#" class="btn btn-danger button-home">Details</a>
+      <!-- Book Taxi Button -->
+      <div class="mt-3 mt-md-0">
+        {% if user.is_authenticated %}
+          <a href="#" class="btn btn-warning button-home">Accept</a>
+          <a href="#" class="btn btn-danger button-home">Details</a>
+        {% else %}
+          <a href="{% url 'driver:driverLogin' %}" class="btn btn-danger button-home">Details</a>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
-{% endfor %}
+  {% endfor %}
 {% else %}
 <div class="container mt-5">
   <div class="alert text-center" id="else-block-driver">
@@ -75,32 +109,21 @@
   </div>
 </div>
 {% endif %}
+
 <script>
   const changeBtn = document.getElementById("change-location-btn");
   const saveBtn = document.getElementById("save-location-btn");
-  const input = document.getElementById("edit-location-input");
+  const cityInput = document.getElementById("edit-location-input");
+  const stateInput = document.getElementById("edit-state-input");
   const displayText = document.getElementById("current-location-text");
 
   changeBtn.addEventListener("click", () => {
-    input.classList.remove("d-none");
+    cityInput.classList.remove("d-none");
+    stateInput.classList.remove("d-none");
     saveBtn.classList.remove("d-none");
     displayText.classList.add("d-none");
-    input.value = displayText.textContent.trim();
-    input.focus();
+    cityInput.focus();
   });
-
-  saveBtn.addEventListener("click", () => {
-    const newLocation = input.value.trim();
-    if (newLocation) {
-      displayText.textContent = newLocation;
-      
-      // Optionally send to backend via fetch()
-    }
-    input.classList.add("d-none");
-    saveBtn.classList.add("d-none");
-    displayText.classList.remove("d-none");
-  });
-
 </script>
 
 {% endblock %}

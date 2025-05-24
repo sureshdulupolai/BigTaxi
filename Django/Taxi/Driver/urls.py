@@ -16,4 +16,6 @@ urlpatterns = [
 
     path('more-information/', views.moreInformationsFunctionBaseView, name='inforamtion'),
     path('page-not-found/', views.pageNotFoundFunctionsBaseView),
+
+    path('log-out/', views.logOutPageFunctionBaseView, name='logOut'),
 ]

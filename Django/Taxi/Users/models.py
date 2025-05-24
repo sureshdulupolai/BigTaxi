@@ -29,6 +29,26 @@ class usersDataModel(models.Model):
     UserPass = models.CharField(max_length=1000, default='password')
     CouponCode = models.CharField(max_length=50, null=True, blank=True)
     UProfileImage = models.ImageField(upload_to='profile/main/', default='profile/default/default.png')
+    UProfileName = models.CharField(max_length=1000, default='BiXTaxi User')
 
     def __str__(self):
-        return str(self.UserMobileNo)
+        return f"{self.UserMobileNo} : {self.UserCategory}"
+
+class ReviewAndRating(models.Model):
+    username = models.CharField(max_length=500)
+    userCode = models.CharField(max_length=100)
+    ratingBarCode = models.CharField(max_length=1000)
+    userReview = models.CharField(max_length=5000)
+    userStar = models.IntegerField(default=0)
+    ratingDate = models.DateField(auto_now_add=True)
+    ratingTime = models.TimeField(auto_now_add=True)
+    userCategoryForRating = models.CharField(max_length=100, default='Customer')
+
+    def __str__(self):
+        return f"{self.username} : {self.ratingBarCode} : {self.ratingDate}"
+    
+class ReviewBarcode(models.Model):
+    barCode = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return f"{self.barCode}"

@@ -6,6 +6,7 @@ from Driver.models import driverDataModel, DriverModelStore
 from Users.models import usersDataModel
 from Customer.models import cutomerDataModel
 from django.contrib.auth import login
+from django.contrib.auth import logout
 
 # login
 def driverLoginFunctionBaseView(request):
@@ -328,3 +329,13 @@ def moreInformationsFunctionBaseView(request):
 
 def pageNotFoundFunctionsBaseView(request):
     return render(request, 'more/pageNotFound.html')
+
+# logout Function
+def logOutPageFunctionBaseView(request):
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            logout(request)
+            return redirect('taxi_app:lan')
+        return render(request, 'logOut.html')
+    else:
+        return render(request, 'more/pageNotFound.html')
