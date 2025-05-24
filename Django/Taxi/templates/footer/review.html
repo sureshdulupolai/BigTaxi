@@ -37,7 +37,8 @@
         <input type="radio" id="star2" name="uStar" value="2"><label for="star2">★</label>
         <input type="radio" id="star1" name="uStar" value="1"><label for="star1">★</label>
         </div>
-
+        
+        <input type="hidden" name="formData" value="valueformForSamePage">
         <textarea class="form-control mb-3" name="uReview" rows="4" placeholder="Share details of your own experience at this place"></textarea>
 
         <div class="d-flex justify-content-end">
@@ -80,7 +81,7 @@
         </div>
 
         <div class="d-flex align-items-center">
-          <div class="me-2">4 Stars</div>
+          <div class="me-2">3 Stars</div>
           <div class="flex-grow-1 me-2 rating-summary-bar">
             <div class="rating-fill" style="width: {{ styleThree }}%;"></div>
           </div>
@@ -88,7 +89,7 @@
         </div>
 
         <div class="d-flex align-items-center">
-          <div class="me-2">4 Stars</div>
+          <div class="me-2">2 Stars</div>
           <div class="flex-grow-1 me-2 rating-summary-bar">
             <div class="rating-fill" style="width: {{ styleTwo }}%;"></div>
           </div>
@@ -96,7 +97,7 @@
         </div>
 
         <div class="d-flex align-items-center">
-          <div class="me-2">4 Stars</div>
+          <div class="me-2">1 Stars</div>
           <div class="flex-grow-1 me-2 rating-summary-bar">
             <div class="rating-fill" style="width: {{ styleOne }}%;"></div>
           </div>
@@ -115,7 +116,7 @@
   <div class="container">
     <div class="row row-cols-1 row-cols-md-3 g-4">
     {% if Rar %}
-      {% for Rar, DL in Rar %}
+      {% for Rar, DL, BT in Rar %}
         <div class="col">
           <div class="card h-100 d-flex flex-column justify-content-between">
             <div class="card-body">
@@ -151,11 +152,17 @@
                 Posted on <br><strong><a href="#">BigTaxi</a></strong>
               </p>
 
-              {% if buttonData %}
-                <button class="btn btn-sm mt-4">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+              {% if BT %}
+                <form method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="formData" value="formToNextPage">
+                  <input type="hidden" name="dataInHid" value="{{ BarCodeOfRating }}">
+                  <button class="btn btn-sm mt-4">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </form>
               {% endif %}
+              
             </div>
             </div>
           </div>

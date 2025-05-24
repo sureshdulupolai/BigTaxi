@@ -77,38 +77,45 @@ def PointCount(RarLst, values = 1):
 
 def reviewPageFunctionBaseView(request):
     if request.user.is_authenticated:
-        showData = True; buttonData = False; uNameData = request.user.username
+        showData = True; buttonData = []; uNameData = request.user.username
         U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
         IMG = data.UProfileImage; userName = data.UProfileName
 
         RarLst = ReviewAndRating.objects.all()
         newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
 
-        if newRar: showData = False; buttonData = True
-
+        if newRar: showData = False; buttonData += [1]; BarCodeOfRating = [DataInNewRar.ratingBarCode for DataInNewRar in newRar][0]
     
         if request.method == 'POST':
-            userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating'); RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
-            
-            if len(RBCLst) != 0:
-                RBC = [DataInRBC for DataInRBC in RBCLst]; DataLst = str(RBC[len(RBC) - 1]); newCodes = ''
-                for i in DataLst:
-                    if i.isdigit(): newCodes += i
-                barCodeCreate = CodeName + str(int(newCodes) + 1)
+            typeOfForm = request.POST.get("formData")
 
-            else: noCode = 1064; barCodeCreate = CodeName + str(noCode)
+            if typeOfForm == "valueformToNextPage":
+                barCode = request.POST.get('')
+                pass
 
-            ReviewAndRating(username = uNameData, userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter or 'Good Service Support', userStar = userStarEnter, userCategoryForRating = str(userCategoryForRatingEnter)).save()
-            ReviewBarcode(barCode = barCodeCreate).save()
+            elif typeOfForm == "valueformForSamePage":
+                userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating'); RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
+                
+                if len(RBCLst) != 0:
+                    RBC = [DataInRBC for DataInRBC in RBCLst]; DataLst = str(RBC[len(RBC) - 1]); newCodes = ''
+                    for i in DataLst:
+                        if i.isdigit(): newCodes += i
+                    barCodeCreate = CodeName + str(int(newCodes) + 1)
 
-            return redirect('taxi_app:review')
+                else: noCode = 1064; barCodeCreate = CodeName + str(noCode)
+
+                ReviewAndRating(username = uNameData, userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter or 'Good Service Support', userStar = userStarEnter, userCategoryForRating = str(userCategoryForRatingEnter)).save()
+                ReviewBarcode(barCode = barCodeCreate).save()
+
+                return redirect('taxi_app:review')
         
         if len(RarLst) > 0: newRar = newRar + [DataInRar for DataInRar in RarLst if uNameData != DataInRar.username]
 
         operationUser = []
         for i in newRar:
             uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
-        fullReviewLst = zip(newRar, operationUser)
+            buttonData += [0]
+        fullReviewLst = zip(newRar, operationUser, buttonData)
 
         # review count 
         CountData = [i.userStar for i in RarLst]; TotalReview = sum(CountData); TotalCount = len(CountData); 
@@ -121,7 +128,7 @@ def reviewPageFunctionBaseView(request):
         if TotalCount != 0: styleFive = countFiveStar / TotalCount * 100; styleFour = countFourStar / TotalCount * 100; styleThree = countThreeStar / TotalCount * 100; styleTwo = countTwoStar / TotalCount * 100; styleOne = countOneStar / TotalCount * 100
         else: styleFive = 0; styleFour = 0; styleThree = 0; styleTwo = 0; styleOne = 0
 
-        context = { 'buttonData' : buttonData, 'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
+        context = { 'BarCodeOfRating' : BarCodeOfRating, 'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
         
         return render(request, 'footer/review.html', context)
     
@@ -129,7 +136,8 @@ def reviewPageFunctionBaseView(request):
         showData = False; buttonData = False; RarLst = ReviewAndRating.objects.all(); newRar = [DataInRar for DataInRar in RarLst]; operationUser = []
         for i in newRar:
             uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
-        fullReviewLst = zip(newRar, operationUser)
+            buttonData += [0]
+        fullReviewLst = zip(newRar, operationUser, buttonData)
         # review count 
         CountData = [i.userStar for i in RarLst]; TotalReview = sum(CountData); TotalCount = len(CountData); 
 
@@ -142,8 +150,12 @@ def reviewPageFunctionBaseView(request):
         else: styleFive = 0; styleFour = 0; styleThree = 0; styleTwo = 0; styleOne = 0
         
         messages.info(request, 'To post a review in BigTaxi. Login, Now!')
-        context = { 'buttonData' : buttonData, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
+        context = { 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
         return render(request, 'footer/review.html', context)
+    
+def deleteReviewFunctionBaseView(request):
+    pass
+
 
 def PinFunction(dataPresentLst):
     dataOfPinLst = []
