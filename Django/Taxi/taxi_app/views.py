@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from taxi_app.models import TaxiBarCode, PinTaxiAvailable
 from django.contrib.auth.models import User
-from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode
+from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete
 from django.contrib import messages
 from datetime import datetime
 from django.http import JsonResponse
@@ -77,7 +77,7 @@ def PointCount(RarLst, values = 1):
 
 def reviewPageFunctionBaseView(request):
     if request.user.is_authenticated:
-        showData = True; buttonData = []; uNameData = request.user.username
+        showData = True; buttonData = []; uNameData = request.user.username; BarCodeOfRating = []
         U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
         IMG = data.UProfileImage; userName = data.UProfileName
 
@@ -89,9 +89,10 @@ def reviewPageFunctionBaseView(request):
         if request.method == 'POST':
             typeOfForm = request.POST.get("formData")
 
-            if typeOfForm == "valueformToNextPage":
-                barCode = request.POST.get('')
-                pass
+            if typeOfForm == "formToNextPage":
+                barCode = request.POST.get('dataInHid')
+                request.session['userRatingCode'] = barCode
+                return redirect('taxi_app:deleteReview')
 
             elif typeOfForm == "valueformForSamePage":
                 userCodeEnter = request.POST.get('uCode'); userReviewEnter = request.POST.get('uReview'); userStarEnter = int(request.POST.get('uStar')); userCategoryForRatingEnter = request.POST.get('uCategoryForRating'); RBCLst = ReviewBarcode.objects.all(); CodeName = 'REVIEWCODE'; barCodeCreate = ''; 
@@ -133,7 +134,7 @@ def reviewPageFunctionBaseView(request):
         return render(request, 'footer/review.html', context)
     
     else:
-        showData = False; buttonData = False; RarLst = ReviewAndRating.objects.all(); newRar = [DataInRar for DataInRar in RarLst]; operationUser = []
+        showData = False; buttonData = []; RarLst = ReviewAndRating.objects.all(); newRar = [DataInRar for DataInRar in RarLst]; operationUser = []
         for i in newRar:
             uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
             buttonData += [0]
@@ -154,8 +155,29 @@ def reviewPageFunctionBaseView(request):
         return render(request, 'footer/review.html', context)
     
 def deleteReviewFunctionBaseView(request):
-    pass
+    if request.user.is_authenticated:
+        DataInBar = request.session.get('userRatingCode', False)
 
+        if DataInBar:
+
+            if request.method == "POST":
+
+                try:
+                    RR = ReviewAndRating.objects.get(ratingBarCode = DataInBar); ReviewDelete(usernames = request.user.username, rCode = RR.ratingBarCode, uCode = RR.userCode, rStar = RR.userStar, rReview = RR.userReview, userCategorySection = RR.userCategoryForRating).save(); RR.delete()
+                    return redirect('taxi_app:review')
+                
+                except:
+                    messages.warning(request, "You can't delete a review. you don't have access to delete")
+                    return render(request, 'more/pageNotFound.html')
+                
+            return render(request, 'footer/deleteReview.html')
+        
+        else:
+            messages.warning(request, "You can't reach this page for now.")
+            return render(request, 'more/pageNotFound.html')
+        
+    else:
+        return redirect('driver:customerLogin')
 
 def PinFunction(dataPresentLst):
     dataOfPinLst = []

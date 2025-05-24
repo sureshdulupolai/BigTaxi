@@ -52,3 +52,16 @@ class ReviewBarcode(models.Model):
 
     def __str__(self):
         return f"{self.barCode}"
+    
+class ReviewDelete(models.Model):
+    rCode = models.CharField(max_length=100)
+    uCode = models.CharField(max_length=100)
+    usernames = models.CharField(max_length=500)
+    rStar = models.IntegerField(default=1)
+    rReview = models.CharField(max_length=5000)
+    rDate = models.DateField(auto_now_add=True)
+    ratingTime = models.TimeField(auto_now_add=True)
+    userCategorySection = models.CharField(max_length=100, default='Customer')
+
+    def __str__(self):
+        return f"{self.usernames} : {self.uCode}"
