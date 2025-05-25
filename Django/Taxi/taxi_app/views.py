@@ -26,38 +26,77 @@ def redirect_based_on_location(request):
 def HomePageForTaxiAppViewFunction(request):
     if request.user.is_authenticated:
         dataFromNavBar = navbar(request)
-        city = dataFromNavBar.get("userModelDataCityis")
-        state = dataFromNavBar.get("userModelDataStateis")
-        userCategory = dataFromNavBar.get('userCategoryis')
-        userBarCode = dataFromNavBar.get('userBarCodeAccessis')
-        DataOfPinTaxiLst = []
+        city = dataFromNavBar.get("userModelDataCityis"); state = dataFromNavBar.get("userModelDataStateis"); userCategory = dataFromNavBar.get('userCategoryis'); userBarCode = dataFromNavBar.get('userBarCodeAccessis')
+        DataOfPinTaxiLst = []; newLstOfDPTL = []
 
         # if userCategory == 'Driver':
         if request.method == "POST":
-            updateCity = request.POST.get('city')
-            updateState = request.POST.get('state')
-            UDM = usersDataModel.objects.get(UserCode = userBarCode)
-            UDM.UserCity = updateCity
-            UDM.UserState = updateState
-            UDM.save()
-
-            return redirect('taxi_app:home')
+            checkFormProcess = request.POST.get('checkForm')
+            if checkFormProcess == 'FormOneSelectByUser':
+                updateCity = request.POST.get('city'); updateState = request.POST.get('state'); UDM = usersDataModel.objects.get(UserCode = userBarCode); UDM.UserCity = updateCity; UDM.UserState = updateState
+                UDM.save()
+                return redirect('taxi_app:home')
+            elif checkFormProcess == 'FormTwoSelectByUser':
+                BarCodeDetails = request.POST.get('userPinCode')
+                request.session['userPinDetailsCodeTaxi'] = BarCodeDetails
+                return redirect('taxi_app:pinDetail', barCode= BarCodeDetails)
         
-    else:
-        city = request.session.get('userDataCityis', 'defaultCity')
-        state = request.session.get('userDataStateis', 'defaultState')
+    else: city = request.session.get('userDataCityis', 'defaultCity'); state = request.session.get('userDataStateis', 'defaultState')
 
     DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity=city)
-    if not DataOfPinTaxiLst:
-        DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=state)
+    if not DataOfPinTaxiLst: DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=state)
+
+    if DataOfPinTaxiLst: newLstOfDPTL =  [(DPTL.customerId.UProfileImage,DPTL.customerId.UProfileName or 'BigTaxi Customer') for DPTL in DataOfPinTaxiLst]
+    newDataOfBoth = zip(DataOfPinTaxiLst, newLstOfDPTL)
 
     context = {
-        'DataOfPinTaxiLst': DataOfPinTaxiLst,
+        'DataOfPinTaxiLst': newDataOfBoth,
         'city' : city.title(),
         'state' : state.title(),
     }
     return render(request, 'main/home.html', context)
 
+def pinDetailFunctionBaseView(request,barCode):
+    pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False)
+    userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'
+
+    if pinCodeHere:
+        if barCode == pinCodeHere:
+            DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere)
+            userTravelFrom = DataOfPinUser.currentLocation
+            userTravelTo = DataOfPinUser.toLocation
+            dateAndTime = DataOfPinUser.taxiDateAndTimeByUser
+            customerImage = DataOfPinUser.customerId.UProfileImage
+            customerName = DataOfPinUser.customerId.UProfileName
+            customerUsername = DataOfPinUser.customerId.ULink.username
+
+            DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
+
+            if DangerTripCount == 0:
+                verifyUser = 'Trusted'
+            elif DangerTripCount >= 0 and DangerTripCount <= 5:
+                verifyUser = 'SomeTrust'
+            elif DangerTripCount >= 6:
+                verifyUser = 'NoTrust'
+
+        else:
+            messages.warning(request ,"don't change any id of taxi details")
+            return redirect('taxi_app:autoRedirect')
+    else:
+        messages.warning(request, "can't reach this page for now!")
+        return redirect('taxi_app:autoRedirect')
+    
+    context = {
+        'userTravelFrom' : userTravelFrom,
+        'userTravelTo' : userTravelTo,
+        'passenger' : passenger,
+        'dateAndTime' : dateAndTime,
+        'customerImage' : customerImage,
+        'customerName' : customerName,
+        'customerUsername' : customerUsername,
+        'verifyUser' : verifyUser
+    }
+    return render(request, 'main/details.html', context)
 
 def locationPageFunctionViewBase(request):
     if request.method == "POST":
@@ -114,8 +153,7 @@ def reviewPageFunctionBaseView(request):
 
         operationUser = []
         for i in newRar:
-            uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
-            buttonData += [0]
+            uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]; buttonData += [0]
         fullReviewLst = zip(newRar, operationUser, buttonData)
 
         # review count 

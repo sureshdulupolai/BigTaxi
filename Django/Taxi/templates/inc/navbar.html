@@ -2,30 +2,34 @@
     a{
         text-decoration: none;
     }
+    .text-color-navbar{
+      /* color: #0d6efd; */
+      font-weight: 550;
+    }
 </style>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand text-primary fw-bold fs-4" href="#">BigTaxi</a>
+    <a class="navbar-brand text-primary fw-bold fs-4" href="{% url 'taxi_app:autoRedirect' %}">BigTaxi</a>
     <div class="ms-auto d-flex align-items-center">
       {% if user.is_authenticated %}
           {% if userCategoryis == 'Customer' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3">Customer</a>
-            <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3">PinTaxi</a>
-            <a href="#" class="me-3">ArgentTaxi</a>
+             <a href="#" class="me-3 text-color-navbar">Customer</a>
+            <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3 text-color-navbar">PinTaxi</a>
+            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
           {% elif userCategoryis == 'Driver' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-            <a href="#" class="me-3">Driver</a>
-            <a href="#" class="me-3">PinTaxi</a>
-            <a href="#" class="me-3">ArgentTaxi</a>
+            <a href="#" class="me-3 text-color-navbar">Driver</a>
+            <a href="#" class="me-3 text-color-navbar">PinTaxi</a>
+            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
           {% elif userCategoryis == 'Developer' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3">Developer</a>
-            <a href="#" class="me-3">TaxiSuggest</a>
-            <a href="#" class="me-3">ArgentTaxi</a>
-            <a href="#" class="me-3">Informations</a>
+             <a href="#" class="me-3 text-color-navbar">Developer</a>
+            <a href="#" class="me-3 text-color-navbar">TaxiSuggest</a>
+            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
+            <a href="#" class="me-3 text-color-navbar">Informations</a>
           {% else %}
             
           {% endif %}

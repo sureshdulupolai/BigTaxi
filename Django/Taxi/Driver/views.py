@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from Driver.models import driverDataModel, DriverModelStore
 from Users.models import usersDataModel
-from Customer.models import cutomerDataModel
 from django.contrib.auth import login
 from django.contrib.auth import logout
 
@@ -227,7 +226,6 @@ def customerSignUpFunctionBaseView(request):
                             UDM = usersDataModel(ULink = user, UserCategory = 'Customer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = 'BIGTAXICUSTOMER', UserCode = successfullGenerateNewCode)
                             UDM.save()
 
-                            cutomerDataModel(UDM = UDM).save()
                             messages.success(request, 'Successfully signup into \'BigTaxi\' customer department')
                             return render(request, 'signup/cutomerSignUp.html')
                         

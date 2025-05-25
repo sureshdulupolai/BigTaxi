@@ -23,6 +23,7 @@
       <i class="bi bi-geo-alt-fill text-primary me-2"></i>
       <span id="current-location-text" class="fw-medium">{{ city }}, {{ state }}</span>
 
+      <input type="hidden" name="checkForm" value="FormOneSelectByUser"/>
       <input
         type="text"
         name="city"
@@ -65,7 +66,7 @@
 
 
 {% if DataOfPinTaxiLst %}
-  {% for DPT in DataOfPinTaxiLst %}
+  {% for DPT, SEC in DataOfPinTaxiLst %}
   <!-- Main Profile Card -->
   <div class="container-xxl my-3">
     <div
@@ -74,7 +75,7 @@
       <!-- Profile Image -->
       <div class="me-4 mb-3 mb-md-0">
         <img
-          src="../../media/customer/default/logo.png"
+          src="/media/{{ SEC.0 }}"
           alt="User Profile"
           class="rounded-circle"
           style="width: 100px; height: 100px; object-fit: cover"
@@ -83,7 +84,7 @@
 
       <!-- User Info -->
       <div class="me-auto">
-        <h4 class="mb-1">Username</h4>
+        <h4 class="mb-1">{{ SEC.1 }}</h4>
         <p class="text-muted mb-0">pick up: {{ DPT.currentLocation|truncatewords:16 }}</p>
         <p class="text-muted mb-0">drop to: {{ DPT.toLocation|truncatewords:16 }}</p>
         <p class="text-muted mb-0">passenger: {{ DPT.taxiPassenger }}</p>
@@ -93,8 +94,13 @@
       <!-- Book Taxi Button -->
       <div class="mt-3 mt-md-0">
         {% if user.is_authenticated %}
-          <a href="#" class="btn btn-warning button-home">Accept</a>
-          <a href="#" class="btn btn-danger button-home">Details</a>
+        <form method="POST">
+            <a href="#" class="btn btn-warning button-home">Accept</a>
+            {% csrf_token %}
+            <input type="hidden" name="checkForm" value="FormTwoSelectByUser"/>
+            <input type="hidden" name="userPinCode" value="{{ DPT.taxiAvaId }}">
+            <button class="btn btn-danger button-home">Details</button>
+          </form>
         {% else %}
           <a href="{% url 'driver:driverLogin' %}" class="btn btn-danger button-home">Details</a>
         {% endif %}

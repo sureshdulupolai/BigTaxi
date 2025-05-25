@@ -31,7 +31,7 @@
 
         {% if user.is_authenticated %}
           <span class="d-block mb-1"><a href="{% url 'taxi_app:autoRedirect' %}" class="a-footer-tag">Home</a></span>
-          <span class="d-block mb-1"><a href="#" class="a-footer-tag">Review</a></span>
+          <span class="d-block mb-1"><a href="{% url 'taxi_app:review' %}" class="a-footer-tag">Review</a></span>
           <span class="d-block mb-1"><a href="{% url 'driver:inforamtion' %}" class="a-footer-tag">More Information</a></span>
           <span class="d-block mb-1"><a href="{% url 'driver:logOut' %}" class="a-footer-tag">Logout</a></span>
         {% else %}
@@ -71,7 +71,7 @@
       </div>
 
       <!-- Developer Column -->
-      <div class="col-6 col-md-2 mb-2">
+      <!-- <div class="col-6 col-md-2 mb-2">
         <h5 class="fw-bold">Developer</h5>
         
         {% if user.is_authenticated %}
@@ -81,7 +81,7 @@
           <span class="d-block mb-1"><a href="{% url 'driver:developerLogin' %}" class="a-footer-tag">Login</a></span>
         <span class="d-block mb-1"><a href="{% url 'driver:developerSigup' %}" class="a-footer-tag">Signup</a></span>
         {% endif %}
-      </div>
+      </div> -->
 
     </div>
   </div>

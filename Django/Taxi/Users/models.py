@@ -30,6 +30,9 @@ class usersDataModel(models.Model):
     CouponCode = models.CharField(max_length=50, null=True, blank=True)
     UProfileImage = models.ImageField(upload_to='profile/main/', default='profile/default/default.png')
     UProfileName = models.CharField(max_length=1000, default='BiXTaxi User')
+    description = models.CharField(max_length=5000, default='No Description!')
+    totalTripCount = models.IntegerField(default=0)
+    dangerTripCount = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.UserMobileNo} : {self.UserCategory}"
