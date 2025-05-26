@@ -8,34 +8,31 @@ from django.http import JsonResponse
 import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
+from Driver.models import DriverAcceptedPin
 
 def redirect_based_on_location(request):
     if request.user.is_authenticated:
-        context = navbar(request)  # Get city/state
-        city = context.get("userModelDataCityis")
-        state = context.get("userModelDataStateis")
-        
-        if city and state:
-            return redirect(reverse('taxi_app:home'))
-        else:
-            return redirect('taxi_app:lan')
-    else:
-        return redirect('driver:customerLogin')
+        context = navbar(request); city = context.get("userModelDataCityis"); state = context.get("userModelDataStateis")
+        if city and state: return redirect(reverse('taxi_app:home'))
+        else: return redirect('taxi_app:lan')
+    else: return redirect('driver:customerLogin')
 
 # Create your views here.
 def HomePageForTaxiAppViewFunction(request):
+    DataOfPinTaxiLst = []; newLstOfDPTL = []
     if request.user.is_authenticated:
         dataFromNavBar = navbar(request)
         city = dataFromNavBar.get("userModelDataCityis"); state = dataFromNavBar.get("userModelDataStateis"); userCategory = dataFromNavBar.get('userCategoryis'); userBarCode = dataFromNavBar.get('userBarCodeAccessis')
-        DataOfPinTaxiLst = []; newLstOfDPTL = []
-
+        
         # if userCategory == 'Driver':
         if request.method == "POST":
             checkFormProcess = request.POST.get('checkForm')
+
             if checkFormProcess == 'FormOneSelectByUser':
                 updateCity = request.POST.get('city'); updateState = request.POST.get('state'); UDM = usersDataModel.objects.get(UserCode = userBarCode); UDM.UserCity = updateCity; UDM.UserState = updateState
                 UDM.save()
                 return redirect('taxi_app:home')
+            
             elif checkFormProcess == 'FormTwoSelectByUser':
                 BarCodeDetails = request.POST.get('userPinCode')
                 request.session['userPinDetailsCodeTaxi'] = BarCodeDetails
@@ -49,88 +46,63 @@ def HomePageForTaxiAppViewFunction(request):
     if DataOfPinTaxiLst: newLstOfDPTL =  [(DPTL.customerId.UProfileImage,DPTL.customerId.UProfileName or 'BigTaxi Customer') for DPTL in DataOfPinTaxiLst]
     newDataOfBoth = zip(DataOfPinTaxiLst, newLstOfDPTL)
 
-    context = {
-        'DataOfPinTaxiLst': newDataOfBoth,
-        'city' : city.title(),
-        'state' : state.title(),
-    }
+    context = { 'DataOfPinTaxiLst': newDataOfBoth, 'city' : city.title(), 'state' : state.title() }
     return render(request, 'main/home.html', context)
 
 def pinDetailFunctionBaseView(request,barCode):
-    pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False)
-    userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'
+    pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False); userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'; gender = 'Male'; dataShow = True
 
     if pinCodeHere:
         if barCode == pinCodeHere:
-            DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere)
-            userTravelFrom = DataOfPinUser.currentLocation
-            userTravelTo = DataOfPinUser.toLocation
-            dateAndTime = DataOfPinUser.taxiDateAndTimeByUser
-            customerImage = DataOfPinUser.customerId.UProfileImage
-            customerName = DataOfPinUser.customerId.UProfileName
-            customerUsername = DataOfPinUser.customerId.ULink.username
 
-            DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
+            if request.method == 'POST':
+                travelPrice = int(request.POST.get('price')); PTA = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere)
+                if int(PTA.priceOfTravel) > int(travelPrice): userCodeBar = usersDataModel.objects.get(ULink = User.objects.get(username = request.user.username)).UserCode; PTA.driverCode = userCodeBar; PTA.priceOfTravel = travelPrice; PTA.save(); DriverAcceptedPin(priceAccepted = travelPrice,pinBarCode = pinCodeHere,userCode = userCodeBar).save()
 
-            if DangerTripCount == 0:
-                verifyUser = 'Trusted'
-            elif DangerTripCount >= 0 and DangerTripCount <= 5:
-                verifyUser = 'SomeTrust'
-            elif DangerTripCount >= 6:
-                verifyUser = 'NoTrust'
+                else: messages.info(request, f'another user have choosed : {PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere).priceOfTravel}₹'); return redirect('taxi_app:pinDetail', barCode=pinCodeHere)
+
+            DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere); userTravelFrom = DataOfPinUser.currentLocation; userTravelTo = DataOfPinUser.toLocation; dateAndTime = DataOfPinUser.taxiDateAndTimeByUser; customerImage = DataOfPinUser.customerId.UProfileImage; customerName = DataOfPinUser.customerId.UProfileName.title(); customerUsername = DataOfPinUser.customerId.ULink.username; gender = DataOfPinUser.customerId.UserGender.title(); DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
+            if gender == 'Not Check': dataShow = False
+
+            if DangerTripCount == 0: verifyUser = 'Trusted'
+            elif DangerTripCount >= 0 and DangerTripCount <= 5: verifyUser = 'SomeTrust'
+            elif DangerTripCount >= 6: verifyUser = 'NoTrust'
 
         else:
             messages.warning(request ,"don't change any id of taxi details")
             return redirect('taxi_app:autoRedirect')
+            
     else:
         messages.warning(request, "can't reach this page for now!")
         return redirect('taxi_app:autoRedirect')
     
-    context = {
-        'userTravelFrom' : userTravelFrom,
-        'userTravelTo' : userTravelTo,
-        'passenger' : passenger,
-        'dateAndTime' : dateAndTime,
-        'customerImage' : customerImage,
-        'customerName' : customerName,
-        'customerUsername' : customerUsername,
-        'verifyUser' : verifyUser
-    }
+    context = { 'userTravelFrom' : userTravelFrom, 'userTravelTo' : userTravelTo, 'passenger' : passenger, 'dateAndTime' : dateAndTime, 'customerImage' : customerImage, 'customerName' : customerName, 'customerUsername' : customerUsername, 'verifyUser' : verifyUser, 'gender' : gender, 'dataShow' : dataShow }
     return render(request, 'main/details.html', context)
 
 def locationPageFunctionViewBase(request):
     if request.method == "POST":
         city = request.POST.get('uCity'); state = request.POST.get('uState')
-        if request.user.is_authenticated:
-            uModelData = User.objects.get(username = request.user.username); UDM_Model_Data = usersDataModel.objects.get(ULink = uModelData)
-            UDM_Model_Data.UserCity = city; UDM_Model_Data.UserState = state; UDM_Model_Data.save()
-        else:
-            request.session['userDataCityis'] = city
-            request.session['userDataStateis'] = state
-
+        if request.user.is_authenticated: uModelData = User.objects.get(username = request.user.username); UDM_Model_Data = usersDataModel.objects.get(ULink = uModelData); UDM_Model_Data.UserCity = city; UDM_Model_Data.UserState = state; UDM_Model_Data.save()
+        else: request.session['userDataCityis'] = city; request.session['userDataStateis'] = state
         return redirect('taxi_app:home')
+    
     return render(request, 'main/checkLocation.html')
 
 def PointCount(RarLst, values = 1):
     return len([i.userStar for i in RarLst if int(i.userStar) == values])
 
 def reviewPageFunctionBaseView(request):
+    showData = False; buttonData = []; RarLst = ReviewAndRating.objects.all(); operationUser = []
     if request.user.is_authenticated:
-        showData = True; buttonData = []; uNameData = request.user.username; BarCodeOfRating = []
-        U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
-        IMG = data.UProfileImage; userName = data.UProfileName
-
-        RarLst = ReviewAndRating.objects.all()
-        newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
-
+        uNameData = request.user.username; BarCodeOfRating = []; newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
+        # U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
         if newRar: showData = False; buttonData += [1]; BarCodeOfRating = [DataInNewRar.ratingBarCode for DataInNewRar in newRar][0]
     
         if request.method == 'POST':
             typeOfForm = request.POST.get("formData")
 
             if typeOfForm == "formToNextPage":
-                barCode = request.POST.get('dataInHid')
-                request.session['userRatingCode'] = barCode
+                barCode = request.POST.get('dataInHid'); request.session['userRatingCode'] = barCode
                 return redirect('taxi_app:deleteReview')
 
             elif typeOfForm == "valueformForSamePage":
@@ -151,8 +123,7 @@ def reviewPageFunctionBaseView(request):
         
         if len(RarLst) > 0: newRar = newRar + [DataInRar for DataInRar in RarLst if uNameData != DataInRar.username]
 
-        operationUser = []
-        for i in newRar:
+        for i in newRar: 
             uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]; buttonData += [0]
         fullReviewLst = zip(newRar, operationUser, buttonData)
 
@@ -167,12 +138,12 @@ def reviewPageFunctionBaseView(request):
         if TotalCount != 0: styleFive = countFiveStar / TotalCount * 100; styleFour = countFourStar / TotalCount * 100; styleThree = countThreeStar / TotalCount * 100; styleTwo = countTwoStar / TotalCount * 100; styleOne = countOneStar / TotalCount * 100
         else: styleFive = 0; styleFour = 0; styleThree = 0; styleTwo = 0; styleOne = 0
 
-        context = { 'BarCodeOfRating' : BarCodeOfRating, 'image' : IMG, 'uName' : userName, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
+        context = { 'BarCodeOfRating' : BarCodeOfRating, 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
         
         return render(request, 'footer/review.html', context)
     
     else:
-        showData = False; buttonData = []; RarLst = ReviewAndRating.objects.all(); newRar = [DataInRar for DataInRar in RarLst]; operationUser = []
+        newRar = [DataInRar for DataInRar in RarLst]
         for i in newRar:
             uNameCodeSearch = i.userCode; DataIn = usersDataModel.objects.get(UserCode = uNameCodeSearch); operationUser += [(DataIn.UProfileName, DataIn.UProfileImage, i.userStar)]
             buttonData += [0]
@@ -222,51 +193,41 @@ def PinFunction(dataPresentLst):
     for a1 in dataPresentLst:
         dataOfPinLst += [a1]
     return dataOfPinLst
-    
+
 # create for coupon code view update, now
 def pinTaxiFunctionBaseView(request):
     if request.user.is_authenticated: 
         usernames = request.user.username; user = User.objects.get(username = usernames); dataOfUser = usersDataModel.objects.get(ULink = user); dataPresentLst = PinTaxiAvailable.objects.filter(customerId = dataOfUser)
         # default form limit is 2
-        profileImage = dataOfUser.UProfileImage; setLimitToForm = 4
+        profileImage = dataOfUser.UProfileImage; setLimitToForm = 2
 
         if dataPresentLst:
             valueOfPin = True
-            if len(dataPresentLst) > 1:
-                # ask, one is already added you need to add more ?
-                dataOfPin = PinFunction(dataPresentLst)
 
-            elif len(dataPresentLst) > 3:
-                # not allowed, already three added
-                dataOfPin = PinFunction(dataPresentLst)
-            else: 
-                dataOfPin = PinFunction(dataPresentLst)
+            if len(dataPresentLst) > 1:dataOfPin = PinFunction(dataPresentLst)
+            elif len(dataPresentLst) > 3: dataOfPin = PinFunction(dataPresentLst)
+            else:  dataOfPin = PinFunction(dataPresentLst)
 
         else: valueOfPin = False; dataOfPin = False
 
         if len(dataPresentLst) < setLimitToForm:
             DataShow = True
-            # post method
+            
             if request.method == 'POST':
                 uCityEnter = request.POST.get('uCity'); uCurrentLocationEnter = request.POST.get('uCurrentLocation'); uPincodeEnter = request.POST.get('uPincode'); uTaxiPassengerEnter = abs(int(request.POST.get('uTaxiPassenger'))); uCouponCodeEnter = request.POST.get('uCouponCode'); uVerifyStatusEnter = request.POST.get('uVerifyStatus'); uBarCodeEnter = request.POST.get('uBarCode'); uLastLocationEnter = request.POST.get('uLastLocation'); utaxiDateAndTimeByUserEnter = request.POST.get('utaxiDateAndTimeByUser')
-                if uVerifyStatusEnter == "Driver":
-                    uCouponCode = usersDataModel.objects.get(UserCode = uBarCodeEnter)
-                    uCouponCodeEnter = uCouponCode.CouponCode
+                # driver default coupon code
+                if uVerifyStatusEnter == "Driver": uCouponCode = usersDataModel.objects.get(UserCode = uBarCodeEnter); uCouponCodeEnter = uCouponCode.CouponCode
 
                 else:
                     if uCouponCodeEnter: pass
                     else: uCouponCodeEnter = 'Customer Not Have Coupon'
 
                 # Convert to desired format: "2025-05-29 11:30AM"
-                if utaxiDateAndTimeByUserEnter:
-                    dt_obj = datetime.strptime(utaxiDateAndTimeByUserEnter, "%Y-%m-%dT%H:%M")
-                    formatted_datetime = dt_obj.strftime("%Y-%m-%d %I:%M%p")  # %I = 12-hour, %p = AM/PM
-                else:
-                    formatted_datetime = "none"
+                if utaxiDateAndTimeByUserEnter: dt_obj = datetime.strptime(utaxiDateAndTimeByUserEnter, "%Y-%m-%dT%H:%M"); formatted_datetime = dt_obj.strftime("%Y-%m-%d %I:%M%p")  # %I = 12-hour, %p = AM/PM
+                else: formatted_datetime = "none"
 
                 if uTaxiPassengerEnter > 0:
-                    checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
-                    CodeNameTaxiAva = 'TAXIAVALIABLE'; CodeNo = 101; TBC = TaxiBarCode.objects.all()
+                    checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); CodeNameTaxiAva = 'TAXIAVALIABLE'; CodeNo = 101; TBC = TaxiBarCode.objects.all()
                     
                     if len(TBC) > 0:
                         barLst = [TBCData.barCode for TBCData in TBC]; oldBarCode = barLst[len(barLst) - 1]; newCodes = ''
@@ -274,23 +235,16 @@ def pinTaxiFunctionBaseView(request):
                             if i.isdigit(): newCodes += i
                         newBarCode = CodeNameTaxiAva + str(int(newCodes) + 1)
 
-                    else:
-                        newBarCode = CodeNameTaxiAva + str(CodeNo)
+                    else: newBarCode = CodeNameTaxiAva + str(CodeNo)
                     
-                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter, taxiDateAndTimeByUser = formatted_datetime).save()
-                    TaxiBarCode(barCode = newBarCode).save()
-
+                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter, taxiDateAndTimeByUser = formatted_datetime).save(); TaxiBarCode(barCode = newBarCode).save()
                     return redirect('taxi_app:pinTaxi')
                 
-                else:
-                    messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi')
-                    return render(request, 'main/pinTaxi.html')
+                else: messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi'); return render(request, 'main/pinTaxi.html')
         
-        else:
-            DataShow = False
+        else: DataShow = False
             
         context = {'valueOfPin' : valueOfPin, 'dataOfPin' : dataOfPin, 'usernames' : usernames, 'DataShow' : DataShow, 'profileImage' : profileImage}
         return render(request, 'main/pinTaxi.html', context)
 
-    else:
-        return redirect('driver:login')
+    else: return redirect('driver:login')

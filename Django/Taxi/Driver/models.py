@@ -29,3 +29,13 @@ class DriverModelStore(models.Model):
 
     def __str__(self):
         return str((self.CouponCode, self.DriverName))
+    
+class DriverAcceptedPin(models.Model):
+    priceAccepted = models.IntegerField()
+    pinBarCode = models.CharField(max_length=100)
+    userCode = models.CharField(max_length=100)
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.priceAccepted} : {self.pinBarCode}"

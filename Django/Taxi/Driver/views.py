@@ -253,8 +253,7 @@ def developerSignUpFunctionBaseView(request):
         if request.method == 'POST':
             username = request.POST.get('username'); email = request.POST.get('gmail'); password1 = request.POST.get('password1'); password2 = request.POST.get('password2'); mobileNo = request.POST.get('mobileNo'); sc = request.POST.get('secretCode'); strMobileNo = str(mobileNo)
             # Big Taxi PersonalCode Secret Granted Successfull, change after every 6 months
-            secretCode = 'BIGTAXIMUOD106463SECRETGS'
-            UDM = usersDataModel.objects.all(); continueData = True; userData = User.objects.all()
+            secretCode = 'BIGTAXIMUOD106463SECRETGS'; UDM = usersDataModel.objects.all(); continueData = True; userData = User.objects.all()
 
             for UD in userData:
                 if str(UD.username) == str(username): continueData = False
@@ -264,19 +263,17 @@ def developerSignUpFunctionBaseView(request):
                     if str(UDM1.UserMobileNo) == str(mobileNo): continueData = False
 
                 if continueData:
+                    
                     if sc == secretCode:
-                        if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and (int(strMobileNo[0]) in [6, 7, 8, 9]):
-                            if password1 == password2:
-                                user = User.objects.create_user(username=username, email=email, password=password2)
-                                user.save()
 
-                                DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXIDRIVER'
-                                # CouponCode Name Define
-                                CodeName = 'BIGTAXIDEVELOPER'
+                        if (strMobileNo != '000000000') and (len(strMobileNo) == 10) and (int(strMobileNo[0]) in [6, 7, 8, 9]):
+
+                            if password1 == password2:
+                                user = User.objects.create_user(username=username, email=email, password=password2); user.save()
+                                DMS = DriverModelStore.objects.all(); NotNameOneCustomer = 'BIGTAXIDRIVER'; CodeName = 'BIGTAXIDEVELOPER'
 
                                 if len(DMS) > 0:
-                                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]
-                                    lastCode = codeLst[len(codeLst) - 1]
+                                    codeLst, lstOfUsername = [DataCode.CouponCode for DataCode in DMS if DataCode.CouponCode != NotNameOneCustomer], [DataIn.DriverName.lower() for DataIn in DMS if DataIn.CouponCode != NotNameOneCustomer]; lastCode = codeLst[len(codeLst) - 1]
 
                                     if request.user.username in lstOfUsername:
                                         messages.warning(request, "you can't create two coupon for one id, Try After 6 Month For New Id")
@@ -293,32 +290,18 @@ def developerSignUpFunctionBaseView(request):
                                 oldCodelst = usersDataModel.objects.all(); oldCodeData = [UD101.UserCode for UD101 in oldCodelst]; oldCodeBar = oldCodeData[len(oldCodeData) - 1]; oldNo = ''; nameOfCode = 'BIGTAXICODE'
                                 for OC in oldCodeBar:
                                     if OC.isdigit(): oldNo += OC
-                                newCodeNo = str(int(oldNo) + 1); successfullGenerateNewCode = nameOfCode + newCodeNo
-                                UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode, UserCode = successfullGenerateNewCode)
-                                UDM.save()
+                                newCodeNo = str(int(oldNo) + 1); successfullGenerateNewCode = nameOfCode + newCodeNo; UDM = usersDataModel(ULink = user, UserCategory = 'Developer', UserMobileNo = mobileNo, UserPass = password2, CouponCode = newCode, UserCode = successfullGenerateNewCode); UDM.save()
 
-                                DriverModelStore(CouponCode = newCode, DriverName = username).save()
-                                messages.success(request, 'Successfully signup into \'BigTaxi\' developer department')
+                                DriverModelStore(CouponCode = newCode, DriverName = username).save(); messages.success(request, 'Successfully signup into \'BigTaxi\' developer department')
                                 # return render(request, 'signup/developerSignUp.html')
                                 # http://localhost:8000/ls/driver/signup/ : url bug
                                 return redirect('driver:inforamtion')
                             
-                            else:
-                                messages.warning(request, 'Password is Not Matched!')
-                                return render(request, 'signup/developerSignUp.html')
-                        else:
-                            messages.warning(request, 'Enter Correct Mobile No!, Again.')
-                            return render(request, 'signup/developerSignUp.html')
-                    else:
-                        messages.warning(request, 'Secrect Code Is Not Matched For Developer Tools Login')
-                        return render(request, 'signup/developerSignUp.html')
-                else:
-                    messages.warning(request, 'Mobile No, already Exist "{}"'.format(strMobileNo))
-                    return render(request, 'signup/developerSignUp.html')
-            else:
-                messages.warning(request, "Username '{}' is already exist inside system".format(username))
-                return render(request, 'signup/developerSignUp.html')
-
+                            else: messages.warning(request, 'Password is Not Matched!'); return render(request, 'signup/developerSignUp.html')
+                        else: messages.warning(request, 'Enter Correct Mobile No!, Again.'); return render(request, 'signup/developerSignUp.html')
+                    else: messages.warning(request, 'Secrect Code Is Not Matched For Developer Tools Login'); return render(request, 'signup/developerSignUp.html')
+                else: messages.warning(request, 'Mobile No, already Exist "{}"'.format(strMobileNo)); return render(request, 'signup/developerSignUp.html')
+            else: messages.warning(request, "Username '{}' is already exist inside system".format(username)); return render(request, 'signup/developerSignUp.html')
     return render(request, 'signup/developerSignUp.html')
 
 def moreInformationsFunctionBaseView(request):

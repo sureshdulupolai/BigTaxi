@@ -21,41 +21,58 @@
 <body>
 
 <div class="container my-4">
-  <!-- User Info -->
-  <div class="d-flex align-items-center mb-4">
-    <img src="/media/{{ customerImage }}" class="user-image me-3" alt="User">
-    <div>
-      <h4 class="mb-0">{{ customerName }}  
-        {% if verifyUser == 'Trusted' or verifyUser == 'SomeTrust' %}
-            <i class="bi bi-patch-check-fill text-primary"></i>
-        {% endif %}
-      </h4>
-      <small class="text-muted">Username: {{ customerUsername }}</small>
+    <!-- User Info -->
+    <div class="d-flex align-items-center mb-4">
+        <img src="/media/{{ customerImage }}" class="user-image me-3" alt="User">
+        <div>
+        <h4 class="mb-0">{{ customerName }}  
+            {% if verifyUser == 'Trusted' or verifyUser == 'SomeTrust' %}
+                <i class="bi bi-patch-check-fill text-primary"></i>
+            {% endif %}
+        </h4>
+        <small class="text-muted">Username: {{ customerUsername }}</small>
+        </div>
     </div>
-  </div>
 
-  <!-- Travel History List -->
-  <h5 class="mb-3">User Status History:</h5>
-  <ul class="list-group mb-4">
-    {% if verifyUser == 'Trusted' %}
-        <li class="list-group-item bg-success text-white fw-semibold">Trusted user</li>
-    {% elif verifyUser == 'SomeTrust' %}
-        <li class="list-group-item bg-info fw-semibold">Have Some Trust</li>
-    {% elif verifyUser == 'NoTrust' %}
-        <li class="list-group-item bg-danger text-white fw-semibold">No Trusted User</li>
-    {% endif %}
-    <li class="list-group-item bg-warning fw-semibold">Non-Argent</li>
-  </ul>
+    <!-- Travel History List -->
+    <h5 class="mb-3">User Status History:</h5>
+    <ul class="list-group mb-4">
+        {% if verifyUser == 'Trusted' %}
+            <li class="list-group-item bg-success text-white fw-semibold">Trusted user</li>
+        {% elif verifyUser == 'SomeTrust' %}
+            <li class="list-group-item bg-info fw-semibold">Have Some Trust</li>
+        {% elif verifyUser == 'NoTrust' %}
+            <li class="list-group-item bg-danger text-white fw-semibold">No Trusted User</li>
+        {% endif %}
+        <li class="list-group-item bg-warning fw-semibold">Non-Argent</li>
+    </ul>
 
   <!-- Travel Details Card (Driver view) -->
   <div class="card travel-card shadow-sm mb-4">
     <div class="card-body">
-      <h5 class="card-title">Travel Details</h5>
-      <p><strong>From:</strong> {{ userTravelFrom }}</p>
-      <p><strong>To:</strong> {{ userTravelTo }}</p>
-      <p><strong>Total Passengers:</strong> {{ passenger }}</p>
-      <p><strong>Travel Date & Time:</strong> {{ dateAndTime }}</p>
-      <!-- <p><strong>User Requested:</strong> 4 times</p> -->
+        <h5 class="card-title mb-4"><strong>Travel Details</strong></h5>
+        <hr>
+        <p><strong>From:</strong> {{ userTravelFrom }}</p>
+        <p><strong>To:</strong> {{ userTravelTo }}</p>
+        <p><strong>Total Passengers:</strong> {{ passenger }}</p>
+        {% if dataShow %}
+            <p><strong>Book user gender:</strong> {{ gender }}</p>
+        {% endif %}
+        <p><strong>Travel Date & Time:</strong> {{ dateAndTime }}</p>
+      
+      
+        <div>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="price"><strong>Price:</strong></label>
+                <input type="number" name="price">
+                <div class="d-flex justify-content-center gap-2 my-2">
+                    <a href="#" class="btn btn-warning">Back</a>
+                    <button class="btn btn-success">Add</button>
+                </div>
+            </form>
+        </div>
+
     </div>
   </div>
 </div>
