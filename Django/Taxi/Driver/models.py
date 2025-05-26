@@ -1,5 +1,6 @@
 from django.db import models
 from Users.models import usersDataModel
+from taxi_app.models import PinTaxiAvailable
 
 # Create your models here.
 class driverDataModel(models.Model):
@@ -39,3 +40,15 @@ class DriverAcceptedPin(models.Model):
 
     def __str__(self):
         return f"{self.priceAccepted} : {self.pinBarCode}"
+    
+class ReportDriverInPinTaxi(models.Model):
+    DriverReport = [('cancel', 'cancel'),('other', 'other'), ('default', 'default')]
+    pinBarCode = models.ForeignKey(PinTaxiAvailable, on_delete=models.CASCADE)
+    driverCode = models.CharField(max_length=100)
+    driverReportFor = models.CharField(max_length=50, default='default')
+    reportData = models.CharField(max_length=5000, default='default data')
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.driverReportFor} : {self.pinBarCode.taxiDateAndTimeByUser} : {self.date}"

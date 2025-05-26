@@ -8,7 +8,7 @@ from django.http import JsonResponse
 import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
-from Driver.models import DriverAcceptedPin
+from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
 
 def redirect_based_on_location(request):
     if request.user.is_authenticated:
@@ -51,7 +51,7 @@ def HomePageForTaxiAppViewFunction(request):
 
 def pinDetailFunctionBaseView(request,barCode):
     pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False); userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'; gender = 'Male'; dataShow = True
-    ShowPriceDataInTemplate = True
+    ShowPriceDataInTemplate = True; PriceExist = 0
     if pinCodeHere:
         if barCode == pinCodeHere:
 
@@ -63,9 +63,11 @@ def pinDetailFunctionBaseView(request,barCode):
 
             DAP = DriverAcceptedPin.objects.all()
             for DataInDAP in DAP:
-                if DataInDAP.userCode == '' and DataInDAP.pinBarCode == pinCodeHere:
+                navData = navbar(request)
+                if DataInDAP.userCode == navData['userBarCodeAccessis'] and DataInDAP.pinBarCode == pinCodeHere:
                     ShowPriceDataInTemplate = False
-
+                    PriceExist = DataInDAP.priceAccepted
+            
             DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere); userTravelFrom = DataOfPinUser.currentLocation; userTravelTo = DataOfPinUser.toLocation; dateAndTime = DataOfPinUser.taxiDateAndTimeByUser; customerImage = DataOfPinUser.customerId.UProfileImage; customerName = DataOfPinUser.customerId.UProfileName.title(); customerUsername = DataOfPinUser.customerId.ULink.username; gender = DataOfPinUser.customerId.UserGender.title(); DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
             if gender == 'Not Check': dataShow = False
 
@@ -81,8 +83,32 @@ def pinDetailFunctionBaseView(request,barCode):
         messages.warning(request, "can't reach this page for now!")
         return redirect('taxi_app:autoRedirect')
     
-    context = { 'userTravelFrom' : userTravelFrom, 'userTravelTo' : userTravelTo, 'passenger' : passenger, 'dateAndTime' : dateAndTime, 'customerImage' : customerImage, 'customerName' : customerName, 'customerUsername' : customerUsername, 'verifyUser' : verifyUser, 'gender' : gender, 'dataShow' : dataShow }
+    context = { 'barCode' : barCode, 'PriceExist' : PriceExist, 'ShowPriceDataInTemplate' : ShowPriceDataInTemplate, 'userTravelFrom' : userTravelFrom, 'userTravelTo' : userTravelTo, 'passenger' : passenger, 'dateAndTime' : dateAndTime, 'customerImage' : customerImage, 'customerName' : customerName, 'customerUsername' : customerUsername, 'verifyUser' : verifyUser, 'gender' : gender, 'dataShow' : dataShow }
     return render(request, 'main/details.html', context)
+
+def reportDriverOnPinTaxiFunctionBaseView(request, barCodes):
+    PinData = request.session.get('userPinDetailsCodeTaxi' or False); navData = navbar(request)
+
+    if PinData:
+
+        if PinData == barCodes:
+
+            if request.method == 'POST':
+                
+                reportDataEnter = request.POST.get('reportData'); reportForEnter = request.POST.get('reportFor')
+                ReportDriverInPinTaxi(pinBarCode = PinTaxiAvailable.objects.get(taxiAvaId = PinData), driverCode = navData['userBarCodeAccessis'], driverReportFor = reportForEnter, reportData = reportDataEnter).save()
+                messages.success(request, f'successfully, reported done for Id : {barCodes}')
+        
+        else:
+            messages.warning(request ,"don't change any id of taxi report page, while reporting.")
+            return redirect('taxi_app:pinDetail', barCode = PinData)
+        
+    else:
+        messages.warning(request, "can't reach this page for now!")
+        return redirect('taxi_app:autoRedirect')
+    
+    context = {'barCodeHere' : barCodes}
+    return render(request, 'main/reportPin.html', context)
 
 def locationPageFunctionViewBase(request):
     if request.method == "POST":

@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.redirect_based_on_location, name='autoRedirect'),
     path('pin/', views.HomePageForTaxiAppViewFunction, name='home'),
     path('pin-detail/<barCode>/', views.pinDetailFunctionBaseView, name='pinDetail'),
+    path('pin-report/<barCodes>/', views.reportDriverOnPinTaxiFunctionBaseView, name='pinReport'),
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),
     path('pin-taxi/', views.pinTaxiFunctionBaseView, name='pinTaxi'),

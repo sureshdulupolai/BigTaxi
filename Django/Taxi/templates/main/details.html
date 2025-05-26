@@ -60,17 +60,26 @@
         {% endif %}
         <p><strong>Travel Date & Time:</strong> {{ dateAndTime }}</p>
       
-      
         <div>
-            <form method="POST">
-                {% csrf_token %}
-                <label for="price"><strong>Price:</strong></label>
-                <input type="number" name="price">
+            {% if ShowPriceDataInTemplate %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="price"><strong>Price:</strong></label>
+                    <input type="number" name="price">
+                    <div class="d-flex justify-content-center gap-2 my-2">
+                        <a href="{% url 'taxi_app:autoRedirect' %}" class="btn btn-warning">Back</a>
+                        <button class="btn btn-success">Add</button>
+                    </div>
+                </form>
+            {% else %}
+                <div>
+                <p><strong>Price you have selected:</strong> {{ PriceExist }}₹</p>
                 <div class="d-flex justify-content-center gap-2 my-2">
-                    <a href="#" class="btn btn-warning">Back</a>
-                    <button class="btn btn-success">Add</button>
+                    <a href="{% url 'taxi_app:autoRedirect' %}" class="btn btn-warning">Back</a>
+                    <a href="{% url 'taxi_app:pinReport' barCode %}" class="btn btn-danger">Report</a>
                 </div>
-            </form>
+                </div>
+            {% endif %}
         </div>
 
     </div>

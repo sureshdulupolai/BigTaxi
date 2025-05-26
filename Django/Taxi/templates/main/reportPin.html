@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="container mb-4 mt-5">
+    <div class="form-section">
+        <h4 class="mb-4">Driver Reporting To : {{ barCodeHere }}</h4>
+
+        <form method="POST">
+        {% csrf_token %}
+
+        <!-- Reason Select Field -->
+        <div class="mb-3 text-start position-relative mb-4">
+            <label for="reportFor" class="form-label">Select Report Reason:</label>
+            <select class="form-select" name="reportFor" id="reportFor" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="cancel">Cancel Trip</option>
+            <option value="other">Other</option>
+            </select>
+        </div>
+
+        <!-- Message Textarea -->
+        <div class="mb-3 text-start position-relative mb-4">
+            <label for="reportData" class="form-label">Your Message:</label>
+            <textarea
+            class="form-control"
+            name="reportData"
+            id="reportData"
+            rows="5"
+            placeholder="Type your message here..."
+            required
+            ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-100 d-flex justify-content-center gap-4">
+            <a href="{% url 'taxi_app:pinDetail' barCodeHere %}" class="btn btn-primary">Back</a>
+            <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
