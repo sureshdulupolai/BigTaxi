@@ -51,15 +51,20 @@ def HomePageForTaxiAppViewFunction(request):
 
 def pinDetailFunctionBaseView(request,barCode):
     pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False); userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'; gender = 'Male'; dataShow = True
-
+    ShowPriceDataInTemplate = True
     if pinCodeHere:
         if barCode == pinCodeHere:
 
             if request.method == 'POST':
                 travelPrice = int(request.POST.get('price')); PTA = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere)
                 if int(PTA.priceOfTravel) > int(travelPrice): userCodeBar = usersDataModel.objects.get(ULink = User.objects.get(username = request.user.username)).UserCode; PTA.driverCode = userCodeBar; PTA.priceOfTravel = travelPrice; PTA.save(); DriverAcceptedPin(priceAccepted = travelPrice,pinBarCode = pinCodeHere,userCode = userCodeBar).save()
-
+# redirect to accepted page remaning
                 else: messages.info(request, f'another user have choosed : {PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere).priceOfTravel}₹'); return redirect('taxi_app:pinDetail', barCode=pinCodeHere)
+
+            DAP = DriverAcceptedPin.objects.all()
+            for DataInDAP in DAP:
+                if DataInDAP.userCode == '' and DataInDAP.pinBarCode == pinCodeHere:
+                    ShowPriceDataInTemplate = False
 
             DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere); userTravelFrom = DataOfPinUser.currentLocation; userTravelTo = DataOfPinUser.toLocation; dateAndTime = DataOfPinUser.taxiDateAndTimeByUser; customerImage = DataOfPinUser.customerId.UProfileImage; customerName = DataOfPinUser.customerId.UProfileName.title(); customerUsername = DataOfPinUser.customerId.ULink.username; gender = DataOfPinUser.customerId.UserGender.title(); DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
             if gender == 'Not Check': dataShow = False
