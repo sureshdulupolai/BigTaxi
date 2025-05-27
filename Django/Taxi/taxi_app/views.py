@@ -19,7 +19,8 @@ def redirect_based_on_location(request):
 
 # Create your views here.
 def HomePageForTaxiAppViewFunction(request):
-    DataOfPinTaxiLst = []; newLstOfDPTL = []
+    DataOfPinTaxiLst = []; newLstOfDPTL = []; showError = [1, 1, 1]
+
     if request.user.is_authenticated:
         dataFromNavBar = navbar(request)
         city = dataFromNavBar.get("userModelDataCityis"); state = dataFromNavBar.get("userModelDataStateis"); userCategory = dataFromNavBar.get('userCategoryis'); userBarCode = dataFromNavBar.get('userBarCodeAccessis')
@@ -43,8 +44,11 @@ def HomePageForTaxiAppViewFunction(request):
     DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(taxiCity=city)
     if not DataOfPinTaxiLst: DataOfPinTaxiLst = PinTaxiAvailable.objects.filter(currentLocation__icontains=state)
 
-    if DataOfPinTaxiLst: newLstOfDPTL =  [(DPTL.customerId.UProfileImage,DPTL.customerId.UProfileName or 'BigTaxi Customer') for DPTL in DataOfPinTaxiLst]
-    newDataOfBoth = zip(DataOfPinTaxiLst, newLstOfDPTL)
+    if DataOfPinTaxiLst: 
+        showError = [1 if ReportDriverInPinTaxi.objects.filter(pinBarCode=PinTaxiAvailable.objects.get(taxiAvaId=i.taxiAvaId)).last() else 0 for i in DataOfPinTaxiLst]
+        newLstOfDPTL = [(i.customerId.UProfileImage, i.customerId.UProfileName or 'BigTaxi Customer') for i in DataOfPinTaxiLst] if DataOfPinTaxiLst else []
+
+    newDataOfBoth = zip(DataOfPinTaxiLst, newLstOfDPTL, showError)
 
     context = { 'DataOfPinTaxiLst': newDataOfBoth, 'city' : city.title(), 'state' : state.title() }
     return render(request, 'main/home.html', context)
@@ -220,10 +224,12 @@ def deleteReviewFunctionBaseView(request):
         return redirect('driver:customerLogin')
 
 def PinFunction(dataPresentLst):
-    dataOfPinLst = []
+    dataOfPinLst = []; passingError = []
     for a1 in dataPresentLst:
         dataOfPinLst += [a1]
-    return dataOfPinLst
+    DataOf = [1 if ReportDriverInPinTaxi.objects.filter(pinBarCode = i) else 0 for i in dataPresentLst]
+    DataZip = list(zip(dataOfPinLst, DataOf))
+    return DataZip
 
 # create for coupon code view update, now
 def pinTaxiFunctionBaseView(request):
