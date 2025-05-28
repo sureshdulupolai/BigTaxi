@@ -294,11 +294,22 @@ def pinTaxiFunctionBaseView(request):
     else: return redirect('driver:login')
 
 def checkPinTaxiReportFunctionBaseView(request, barCodeId):
-    Codelst = request.session.get('ReportAccessBarCode')
-    if barCodeId in Codelst:
-        pass
+    Codelst = request.session.get('ReportAccessBarCode' or False)
+    usernames = ''; report = ''; date_time = ''
+    if Codelst:
+        if barCodeId in Codelst:
+            PTA = PinTaxiAvailable.objects.get(taxiAvaId = barCodeId)
+            RDPT = ReportDriverInPinTaxi.objects.get(pinBarCode = PTA)
+            usernames = usersDataModel.objects.get(UserCode = RDPT.driverCode).ULink.username
+            report = RDPT.reportData
+            date_time = str(RDPT.date) + ' ' + str(RDPT.time)
+
+        else:
+            messages.warning(request, "Don't change anybarcode while accessing report")
+            return redirect('taxi_app:pinTaxi')
     else:
-        messages.warning(request, "Don't change anybarcode while accessing report")
+        messages.warning(request, 'Currently Cant Reach this page')
         return redirect('taxi_app:pinTaxi')
     
-    return render(request, 'main/checkReport.html')
+    context = { 'usernames' : usernames, 'report' : report, 'date_time' : date_time }
+    return render(request, 'main/checkReport.html', context)
