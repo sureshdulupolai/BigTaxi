@@ -223,12 +223,19 @@ def deleteReviewFunctionBaseView(request):
     else:
         return redirect('driver:customerLogin')
 
-def PinFunction(dataPresentLst):
-    dataOfPinLst = []; passingError = []
+def PinFunction(request, dataPresentLst):
+    dataOfPinLst = []; IdLst = []; codeLst = []
     for a1 in dataPresentLst:
         dataOfPinLst += [a1]
     DataOf = [1 if ReportDriverInPinTaxi.objects.filter(pinBarCode = i) else 0 for i in dataPresentLst]
-    DataZip = list(zip(dataOfPinLst, DataOf))
+
+    if 1 in DataOf:
+        indexPosition, NoIndex = [index for index, value in enumerate(DataOf) if value == 1], [index for index, value in enumerate(DataOf) if value == 0]
+        for i in indexPosition: IdLst.append(str(dataOfPinLst[i].taxiAvaId)); codeLst.append(str(dataOfPinLst[i].taxiAvaId))
+        for j in NoIndex: IdLst.insert(j, '')
+
+    request.session['ReportAccessBarCode'] = codeLst
+    DataZip = list(zip(dataOfPinLst, DataOf, IdLst))
     return DataZip
 
 # create for coupon code view update, now
@@ -241,9 +248,9 @@ def pinTaxiFunctionBaseView(request):
         if dataPresentLst:
             valueOfPin = True
 
-            if len(dataPresentLst) > 1:dataOfPin = PinFunction(dataPresentLst)
-            elif len(dataPresentLst) > 3: dataOfPin = PinFunction(dataPresentLst)
-            else:  dataOfPin = PinFunction(dataPresentLst)
+            if len(dataPresentLst) > 1:dataOfPin = PinFunction(request, dataPresentLst)
+            elif len(dataPresentLst) > 3: dataOfPin = PinFunction(request, dataPresentLst)
+            else:  dataOfPin = PinFunction(request, dataPresentLst)
 
         else: valueOfPin = False; dataOfPin = False
 
@@ -285,3 +292,13 @@ def pinTaxiFunctionBaseView(request):
         return render(request, 'main/pinTaxi.html', context)
 
     else: return redirect('driver:login')
+
+def checkPinTaxiReportFunctionBaseView(request, barCodeId):
+    Codelst = request.session.get('ReportAccessBarCode')
+    if barCodeId in Codelst:
+        pass
+    else:
+        messages.warning(request, "Don't change anybarcode while accessing report")
+        return redirect('taxi_app:pinTaxi')
+    
+    return render(request, 'main/checkReport.html')
