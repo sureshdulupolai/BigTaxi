@@ -313,3 +313,4 @@ def checkPinTaxiReportFunctionBaseView(request, barCodeId):
     
     context = { 'usernames' : usernames, 'report' : report, 'date_time' : date_time }
     return render(request, 'main/checkReport.html', context)
+
