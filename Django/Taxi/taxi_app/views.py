@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete
 from django.contrib import messages
 from datetime import datetime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
@@ -313,4 +313,24 @@ def checkPinTaxiReportFunctionBaseView(request, barCodeId):
     
     context = { 'usernames' : usernames, 'report' : report, 'date_time' : date_time }
     return render(request, 'main/checkReport.html', context)
+
+def deletePinTaxiRepost(request, codeNeed):
+    return render(request, 'main/deletetRepost.html')
+
+def deletePinTaxiDetailsNoReport(request):
+    return render(request, 'main/deleteDetailsPin.html')
+
+# def ava_id_view(request, code):
+#     referrer = request.META.get('HTTP_REFERER')
+
+#     if referrer:
+#         # User didn't type manually — show 404
+#         return HttpResponseNotFound("404 Not Found: Direct access only")
+
+#     # Now validate the code if needed (optional)
+#     # Example: check from database if this code exists
+#     # if not YourModel.objects.filter(code=code).exists():
+#     #     return HttpResponseNotFound("Invalid code")
+
+#     return HttpResponse(f"Welcome to secret page for code: {code}")
 

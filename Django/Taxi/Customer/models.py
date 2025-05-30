@@ -2,6 +2,9 @@ from django.db import models
 from Users.models import usersDataModel
 
 class PinDeleteReview(models.Model):
+    dataLike = [('report', 'report'),('normal', 'normal')]
+
+    deleteType = models.CharField(choices=dataLike, default='normal', max_length=15)
     pinBarCode = models.CharField(max_length=100)
     userBarCode = models.CharField(max_length=100)
     driverCode = models.CharField(max_length=100)
