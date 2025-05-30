@@ -240,16 +240,17 @@
       {% if FIR %}
         <a href="{% url 'taxi_app:checkPinReport' IdData %}" class="btn btn-primary"><i class="bi bi-file-earmark-text"></i></a>
         <a href="#" class="btn btn-success"><i class="bi bi-arrow-clockwise"></i></a>
-        <a href="#" class="btn btn-danger"><i class="bi bi-trash"></i></a> 
+        <a href="{% url 'taxi_app:deletePinTaxiReport' DP.taxiAvaId %}" class="btn btn-danger"><i class="bi bi-trash"></i></a> 
       {% else %}
         <a href="#" class="btn btn-warning button-home"><i class="bi bi-check-circle"></i></a>
         <a href="#" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
-        <a href="#" class="btn btn-danger button-home-red"><i class="bi bi-trash"></i></a>
+        <a href="{% url 'taxi_app:deletePinTaxiDetail' DP.taxiAvaId %}" class="btn btn-danger button-home-red"><i class="bi bi-trash"></i></a>
       {% endif %}
     </div>
   </div>
 </div>
-{% endfor %} {% endif %}
+{% endfor %} 
+{% endif %}
 
 <!-- <script src="../../static/js/city.js"></script> -->
 <script src="../../static/js/pinTaxi.js"></script>

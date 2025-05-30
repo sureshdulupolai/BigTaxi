@@ -14,12 +14,11 @@ urlpatterns = [
     path('pin-detail/<barCode>/', views.pinDetailFunctionBaseView, name='pinDetail'),
     path('pin-report/<barCodes>/', views.reportDriverOnPinTaxiFunctionBaseView, name='pinReport'),
     path('pin-report-check/<barCodeId>/', views.checkPinTaxiReportFunctionBaseView, name='checkPinReport'),
-    path('delete-report/<codeNeed>/', views.deletePinTaxiRepost, name='deletePinTaxiDetails'),
+    path('delete-report-detail/<codeNeed>/', views.deletePinTaxiReport, name='deletePinTaxiReport'),
+    path('delete-pin-detail/<codeNeed>/', views.deletePinTaxiDetailsNoReport, name='deletePinTaxiDetail'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),
 
-
-    
 ]

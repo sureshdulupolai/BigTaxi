@@ -9,6 +9,7 @@ import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
 from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
+from Customer.models import PinDeleteReview
 
 def redirect_based_on_location(request):
     if request.user.is_authenticated:
@@ -314,23 +315,72 @@ def checkPinTaxiReportFunctionBaseView(request, barCodeId):
     context = { 'usernames' : usernames, 'report' : report, 'date_time' : date_time }
     return render(request, 'main/checkReport.html', context)
 
-def deletePinTaxiRepost(request, codeNeed):
-    return render(request, 'main/deletetRepost.html')
+def deletePinTaxiReport(request, codeNeed):
+    referrer = request.META.get('HTTP_REFERER')
+    if referrer:
+        PTA_Object = PinTaxiAvailable.objects.get(taxiAvaId = codeNeed)
 
-def deletePinTaxiDetailsNoReport(request):
-    return render(request, 'main/deleteDetailsPin.html')
+        try:
+            if request.method == 'POST':
+                PinDeleteReview(
+                        deleteType = 'normal',
+                        pinBarCode = PTA_Object.taxiAvaId,
+                        userBarCode = PTA_Object.customerId.UserCode,
+                        driverCode = PTA_Object.driverCode,
+                        addressFrom = PTA_Object.currentLocation,
+                        addressTo = PTA_Object.toLocation,
+                        date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
+                        passenger = str(PTA_Object.taxiPassenger),
+                        price = str(PTA_Object.priceOfTravel),
+                        discountCoupon = PTA_Object.couponCodeWas
+                ).save()
 
-# def ava_id_view(request, code):
-#     referrer = request.META.get('HTTP_REFERER')
+        except:
+            messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
+            return redirect('taxi_app:pinTaxi')
+        
+    else:
+        # User didn't type manually — show 404
+        return HttpResponseNotFound("404 Not Found: Direct access only")
+    
+    context = {'CodeId' : codeNeed}
+    return render(request, 'main/deletetRepost.html', context)
 
-#     if referrer:
-#         # User didn't type manually — show 404
-#         return HttpResponseNotFound("404 Not Found: Direct access only")
+def deletePinTaxiDetailsNoReport(request, codeNeed):
+    referrer = request.META.get('HTTP_REFERER')
 
-#     # Now validate the code if needed (optional)
-#     # Example: check from database if this code exists
-#     # if not YourModel.objects.filter(code=code).exists():
-#     #     return HttpResponseNotFound("Invalid code")
+    if referrer:
+        PTA_Object = PinTaxiAvailable.objects.get(taxiAvaId = codeNeed)
 
-#     return HttpResponse(f"Welcome to secret page for code: {code}")
+        if request.method == 'POST':
 
+            try:
+                PinDeleteReview(
+                    deleteType = 'normal',
+                    pinBarCode = PTA_Object.taxiAvaId,
+                    userBarCode = PTA_Object.customerId.UserCode,
+                    driverCode = PTA_Object.driverCode,
+                    addressFrom = PTA_Object.currentLocation,
+                    addressTo = PTA_Object.toLocation,
+                    date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
+                    passenger = str(PTA_Object.taxiPassenger),
+                    price = str(PTA_Object.priceOfTravel),
+                    discountCoupon = PTA_Object.couponCodeWas
+                ).save()
+
+                PTA_Object.delete()
+
+                messages.success(request, f'Pin Taxi Details Is Deleted SuccessFully, For Id {codeNeed}')
+                return redirect('taxi_app:pinTaxi')
+            
+            except:
+                messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
+                return redirect('taxi_app:pinTaxi')
+
+    else:
+        # User didn't type manually — show 404
+        messages.success(request, "Can't getting the page!, please click on delete button to access that page, data will fetch automatic.")
+        return redirect('taxi_app:pinTaxi')
+    
+    context = {'CodeId' : codeNeed}
+    return render(request, 'main/deleteDetailsPin.html', context)
