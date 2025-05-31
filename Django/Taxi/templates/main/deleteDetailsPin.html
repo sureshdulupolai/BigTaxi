@@ -18,13 +18,14 @@
 
 <div class="d-flex justify-content-center align-items-center bg-light" style="margin-top: 155px !important; margin-bottom: 140px !important;">
   <div class="logout-card text-center">
-    <h4 class="mb-3 text-dark">Delete Pin</h4>
-    <p class="mb-0 text-secondary">Are you sure you want to delete pin taxi detail </p>
-    <p class="mb-4 text-secondary">For Id : <strong>{{ CodeId }}</strong> ?</p>
-
     <form method="post">
       {% csrf_token %}
+      <h4 class="mb-3 text-dark">Delete Pin</h4>
+      <p class="mb-0 text-secondary">Are you sure you want to delete pin taxi detail </p>
+      <p class="mb-1 text-secondary">For Id : <strong>{{ CodeId }}</strong> ?</p>
+      <p><input type="text" name="report" class="w-100 p-1" placeholder="why you need to delete ?" required></p>
       <div class="d-flex justify-content-between align-items-center">
+        
         <a href="{% url 'taxi_app:pinTaxi' %}" class="text-decoration-none text-dark fw-semibold">
           ← Cancel
         </a>

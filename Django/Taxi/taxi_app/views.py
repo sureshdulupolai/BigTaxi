@@ -236,12 +236,13 @@ def PinFunction(request, dataPresentLst):
         for j in NoIndex: IdLst.insert(j, '')
 
     request.session['ReportAccessBarCode'] = codeLst
-    DataZip = list(zip(dataOfPinLst, DataOf, IdLst))
+    DataZip = list(zip(dataOfPinLst, DataOf))
     return DataZip
 
 # create for coupon code view update, now
 def pinTaxiFunctionBaseView(request):
     if request.user.is_authenticated: 
+        showMessage = False
         usernames = request.user.username; user = User.objects.get(username = usernames); dataOfUser = usersDataModel.objects.get(ULink = user); dataPresentLst = PinTaxiAvailable.objects.filter(customerId = dataOfUser)
         # default form limit is 2
         profileImage = dataOfUser.UProfileImage; setLimitToForm = 2
@@ -285,11 +286,11 @@ def pinTaxiFunctionBaseView(request):
                     PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter, taxiDateAndTimeByUser = formatted_datetime).save(); TaxiBarCode(barCode = newBarCode).save()
                     return redirect('taxi_app:pinTaxi')
                 
-                else: messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi'); return render(request, 'main/pinTaxi.html')
+                else: messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi'); showMessage = True; return render(request, 'main/pinTaxi.html')
         
         else: DataShow = False
-            
-        context = {'valueOfPin' : valueOfPin, 'dataOfPin' : dataOfPin, 'usernames' : usernames, 'DataShow' : DataShow, 'profileImage' : profileImage}
+        
+        context = { 'showMessage' : showMessage, 'valueOfPin' : valueOfPin, 'dataOfPin' : dataOfPin, 'usernames' : usernames, 'DataShow' : DataShow, 'profileImage' : profileImage}
         return render(request, 'main/pinTaxi.html', context)
 
     else: return redirect('driver:login')
@@ -363,7 +364,7 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
         PTA_Object = PinTaxiAvailable.objects.get(taxiAvaId = codeNeed)
 
         if request.method == 'POST':
-
+            
             try:
                 PinDeleteReview(
                     deleteType = 'normal',
@@ -375,7 +376,8 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
                     date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
                     passenger = str(PTA_Object.taxiPassenger),
                     price = str(PTA_Object.priceOfTravel),
-                    discountCoupon = PTA_Object.couponCodeWas
+                    discountCoupon = PTA_Object.couponCodeWas,
+                    review = request.POST.get('report')
                 ).save()
 
                 PTA_Object.delete()
@@ -395,3 +397,34 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
     
     context = {'CodeId' : codeNeed}
     return render(request, 'main/deleteDetailsPin.html', context)
+
+def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
+    IdCodeNeed = IdCodeNeed.upper()
+    localTime = ''; showMoreDetailsInTemplete = False; price = ''
+
+    try:
+        PTA_LstOfObject = PinTaxiAvailable.objects.get(taxiAvaId = IdCodeNeed)
+        RDPTObject = ReportDriverInPinTaxi.objects.filter(pinBarCode = PTA_LstOfObject)
+        
+    except Exception as e:
+        if str(e) == 'PinTaxiAvailable matching query does not exist.':
+            messages.info(request, f"Need a Proper Id, This id is does'nt exist {IdCodeNeed}.")
+            return redirect('taxi_app:pinTaxi')
+        else:
+            messages.info(request, "Can't reach this page for not try again after sometime.")
+            return redirect('taxi_app:pinTaxi')
+        
+    if not RDPTObject:
+
+        if int(str(PTA_LstOfObject.taxiTime)[:2]) < 12: localTime = 'am'
+        else: localTime = 'pm'
+
+        if PTA_LstOfObject.driverCode != 'DRIVERCODE':  driverData = usersDataModel.objects.get(UserCode = PTA_LstOfObject.driverCode).UProfileName; showMoreDetailsInTemplete = True; price = PTA_LstOfObject.priceOfTravel
+        else: driverData = 'Driver Not Assigned'
+
+    else:
+        messages.info(request, f"Can't show status for this ID {IdCodeNeed}, Detail in reported for now.")
+        return redirect('taxi_app:pinTaxi')
+
+    context = { 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
+    return render(request, 'main/checkStatus.html', context)
