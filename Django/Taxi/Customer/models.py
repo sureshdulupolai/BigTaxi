@@ -1,5 +1,4 @@
 from django.db import models
-from Users.models import usersDataModel
 
 class PinDeleteReview(models.Model):
     dataLike = [('report', 'report'),('normal', 'normal')]
@@ -19,4 +18,15 @@ class PinDeleteReview(models.Model):
     time = models.TimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"AvaId : {self.pinBarCode}, Customer : {self.userBarCode}, Driver : {self.driverCode}"
+        dataShow = ''
+        if self.driverCode == 'DRIVERCODE':
+            dataShow = 'No Driver Found'
+
+        else:
+            if self.review != 'No Report, Delete By User':
+                dataShow = self.driverCode + ' ' + 'Driver Reported!'
+                
+            else:
+                dataShow = self.driverCode
+
+        return f"AvaId : {self.pinBarCode}, Customer : {self.userBarCode}, Driver : {dataShow}"

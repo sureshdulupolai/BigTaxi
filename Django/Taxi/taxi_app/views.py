@@ -319,11 +319,13 @@ def deletePinTaxiReport(request, codeNeed):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
         PTA_Object = PinTaxiAvailable.objects.get(taxiAvaId = codeNeed)
+        ReviewObject = ReportDriverInPinTaxi.objects.get(pinBarCode = PTA_Object)
 
         try:
             if request.method == 'POST':
+            
                 PinDeleteReview(
-                        deleteType = 'normal',
+                        deleteType = 'report',
                         pinBarCode = PTA_Object.taxiAvaId,
                         userBarCode = PTA_Object.customerId.UserCode,
                         driverCode = PTA_Object.driverCode,
@@ -331,9 +333,16 @@ def deletePinTaxiReport(request, codeNeed):
                         addressTo = PTA_Object.toLocation,
                         date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
                         passenger = str(PTA_Object.taxiPassenger),
+                        review = ReviewObject.reportData,
                         price = str(PTA_Object.priceOfTravel),
                         discountCoupon = PTA_Object.couponCodeWas
                 ).save()
+
+                PTA_Object.delete(); ReviewObject.delete()
+
+                messages.success(request, f'Pin Taxi Report Details Is Deleted SuccessFully, For Id {codeNeed}')
+                return redirect('taxi_app:pinTaxi')
+
 
         except:
             messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
@@ -341,7 +350,8 @@ def deletePinTaxiReport(request, codeNeed):
         
     else:
         # User didn't type manually — show 404
-        return HttpResponseNotFound("404 Not Found: Direct access only")
+        messages.success(request, "Can't getting the page!, please click on delete button to access that page, data will fetch automatic.")
+        return redirect('taxi_app:pinTaxi')
     
     context = {'CodeId' : codeNeed}
     return render(request, 'main/deletetRepost.html', context)
@@ -373,7 +383,8 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
                 messages.success(request, f'Pin Taxi Details Is Deleted SuccessFully, For Id {codeNeed}')
                 return redirect('taxi_app:pinTaxi')
             
-            except:
+            except Exception as e:
+                print('Error -  ', e)
                 messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
                 return redirect('taxi_app:pinTaxi')
 
