@@ -126,7 +126,8 @@
           id="user-city"
           value=""
           placeholder="Select your starting location from the map. It will be filled automatically, but please make sure to verify the city as well*"
-        />
+          readonly
+          />
         <input
           type="number"
           class="form-control"
@@ -241,7 +242,7 @@
     <div class="mt-3 mt-md-0">
       {% if FIR %}
         <a href="{% url 'taxi_app:checkPinReport' DP.taxiAvaId %}" class="btn btn-primary"><i class="bi bi-file-earmark-text"></i></a>
-        <a href="#" class="btn btn-success"><i class="bi bi-arrow-clockwise"></i></a>
+        <a href="{% url 'taxi_app:repostPin' DP.taxiAvaId %}" class="btn btn-success"><i class="bi bi-arrow-clockwise"></i></a>
         <a href="{% url 'taxi_app:deletePinTaxiReport' DP.taxiAvaId %}" class="btn btn-danger"><i class="bi bi-trash"></i></a> 
       {% else %}
         <a href="{% url 'taxi_app:pinStatus' DP.taxiAvaId %}" class="btn btn-warning button-home"><i class="bi bi-check-circle"></i></a>

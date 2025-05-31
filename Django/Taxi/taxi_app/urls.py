@@ -17,9 +17,9 @@ urlpatterns = [
     path('pin-report-check/<barCodeId>/', views.checkPinTaxiReportFunctionBaseView, name='checkPinReport'),
     path('pin-report-delete/<codeNeed>/', views.deletePinTaxiReport, name='deletePinTaxiReport'),
     path('pin-detail-delete/<codeNeed>/', views.deletePinTaxiDetailsNoReport, name='deletePinTaxiDetail'),
+    path('pin-repost/<CodeNeed>/', views.RePostPinTaxiFunctionBaseView, name='repostPin'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),
-
 ]

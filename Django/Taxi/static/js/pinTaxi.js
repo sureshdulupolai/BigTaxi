@@ -1428,65 +1428,67 @@ document.getElementById("search-location-btn").addEventListener("click", () => {
     });
 });
 
-document.querySelector("form").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const form = e.target;
+// document.querySelector("form").addEventListener("submit", function (e) {
+//   e.preventDefault();
+//   const form = e.target;
 
-  const cityInputByUser = document.getElementById("user-city").value.trim();
-  if (cityInputByUser in cityLst) {
-    const formValueFrom = document
-      .getElementById("currentLocationUser")
-      .value.trim();
-    const formValueTo = document.getElementById("toLocationInput").value.trim();
+//   const cityInputByUser = document.getElementById("user-city").value.trim();
+//   console.log(cityInputByUser);
+//   console.log(cityInputByUser in cityLst);
+//   if (cityInputByUser in cityLst) {
+//     const formValueFrom = document
+//       .getElementById("currentLocationUser")
+//       .value.trim();
+//     const formValueTo = document.getElementById("toLocationInput").value.trim();
 
-    let resultSaveFrom = userAddressSelectedFrom
-      .trim()
-      .split(/\s+/)
-      .map((w, i) => (i === 0 ? w.toLowerCase() : w))
-      .join("");
-    let resultSaveTo = userAddressSelectedTo
-      .trim()
-      .split(/\s+/)
-      .map((w, i) => (i === 0 ? w.toLowerCase() : w))
-      .join("");
-    let resultFrom = formValueFrom
-      .trim()
-      .split(/\s+/)
-      .map((w, i) => (i === 0 ? w.toLowerCase() : w))
-      .join("");
-    let resultTo = formValueTo
-      .trim()
-      .split(/\s+/)
-      .map((w, i) => (i === 0 ? w.toLowerCase() : w))
-      .join("");
+//     let resultSaveFrom = userAddressSelectedFrom
+//       .trim()
+//       .split(/\s+/)
+//       .map((w, i) => (i === 0 ? w.toLowerCase() : w))
+//       .join("");
+//     let resultSaveTo = userAddressSelectedTo
+//       .trim()
+//       .split(/\s+/)
+//       .map((w, i) => (i === 0 ? w.toLowerCase() : w))
+//       .join("");
+//     let resultFrom = formValueFrom
+//       .trim()
+//       .split(/\s+/)
+//       .map((w, i) => (i === 0 ? w.toLowerCase() : w))
+//       .join("");
+//     let resultTo = formValueTo
+//       .trim()
+//       .split(/\s+/)
+//       .map((w, i) => (i === 0 ? w.toLowerCase() : w))
+//       .join("");
 
-    if (userAddressSelectedFrom === "") {
-      alert(
-        "you have filled but its not select inside map, please select from the map 'current location'"
-      );
-    } else {
-      if (userAddressSelectedTo === "") {
-        alert(
-          "you have filled but its not select inside map, please select from the map 'last location'"
-        );
-      } else {
-        if (resultSaveFrom === resultFrom) {
-          if (resultSaveTo === resultTo) {
-            console.log("SuccessFull");
-            // form.submit();
-          } else {
-            alert(
-              "you have change address for 'current location!', now select on map"
-            );
-          }
-        } else {
-          alert(
-            "you have change address for 'last location!', now select on map"
-          );
-        }
-      }
-    }
-  } else {
-    alert("No City Found " + cityInputByUser);
-  }
-});
+//     if (userAddressSelectedFrom === "") {
+//       alert(
+//         "you have filled but its not select inside map, please select from the map 'current location'"
+//       );
+//     } else {
+//       if (userAddressSelectedTo === "") {
+//         alert(
+//           "you have filled but its not select inside map, please select from the map 'last location'"
+//         );
+//       } else {
+//         if (resultSaveFrom === resultFrom) {
+//           if (resultSaveTo === resultTo) {
+//             console.log("SuccessFull");
+//             // form.submit();
+//           } else {
+//             alert(
+//               "you have change address for 'current location!', now select on map"
+//             );
+//           }
+//         } else {
+//           alert(
+//             "you have change address for 'last location!', now select on map"
+//           );
+//         }
+//       }
+//     }
+//   } else {
+//     alert("No City Found " + cityInputByUser);
+//   }
+// });

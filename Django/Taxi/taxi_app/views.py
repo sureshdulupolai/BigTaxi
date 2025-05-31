@@ -9,7 +9,7 @@ import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
 from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
-from Customer.models import PinDeleteReview
+from Customer.models import PinDeleteReview, repostData
 
 def redirect_based_on_location(request):
     if request.user.is_authenticated:
@@ -428,3 +428,36 @@ def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
 
     context = { 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
     return render(request, 'main/checkStatus.html', context)
+
+def RePostPinTaxiFunctionBaseView(request, CodeNeed):
+    referrer = request.META.get('HTTP_REFERER')
+
+    if referrer:
+        try:
+            PTAObject = PinTaxiAvailable.objects.get(taxiAvaId = CodeNeed)
+            RDPTObject = ReportDriverInPinTaxi.objects.get(pinBarCode = PTAObject)
+            
+        except Exception as e:
+            if str(e) == 'PinTaxiAvailable matching query does not exist.':
+                messages.info(request, f"Oops!, try again after time. Something got missed.")
+                return redirect('taxi_app:pinTaxi')
+            
+            else:
+                messages.info(request, "Can't reach this page for not try again after sometime.")
+                return redirect('taxi_app:pinTaxi')
+
+    else:
+        # User didn't type manually — show 404
+        messages.success(request, "Can't getting the page!, please click a button to access that page, data will fetch automatic.")
+        return redirect('taxi_app:pinTaxi')
+    
+    if request.method == 'POST':
+
+        repostData(PNRCode = PTAObject.taxiAvaId, userCode = PTAObject.customerId.UserCode, driverCode = PTAObject.driverCode, status = RDPTObject.driverReportFor, text = RDPTObject.reportData).save()
+        PTAObject.driverCode = 'DRIVERCODE'; PTAObject.priceOfTravel = 00; PTAObject.save()
+        RDPTObject.delete()
+
+        messages.success(request, 'SuccessFully Re-Submited the pin 😊🧳✈️')
+        return redirect('taxi_app:pinTaxi')
+    
+    return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})

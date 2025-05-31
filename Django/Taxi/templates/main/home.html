@@ -99,11 +99,11 @@
         <div class="mt-3 mt-md-0">
           {% if user.is_authenticated %}
           <form method="POST">
-              <a href="#" class="btn btn-warning button-home">Accept</a>
+              
               {% csrf_token %}
               <input type="hidden" name="checkForm" value="FormTwoSelectByUser"/>
               <input type="hidden" name="userPinCode" value="{{ DPT.taxiAvaId }}">
-              <button class="btn btn-danger button-home">Details</button>
+              <button class="btn btn-warning button-home">Accept</button>
             </form>
           {% else %}
             <a href="{% url 'driver:driverLogin' %}" class="btn btn-danger button-home">Details</a>

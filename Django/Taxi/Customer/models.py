@@ -30,3 +30,15 @@ class PinDeleteReview(models.Model):
                 dataShow = self.driverCode
 
         return f"AvaId : {self.pinBarCode}, Customer : {self.userBarCode}, Driver : {dataShow}"
+    
+class repostData(models.Model):
+    PNRCode = models.CharField(max_length=100)
+    userCode = models.CharField(max_length=100)
+    status = models.CharField(max_length=100)
+    driverCode = models.CharField(max_length=100)
+    text = models.CharField(max_length=5000)
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"PNR : {self.PNRCode}, Status : {self.status}"
