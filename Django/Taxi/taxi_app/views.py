@@ -4,12 +4,13 @@ from django.contrib.auth.models import User
 from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete
 from django.contrib import messages
 from datetime import datetime
-from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
-import json
 from taxi_app.navbar import navbar
 from django.urls import reverse
 from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
-from Customer.models import PinDeleteReview, repostData
+from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePin
+
+# from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
+# import json
 
 def redirect_based_on_location(request):
     if request.user.is_authenticated:
@@ -18,27 +19,34 @@ def redirect_based_on_location(request):
         else: return redirect('taxi_app:lan')
     else: return redirect('driver:customerLogin')
 
-# Create your views here.
+# home for driver pin customer check
 def HomePageForTaxiAppViewFunction(request):
-    DataOfPinTaxiLst = []; newLstOfDPTL = []; showError = [1, 1, 1]
+    DataOfPinTaxiLst = []; newLstOfDPTL = []; showError = []
 
     if request.user.is_authenticated:
         dataFromNavBar = navbar(request)
         city = dataFromNavBar.get("userModelDataCityis"); state = dataFromNavBar.get("userModelDataStateis"); userCategory = dataFromNavBar.get('userCategoryis'); userBarCode = dataFromNavBar.get('userBarCodeAccessis')
-        
-        # if userCategory == 'Driver':
-        if request.method == "POST":
-            checkFormProcess = request.POST.get('checkForm')
 
-            if checkFormProcess == 'FormOneSelectByUser':
-                updateCity = request.POST.get('city'); updateState = request.POST.get('state'); UDM = usersDataModel.objects.get(UserCode = userBarCode); UDM.UserCity = updateCity; UDM.UserState = updateState
-                UDM.save()
-                return redirect('taxi_app:home')
+        SNDP_ObjectLst = SaveNotificaionDeletePin.objects.all()
+        for DataInSNDP in SNDP_ObjectLst:
+            if userBarCode == DataInSNDP.userCode:
+                messages.success(request, f"{DataInSNDP.text}")
+                DataInSNDP.delete()
+
+        if userCategory == 'Driver':
             
-            elif checkFormProcess == 'FormTwoSelectByUser':
-                BarCodeDetails = request.POST.get('userPinCode')
-                request.session['userPinDetailsCodeTaxi'] = BarCodeDetails
-                return redirect('taxi_app:pinDetail', barCode= BarCodeDetails)
+            if request.method == "POST":
+                checkFormProcess = request.POST.get('checkForm')
+
+                if checkFormProcess == 'FormOneSelectByUser':
+                    updateCity = request.POST.get('city'); updateState = request.POST.get('state'); UDM = usersDataModel.objects.get(UserCode = userBarCode); UDM.UserCity = updateCity; UDM.UserState = updateState
+                    UDM.save()
+                    return redirect('taxi_app:home')
+                
+                elif checkFormProcess == 'FormTwoSelectByUser':
+                    BarCodeDetails = request.POST.get('userPinCode')
+                    request.session['userPinDetailsCodeTaxi'] = BarCodeDetails
+                    return redirect('taxi_app:pinDetail', barCode= BarCodeDetails)
         
     else: city = request.session.get('userDataCityis', 'defaultCity'); state = request.session.get('userDataStateis', 'defaultState')
 
@@ -54,6 +62,7 @@ def HomePageForTaxiAppViewFunction(request):
     context = { 'DataOfPinTaxiLst': newDataOfBoth, 'city' : city.title(), 'state' : state.title() }
     return render(request, 'main/home.html', context)
 
+# to accept pin by driver
 def pinDetailFunctionBaseView(request,barCode):
     pinCodeHere = request.session.get('userPinDetailsCodeTaxi' or False); userTravelFrom = ''; userTravelTo = ''; passenger = 1; dateAndTime = ''; customerImage = ''; customerName = '';  customerUsername = ''; verifyUser = 'UnTrusted'; gender = 'Male'; dataShow = True
     ShowPriceDataInTemplate = True; PriceExist = 0
@@ -91,6 +100,7 @@ def pinDetailFunctionBaseView(request,barCode):
     context = { 'barCode' : barCode, 'PriceExist' : PriceExist, 'ShowPriceDataInTemplate' : ShowPriceDataInTemplate, 'userTravelFrom' : userTravelFrom, 'userTravelTo' : userTravelTo, 'passenger' : passenger, 'dateAndTime' : dateAndTime, 'customerImage' : customerImage, 'customerName' : customerName, 'customerUsername' : customerUsername, 'verifyUser' : verifyUser, 'gender' : gender, 'dataShow' : dataShow }
     return render(request, 'main/details.html', context)
 
+# driver report on accepted pin
 def reportDriverOnPinTaxiFunctionBaseView(request, barCodes):
     PinData = request.session.get('userPinDetailsCodeTaxi' or False); navData = navbar(request)
 
@@ -115,6 +125,7 @@ def reportDriverOnPinTaxiFunctionBaseView(request, barCodes):
     context = {'barCodeHere' : barCodes}
     return render(request, 'main/reportPin.html', context)
 
+# location to get pin
 def locationPageFunctionViewBase(request):
     if request.method == "POST":
         city = request.POST.get('uCity'); state = request.POST.get('uState')
@@ -124,9 +135,11 @@ def locationPageFunctionViewBase(request):
     
     return render(request, 'main/checkLocation.html')
 
+# function to count bigtaxi point
 def PointCount(RarLst, values = 1):
     return len([i.userStar for i in RarLst if int(i.userStar) == values])
 
+# review of BigTaxi
 def reviewPageFunctionBaseView(request):
     showData = False; buttonData = []; RarLst = ReviewAndRating.objects.all(); operationUser = []
     if request.user.is_authenticated:
@@ -199,6 +212,7 @@ def reviewPageFunctionBaseView(request):
         context = { 'showData' : showData, 'Rar' : fullReviewLst, 'totalOutOf' : totalOutOf, 'countFiveStar' : countFiveStar, 'countFourStar' : countFourStar, 'countThreeStar' : countThreeStar, 'countTwoStar' : countTwoStar, 'countOneStar' : countOneStar, 'styleFive' : styleFive, 'styleFour' : styleFour, 'styleThree' : styleThree, 'styleTwo' : styleTwo, 'styleOne' : styleOne }
         return render(request, 'footer/review.html', context)
     
+# to delete review of BigTaxi Posted
 def deleteReviewFunctionBaseView(request):
     if request.user.is_authenticated:
         DataInBar = request.session.get('userRatingCode', False)
@@ -224,6 +238,7 @@ def deleteReviewFunctionBaseView(request):
     else:
         return redirect('driver:customerLogin')
 
+# pinTaxiFunction
 def PinFunction(request, dataPresentLst):
     dataOfPinLst = []; IdLst = []; codeLst = []
     for a1 in dataPresentLst:
@@ -239,7 +254,7 @@ def PinFunction(request, dataPresentLst):
     DataZip = list(zip(dataOfPinLst, DataOf))
     return DataZip
 
-# create for coupon code view update, now
+# pin post and details page for customer
 def pinTaxiFunctionBaseView(request):
     if request.user.is_authenticated: 
         showMessage = False
@@ -295,6 +310,7 @@ def pinTaxiFunctionBaseView(request):
 
     else: return redirect('driver:login')
 
+# to check pin taxi report given by the driver
 def checkPinTaxiReportFunctionBaseView(request, barCodeId):
     Codelst = request.session.get('ReportAccessBarCode' or False)
     usernames = ''; report = ''; date_time = ''
@@ -316,6 +332,7 @@ def checkPinTaxiReportFunctionBaseView(request, barCodeId):
     context = { 'usernames' : usernames, 'report' : report, 'date_time' : date_time }
     return render(request, 'main/checkReport.html', context)
 
+# to delete report post by the driver
 def deletePinTaxiReport(request, codeNeed):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
@@ -357,6 +374,7 @@ def deletePinTaxiReport(request, codeNeed):
     context = {'CodeId' : codeNeed}
     return render(request, 'main/deletetRepost.html', context)
 
+# delete a pin taxi by customer
 def deletePinTaxiDetailsNoReport(request, codeNeed):
     referrer = request.META.get('HTTP_REFERER')
 
@@ -398,6 +416,7 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
     context = {'CodeId' : codeNeed}
     return render(request, 'main/deleteDetailsPin.html', context)
 
+# to check of travel information, driver assigned or not
 def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
     IdCodeNeed = IdCodeNeed.upper()
     localTime = ''; showMoreDetailsInTemplete = False; price = ''
@@ -429,6 +448,7 @@ def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
     context = { 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
     return render(request, 'main/checkStatus.html', context)
 
+# to delete the report but need to repost with same data
 def RePostPinTaxiFunctionBaseView(request, CodeNeed):
     referrer = request.META.get('HTTP_REFERER')
 
@@ -461,3 +481,4 @@ def RePostPinTaxiFunctionBaseView(request, CodeNeed):
         return redirect('taxi_app:pinTaxi')
     
     return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})
+

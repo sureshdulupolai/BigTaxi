@@ -12,7 +12,28 @@
     position: relative;
     top: -5px;
    }
+   .bg-teal-700 {
+    background-color: #0f766e !important; /* Teal 700 (Tailwind ka) */
+    color: white;
+  }
+  .buttonLocation{
+    background-color: #3730a3 !important;
+    color: white;
+  }
+  .buttonLocation:hover,
+  .buttonLocation:focus,
+  .buttonLocation:active,
+  .buttonLocation:visited,
+  .buttonLocation:focus-visible {
+    color: white !important;
+  }
 </style>
+{% if show_warning %}
+  <div class="alert alert-danger text-center">
+    Your previous taxi was removed because no date/time was mentioned.
+  </div>
+{% endif %}
+
 <form method="POST" action="" class="w-100">
   {% csrf_token %}
   <div
@@ -45,7 +66,7 @@
     </div>
     <div class="d-flex align-items-center gap-2 mt-1 mb-1">
       {% if user.is_authenticated %}
-        <button type="button" class="btn btn-warning height-to-button-location" id="change-location-btn">
+        <button type="button" class="btn buttonLocation height-to-button-location" id="change-location-btn">
           <span class="text-inside-location-button">
             Change Location
           </span>
@@ -88,7 +109,11 @@
         <p class="text-muted mb-0">pick up: {{ DPT.currentLocation|truncatewords:16 }}</p>
         <p class="text-muted mb-0">drop to: {{ DPT.toLocation|truncatewords:16 }}</p>
         <p class="text-muted mb-0">passenger: {{ DPT.taxiPassenger }}</p>
-        <p class="text-muted mb-0">date & time: {{ DPT.taxiDateAndTimeByUser }}</p>
+        {% if userCategoryis == 'Driver' %}
+          <p class="text-muted mb-0">date & time: {{ DPT.taxiDateAndTimeByUser }}</p>
+        {% else %}
+          <p class="text-muted mb-0">price taking: {{ DPT.priceOfTravel }}₹</p>
+        {% endif %}
         {% if THRD %}
           <p class="text-danger mb-0">Driver reported, trip will be cancelled soon.</p>
         {% endif %}
@@ -98,13 +123,16 @@
         <!-- Book Taxi Button -->
         <div class="mt-3 mt-md-0">
           {% if user.is_authenticated %}
-          <form method="POST">
-              
-              {% csrf_token %}
-              <input type="hidden" name="checkForm" value="FormTwoSelectByUser"/>
-              <input type="hidden" name="userPinCode" value="{{ DPT.taxiAvaId }}">
-              <button class="btn btn-warning button-home">Accept</button>
-            </form>
+            {% if userCategoryis == 'Driver' %}
+              <form method="POST">
+                  
+                  {% csrf_token %}
+                  <input type="hidden" name="checkForm" value="FormTwoSelectByUser"/>
+                  <input type="hidden" name="userPinCode" value="{{ DPT.taxiAvaId }}">
+                  <button class="btn btn-warning button-home">Accept</button>
+                </form>
+                
+              {% endif %}
           {% else %}
             <a href="{% url 'driver:driverLogin' %}" class="btn btn-danger button-home">Details</a>
           {% endif %}

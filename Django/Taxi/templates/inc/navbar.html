@@ -11,25 +11,25 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand text-primary fw-bold fs-4" href="{% url 'taxi_app:autoRedirect' %}">BigTaxi</a>
+    <a class="navbar-brand text-primary text-main-own fw-bold fs-4" href="{% url 'taxi_app:autoRedirect' %}">BigTaxi</a>
     <div class="ms-auto d-flex align-items-center">
       {% if user.is_authenticated %}
           {% if userCategoryis == 'Customer' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3 text-color-navbar">Customer</a>
-            <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3 text-color-navbar">PinTaxi</a>
-            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
+             <a href="#" class="me-3 text-color-navbar text-main-own">Customer</a>
+            <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3 text-color-navbar text-main-own">PinTaxi</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
           {% elif userCategoryis == 'Driver' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-            <a href="#" class="me-3 text-color-navbar">Driver</a>
-            <a href="#" class="me-3 text-color-navbar">PinTaxi</a>
-            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">Driver</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">PinTaxi</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
           {% elif userCategoryis == 'Developer' %}
             <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3 text-color-navbar">Developer</a>
-            <a href="#" class="me-3 text-color-navbar">TaxiSuggest</a>
-            <a href="#" class="me-3 text-color-navbar">ArgentTaxi</a>
-            <a href="#" class="me-3 text-color-navbar">Informations</a>
+             <a href="#" class="me-3 text-color-navbar text-main-own">Developer</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">TaxiSuggest</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
+            <a href="#" class="me-3 text-color-navbar text-main-own">Informations</a>
           {% else %}
             
           {% endif %}
@@ -44,7 +44,7 @@
   <div class="w-100">
     {% for message in messages %}
       <div
-        class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-0 mb-0"
+        class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-0 mb-0 text-center"
         role="alert">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

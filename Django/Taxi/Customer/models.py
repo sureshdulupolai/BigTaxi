@@ -42,3 +42,11 @@ class repostData(models.Model):
 
     def __str__(self):
         return f"PNR : {self.PNRCode}, Status : {self.status}"
+    
+class SaveNotificaionDeletePin(models.Model):
+    barCode = models.CharField(max_length=100)
+    userCode = models.CharField(max_length=100)
+    text = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"PNR : {self.barCode}, UserCode : {self.userCode}"
