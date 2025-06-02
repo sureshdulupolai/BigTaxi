@@ -7,7 +7,7 @@ urlpatterns = [
     # basic login
     path('', views.redirect_based_on_location, name='autoRedirect'),
     path('location/', views.locationPageFunctionViewBase, name='lan'),
-    path('home/', views.HomePageForTaxiAppViewFunction, name='home'),
+    path('in/', views.HomePageForTaxiAppViewFunction, name='home'),
 
     # pin taxi
     path('pin/', views.pinTaxiFunctionBaseView, name='pinTaxi'),

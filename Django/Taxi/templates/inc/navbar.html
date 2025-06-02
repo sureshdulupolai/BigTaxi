@@ -1,11 +1,59 @@
 <style>
-    a{
-        text-decoration: none;
-    }
-    .text-color-navbar{
-      /* color: #0d6efd; */
-      font-weight: 550;
-    }
+    a {
+  text-decoration: none;
+}
+
+.text-color-navbar {
+  font-weight: 550;
+}
+
+.scrolling-navbar {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.scrolling-navbar::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-item-wrapper {
+  display: inline-block;
+  padding: 0.7rem;
+}
+
+.nav-link {
+  color: gray;
+  position: relative;
+}
+
+/* .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background-color: #007bff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease-in-out;
+}
+
+.nav-item-wrapper:hover .nav-link {
+  color: black;
+}
+
+.nav-item-wrapper:hover .nav-link::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-item-wrapper:not(:hover) .nav-link::after {
+  transform: scaleX(0);
+  transform-origin: right;
+} */
+
 </style>
 
 <!-- Navbar -->
@@ -13,33 +61,44 @@
   <div class="container-fluid">
     <a class="navbar-brand text-primary text-main-own fw-bold fs-4" href="{% url 'taxi_app:autoRedirect' %}">BigTaxi</a>
     <div class="ms-auto d-flex align-items-center">
-      {% if user.is_authenticated %}
-          {% if userCategoryis == 'Customer' %}
-            <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3 text-color-navbar text-main-own">Customer</a>
-            <a href="{% url 'taxi_app:pinTaxi' %}" class="me-3 text-color-navbar text-main-own">PinTaxi</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
-          {% elif userCategoryis == 'Driver' %}
-            <!-- <a href="#" class="me-3">Profile</a> -->
-            <a href="#" class="me-3 text-color-navbar text-main-own">Driver</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">PinTaxi</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
-          {% elif userCategoryis == 'Developer' %}
-            <!-- <a href="#" class="me-3">Profile</a> -->
-             <a href="#" class="me-3 text-color-navbar text-main-own">Developer</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">TaxiSuggest</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">ArgentTaxi</a>
-            <a href="#" class="me-3 text-color-navbar text-main-own">Informations</a>
-          {% else %}
-            
-          {% endif %}
-      {% else %}
-          <a href="{% url 'driver:customerLogin' %}" class="btn btn-outline-primary me-2">Login</a>
-          <a href="{% url 'driver:customerSignup' %}" class="btn btn-outline-primary me-2">Signup</a>
+      <!-- search bar -->
+      {% if not user.is_authenticated %}
+        <a href="{% url 'driver:customerLogin' %}" class="btn btn-outline-main me-2">Login</a>
+        <a href="{% url 'driver:customerSignup' %}" class="btn btn-outline-main me-2">Signup</a>
       {% endif %}
+
     </div>
   </div>
 </nav>
+
+<div class="bg-light border-bottom scrolling-navbar d-flex">
+{% if user.is_authenticated %}
+  {% if userCategoryis == 'Customer' %}
+
+    <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">Customer</a></div>
+    <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link">PinTaxi</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
+
+  {% elif userCategoryis == 'Driver' %}
+
+    <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">Driver</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">PinTaxi</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
+
+  {% elif userCategoryis == 'Developer' %}
+
+    <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">Developer</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">TaxiSuggest</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#">Informations</a></div>
+
+  {% endif %}
+{% endif %}
+</div>
+
 {% if messages %}
   <div class="w-100">
     {% for message in messages %}
