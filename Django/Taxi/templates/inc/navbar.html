@@ -76,20 +76,20 @@
   {% if userCategoryis == 'Customer' %}
 
     <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
-    <div class="nav-item-wrapper"><a class="nav-link" href="#">Customer</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}">Home</a></div>
     <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link">PinTaxi</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
 
   {% elif userCategoryis == 'Driver' %}
 
     <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
-    <div class="nav-item-wrapper"><a class="nav-link" href="#">Driver</a></div>
-    <div class="nav-item-wrapper"><a class="nav-link" href="#">PinTaxi</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}">Driver</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:pinTaxi' %}">PinTaxi</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
 
   {% elif userCategoryis == 'Developer' %}
-
-    <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}"></a>Home</div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:pinTaxi' %}">PinTaxi</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">Developer</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">TaxiSuggest</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>

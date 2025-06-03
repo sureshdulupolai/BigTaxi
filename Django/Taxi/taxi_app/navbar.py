@@ -4,6 +4,7 @@ from django.contrib import messages
 from taxi_app.models import PinTaxiAvailable
 from Customer.models import PinDeleteReview, SaveNotificaionDeletePin
 from django.shortcuts import render
+from datetime import datetime
 
 def navbar(request):
     if request.user.is_authenticated: 
@@ -16,6 +17,15 @@ def navbar(request):
         else: results = PinTaxiAvailable.objects.filter(currentLocation__icontains=UDM.UserState)
 
         for i in results:
+            userDate = i.taxiDateAndTimeByUser[:10]
+            userTime = i.taxiDateAndTimeByUser[11:16]
+            userZone = i.taxiDateAndTimeByUser[16:18]
+
+            now = datetime.now()
+            current_date = str(now.strftime("%Y-%m-%d"))
+            currentDate = str(now.strftime("%I:%M:%S %p"))
+            current_Time, current_Zone = currentDate[:5], currentDate[9:11]
+            
             if i.taxiDateAndTimeByUser == 'none':
                 
                 PinDeleteReview(deleteType = 'normal', pinBarCode= i.taxiAvaId, userBarCode = i.customerId.UserCode, review = 'UnPin Because Of Time Not Mention.', addressFrom = i.currentLocation, addressTo = i.toLocation, date_Time = i.taxiDateAndTimeByUser, passenger = i.taxiPassenger, discountCoupon = i.couponCodeWas).save()
