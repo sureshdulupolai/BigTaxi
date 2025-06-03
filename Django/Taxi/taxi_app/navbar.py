@@ -17,20 +17,37 @@ def navbar(request):
         else: results = PinTaxiAvailable.objects.filter(currentLocation__icontains=UDM.UserState)
 
         for i in results:
-            userDate = i.taxiDateAndTimeByUser[:10]
-            userTime = i.taxiDateAndTimeByUser[11:16]
-            userZone = i.taxiDateAndTimeByUser[16:18]
-
-            now = datetime.now()
-            current_date = str(now.strftime("%Y-%m-%d"))
-            currentDate = str(now.strftime("%I:%M:%S %p"))
-            current_Time, current_Zone = currentDate[:5], currentDate[9:11]
-            
             if i.taxiDateAndTimeByUser == 'none':
-                
                 PinDeleteReview(deleteType = 'normal', pinBarCode= i.taxiAvaId, userBarCode = i.customerId.UserCode, review = 'UnPin Because Of Time Not Mention.', addressFrom = i.currentLocation, addressTo = i.toLocation, date_Time = i.taxiDateAndTimeByUser, passenger = i.taxiPassenger, discountCoupon = i.couponCodeWas).save()
                 SaveNotificaionDeletePin(barCode = i.taxiAvaId, userCode = i.customerId.UserCode, text = f"Your previous taxi was removed because no date/time was mentioned for id : {i.taxiAvaId}").save()
                 i.delete()
+
+            else:
+                try:
+                    if i.driverCode != 'DRIVERCODE':
+                        # Extract date + time + AM/PM zone
+                        userDateStr = i.taxiDateAndTimeByUser[:10]       # '2025-03-29'
+                        userTimeStr = i.taxiDateAndTimeByUser[11:16]     # '04:33'
+                        userZoneStr = i.taxiDateAndTimeByUser[16:18]     # 'AM'
+
+                        # Combine to datetime object
+                        user_datetime = datetime.strptime(
+                            f"{userDateStr} {userTimeStr} {userZoneStr}", "%Y-%m-%d %I:%M %p"
+                        )
+                        
+
+                        current_datetime = datetime.now()
+
+                        # ✅ Keep if current <= saved time
+                        if current_datetime > user_datetime:
+                            # # 🗑️ Delete if current time exceeds saved time
+                            PinDeleteReview(deleteType='normal', pinBarCode=i.taxiAvaId, userBarCode=i.customerId.UserCode, review='UnPin Because Time Expired.', addressFrom=i.currentLocation, addressTo=i.toLocation, date_Time=i.taxiDateAndTimeByUser, passenger=i.taxiPassenger, discountCoupon=i.couponCodeWas).save()
+                            SaveNotificaionDeletePin(barCode=i.taxiAvaId, userCode=i.customerId.UserCode, text=f"Your previous taxi was removed because time expired for id : {i.taxiAvaId}").save()
+                            i.delete()
+
+                except Exception as e:
+                    # print("❌ Error in datetime conversion:", e)
+                    pass
 
         return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis, 'userModelDataCityis' : userModelDataCityis, 'userModelDataStateis' : userModelDataStateis}
     
