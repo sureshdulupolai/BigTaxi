@@ -68,3 +68,16 @@ class ReviewDelete(models.Model):
 
     def __str__(self):
         return f"{self.usernames} : {self.uCode}"
+    
+class ErrorWork(models.Model):
+    lstOfUserVerifationType = [('LOGIN_USER', 'LOGIN_USER'),('NOT_LOGIN_USER', 'NOT_LOGIN_USER')]
+
+    userType = models.CharField(max_length=100, choices=lstOfUserVerifationType, default='NOT_LOGIN_USER')
+    uNamesAre = models.CharField(max_length=500, default='NA')
+    barCode = models.CharField(max_length=100, default='NOBARCODE1001')
+    errorAre = models.CharField(max_length=5000)
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User Type : {self.userType}, Date & Time : {self.date} {self.time}"
