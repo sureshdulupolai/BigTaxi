@@ -19,7 +19,7 @@ class PinTaxiAvailable(models.Model):
     taxiDate = models.DateField(auto_now_add=True)
     taxiTime = models.TimeField(auto_now_add=True)
     taxiDateAndTimeByUser = models.CharField(max_length=100, default='none')
-    priceOfTravel = models.IntegerField(default=100)
+    priceOfTravel = models.IntegerField(default=0)
     driverCode = models.CharField(max_length=100, default='DRIVERCODE')
     
     def __str__(self):

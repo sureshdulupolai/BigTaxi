@@ -11,11 +11,14 @@ from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePi
 
 # from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 # import json
+
+# getting userBarCode From NavBar.py
 def CodeOfUser(request):
     data = navbar(request)
     userCode = data.get('userBarCodeAccessis')
     return userCode
 
+# redirect to home page according to user verification
 def redirect_based_on_location(request):
 
     if request.user.is_authenticated:
@@ -83,18 +86,22 @@ def pinDetailFunctionBaseView(request,barCode):
     if pinCodeHere:
         if barCode == pinCodeHere:
 
+            # accepted a pin by driver
             if request.method == 'POST':
+
                 travelPrice = int(request.POST.get('price')); PTA = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere)
-                if int(PTA.priceOfTravel) > int(travelPrice): userCodeBar = usersDataModel.objects.get(ULink = User.objects.get(username = request.user.username)).UserCode; PTA.driverCode = userCodeBar; PTA.priceOfTravel = travelPrice; PTA.save(); DriverAcceptedPin(priceAccepted = travelPrice,pinBarCode = pinCodeHere,userCode = userCodeBar).save()
-# redirect to accepted page remaning
+                if (int(PTA.priceOfTravel) > int(travelPrice)) or (int(PTA.priceOfTravel) == 0): 
+                    userCodeBar = usersDataModel.objects.get(ULink = User.objects.get(username = request.user.username)).UserCode; 
+                    PTA.driverCode = userCodeBar; PTA.priceOfTravel = travelPrice; PTA.save(); 
+                    DriverAcceptedPin(priceAccepted = travelPrice,pinBarCode = pinCodeHere,userCode = userCodeBar).save()
+
                 else: messages.info(request, f'another user have choosed : {PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere).priceOfTravel}₹'); return redirect('taxi_app:pinDetail', barCode=pinCodeHere)
 
             DAP = DriverAcceptedPin.objects.all()
             for DataInDAP in DAP:
                 navData = navbar(request)
-                if DataInDAP.userCode == navData['userBarCodeAccessis'] and DataInDAP.pinBarCode == pinCodeHere:
-                    ShowPriceDataInTemplate = False
-                    PriceExist = DataInDAP.priceAccepted
+                if (DataInDAP.userCode == navData['userBarCodeAccessis']) and (DataInDAP.pinBarCode == pinCodeHere):
+                    ShowPriceDataInTemplate = False; PriceExist = DataInDAP.priceAccepted
             
             DataOfPinUser = PinTaxiAvailable.objects.get(taxiAvaId = pinCodeHere); userTravelFrom = DataOfPinUser.currentLocation; userTravelTo = DataOfPinUser.toLocation; dateAndTime = DataOfPinUser.taxiDateAndTimeByUser; customerImage = DataOfPinUser.customerId.UProfileImage; customerName = DataOfPinUser.customerId.UProfileName.title(); customerUsername = DataOfPinUser.customerId.ULink.username; gender = DataOfPinUser.customerId.UserGender.title(); DangerTripCount = int(DataOfPinUser.customerId.dangerTripCount)
             if gender == 'Not Check': dataShow = False
