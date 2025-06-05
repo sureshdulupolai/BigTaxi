@@ -6,7 +6,6 @@ from Customer.models import PinDeleteReview, SaveNotificaionDeletePin
 from django.shortcuts import render, redirect
 from datetime import datetime
 
-
 def navbar(request):
     try:
         if request.user.is_authenticated: 
@@ -48,14 +47,16 @@ def navbar(request):
                                     i.delete()
 
                         except Exception as e:
-                            # print("❌ Error in datetime conversion:", e)
-                            pass
+
+                            ErrorWork(userType = 'LOGIN_USER', uNamesAre = request.user.username, barCode = userBarCodeAccessis, errorAre = e, urls = request).save()
+                            messages.info(request, 'Oops!, Something Went Wrong in date and time, Please Try Again Later We Will Solve Your Problem Soon!.')
+                            return redirect('taxi_app:autoRedirect')
 
                 return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis, 'userModelDataCityis' : userModelDataCityis, 'userModelDataStateis' : userModelDataStateis}
             
             except Exception as e:
-                
-                ErrorWork(userType = 'LOGIN_USER', uNamesAre = request.user.username, barCode = userBarCodeAccessis, errorAre = e).save()
+
+                ErrorWork(userType = 'LOGIN_USER', uNamesAre = request.user.username, barCode = userBarCodeAccessis, errorAre = e, urls = request).save()
                 messages.info(request, 'Oops!, Something Went Wrong Please Try Again Later We Will Solve Your Problem Soon!.')
                 return redirect('taxi_app:autoRedirect')
             
@@ -64,6 +65,6 @@ def navbar(request):
     
     except Exception as e:
 
-        ErrorWork(userType = 'NOT_LOGIN_USER', errorAre = e).save()
+        ErrorWork(userType = 'NOT_LOGIN_USER', errorAre = e, urls = request).save()
         messages.info(request, 'Oops!, Something Went Wrong Please Try Again Later We Will Solve Your Problem Soon!.')
         return redirect('taxi_app:autoRedirect')

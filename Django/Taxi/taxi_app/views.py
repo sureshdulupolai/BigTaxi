@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from taxi_app.models import TaxiBarCode, PinTaxiAvailable
 from django.contrib.auth.models import User
-from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete
+from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete, ErrorWork
 from django.contrib import messages
 from datetime import datetime
 from taxi_app.navbar import navbar
@@ -11,12 +11,26 @@ from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePi
 
 # from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 # import json
+def CodeOfUser(request):
+    data = navbar(request)
+    userCode = data.get('userBarCodeAccessis')
+    return userCode
 
 def redirect_based_on_location(request):
+
     if request.user.is_authenticated:
-        context = navbar(request); city = context.get("userModelDataCityis"); state = context.get("userModelDataStateis")
-        if city and state: return redirect(reverse('taxi_app:home'))
-        else: return redirect('taxi_app:lan')
+        try:
+            
+            context = navbar(request); city = context.get("userModelDataCityis"); state = context.get("userModelDataStateis")
+            if city and state: return redirect(reverse('taxi_app:home'))
+            else: return redirect('taxi_app:lan')
+
+        except Exception as e:
+
+            ErrorWork(userType = 'LOGIN_USER', uNamesAre = request.user.username, barCode = CodeOfUser(request), errorAre = e, urls = request).save()
+            messages.info(request, 'Oops!, Something Went Wrong Please Try Again Later We Will Solve Your Problem Soon!.')
+            return redirect('taxi_app:autoRedirect')
+        
     else: return redirect('driver:customerLogin')
 
 # home for driver pin customer check

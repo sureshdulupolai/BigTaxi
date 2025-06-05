@@ -78,6 +78,7 @@ class ErrorWork(models.Model):
     errorAre = models.CharField(max_length=5000)
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now_add=True)
+    urls = models.CharField(max_length=2000, default='NO_URL')
 
     def __str__(self):
         return f"User Type : {self.userType}, Date & Time : {self.date} {self.time}"
