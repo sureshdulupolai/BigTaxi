@@ -3,11 +3,12 @@ from taxi_app.models import TaxiBarCode, PinTaxiAvailable
 from django.contrib.auth.models import User
 from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete, ErrorWork
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, timedelta
 from taxi_app.navbar import navbar
 from django.urls import reverse
 from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
 from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePin
+from django.utils import timezone
 
 # from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 # import json
@@ -462,11 +463,28 @@ def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
         if PTA_LstOfObject.driverCode != 'DRIVERCODE':  driverData = usersDataModel.objects.get(UserCode = PTA_LstOfObject.driverCode).UProfileName; showMoreDetailsInTemplete = True; price = PTA_LstOfObject.priceOfTravel
         else: driverData = 'Driver Not Assigned'
 
+        # Calculate countdown target time
+        now = timezone.now()
+
+        # If PTA_LstOfObject.taxiTime is just a time (not datetime)
+        if isinstance(PTA_LstOfObject.taxiTime, datetime):
+            trip_datetime = PTA_LstOfObject.taxiTime
+        else:
+            trip_datetime = datetime.combine(now.date(), PTA_LstOfObject.taxiTime)
+            # Convert to aware datetime
+            trip_datetime = timezone.make_aware(trip_datetime)
+
+        # ✅ Now safe to compare
+        if trip_datetime < now:
+            trip_datetime += timedelta(days=1)
+
+        trip_timestamp = int(trip_datetime.timestamp() * 1000)
+
     else:
         messages.info(request, f"Can't show status for this ID {IdCodeNeed}, Detail in reported for now.")
         return redirect('taxi_app:pinTaxi')
 
-    context = { 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
+    context = { 'trip_timestamp': trip_timestamp, 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
     return render(request, 'main/checkStatus.html', context)
 
 # to delete the report but need to repost with same data

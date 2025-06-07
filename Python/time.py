@@ -15,3 +15,6 @@ userInput = int(input('Enter extra minutes: '))
 
 result = add_minutes(currentHour, currentMinute, userInput)
 print("New time:", result)
+
+aTuple = ("orange")
+print(type(aTuple))
