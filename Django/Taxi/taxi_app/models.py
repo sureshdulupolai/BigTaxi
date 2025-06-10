@@ -8,6 +8,7 @@ class TaxiBarCode(models.Model):
     time = models.TimeField(auto_now_add=True)
 
 class PinTaxiAvailable(models.Model):
+    run = [('not', 'not'),('yes', 'yes')]
     taxiAvaId = models.CharField(max_length=50)
     taxiCity = models.CharField(max_length=500)
     customerId = models.ForeignKey(usersDataModel, on_delete=models.CASCADE)
@@ -21,6 +22,7 @@ class PinTaxiAvailable(models.Model):
     taxiDateAndTimeByUser = models.CharField(max_length=100, default='none')
     priceOfTravel = models.IntegerField(default=0)
     driverCode = models.CharField(max_length=100, default='DRIVERCODE')
+    runningStatus = models.CharField(max_length=100, choices=run, default='not')
     
     def __str__(self):
         return str((self.taxiAvaId, self.taxiDate ,self.taxiTime))

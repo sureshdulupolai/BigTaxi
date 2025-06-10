@@ -19,6 +19,9 @@ urlpatterns = [
     path('pin-detail-delete/<codeNeed>/', views.deletePinTaxiDetailsNoReport, name='deletePinTaxiDetail'),
     path('pin-repost/<CodeNeed>/', views.RePostPinTaxiFunctionBaseView, name='repostPin'),
 
+    #
+    path('status/', views.driverPinStart, name='statusDriverHere'),
+
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),

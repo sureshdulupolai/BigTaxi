@@ -35,16 +35,16 @@ def navbar(request):
                                 user_datetime = datetime.strptime(
                                     f"{userDateStr} {userTimeStr} {userZoneStr}", "%Y-%m-%d %I:%M %p"
                                 )
-                                
 
                                 current_datetime = datetime.now()
 
                                 # ✅ Keep if current <= saved time
-                                if current_datetime > user_datetime:
-                                    # # 🗑️ Delete if current time exceeds saved time
+                                if (current_datetime > user_datetime) and (int(i.priceOfTravel) == 0):
                                     PinDeleteReview(deleteType='normal', pinBarCode=i.taxiAvaId, userBarCode=i.customerId.UserCode, review='UnPin Because Time Expired.', addressFrom=i.currentLocation, addressTo=i.toLocation, date_Time=i.taxiDateAndTimeByUser, passenger=i.taxiPassenger, discountCoupon=i.couponCodeWas).save()
                                     SaveNotificaionDeletePin(barCode=i.taxiAvaId, userCode=i.customerId.UserCode, text=f"Your previous taxi was removed because time expired for id : {i.taxiAvaId}").save()
                                     i.delete()
+                                
+                                elif (current_datetime > user_datetime) and  (int(i.priceOfTravel) != 0): i.runningStatus = 'yes'; i.save()
 
                         except Exception as e:
 
@@ -62,9 +62,8 @@ def navbar(request):
             
         else:
             return {'userCategoryis' : None, 'userBarCodeAccessis' : None,  'userModelDataCityis' : None, 'userModelDataStateis' : None}
-    
-    except Exception as e:
 
+    except Exception as e:
         ErrorWork(userType = 'NOT_LOGIN_USER', errorAre = e, urls = request).save()
         messages.info(request, 'Oops!, Something Went Wrong Please Try Again Later We Will Solve Your Problem Soon!.')
         return redirect('taxi_app:autoRedirect')

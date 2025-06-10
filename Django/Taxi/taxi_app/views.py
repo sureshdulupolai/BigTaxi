@@ -426,7 +426,7 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
                 return redirect('taxi_app:pinTaxi')
             
             except Exception as e:
-                print('Error -  ', e)
+                # print('Error -  ', e)
                 messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
                 return redirect('taxi_app:pinTaxi')
 
@@ -440,9 +440,7 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
 
 # to check of travel information, driver assigned or not
 def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
-    IdCodeNeed = IdCodeNeed.upper()
-    localTime = ''; showMoreDetailsInTemplete = False; price = ''
-
+    IdCodeNeed = IdCodeNeed.upper(); showMoreDetailsInTemplete = False; price = ''
     try:
         PTA_LstOfObject = PinTaxiAvailable.objects.get(taxiAvaId = IdCodeNeed)
         RDPTObject = ReportDriverInPinTaxi.objects.filter(pinBarCode = PTA_LstOfObject)
@@ -511,3 +509,16 @@ def RePostPinTaxiFunctionBaseView(request, CodeNeed):
     
     return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})
 
+def driverPinStart(request):
+    nav = navbar(request)
+    userCode = nav.get('userBarCodeAccessis')
+    PTA_Object_List = PinTaxiAvailable.objects.filter(driverCode = userCode)
+    timeToRun = []
+    if PTA_Object_List:
+        for checkStatus in PTA_Object_List:
+            if checkStatus.runningStatus == 'yes':
+                timeToRun.append(checkStatus)
+    context = {
+        'timeToRun' : timeToRun
+    }
+    return render(request, 'ava/status.html', context)
