@@ -457,34 +457,24 @@ def checkStatusOfPinFunctionBaseView(request, IdCodeNeed):
         
     if not RDPTObject:
 
-        if int(str(PTA_LstOfObject.taxiTime)[:2]) < 12: localTime = 'am'
-        else: localTime = 'pm'
-
         if PTA_LstOfObject.driverCode != 'DRIVERCODE':  driverData = usersDataModel.objects.get(UserCode = PTA_LstOfObject.driverCode).UProfileName; showMoreDetailsInTemplete = True; price = PTA_LstOfObject.priceOfTravel
         else: driverData = 'Driver Not Assigned'
 
-        # Calculate countdown target time
-        now = timezone.now()
-
-        # If PTA_LstOfObject.taxiTime is just a time (not datetime)
-        if isinstance(PTA_LstOfObject.taxiTime, datetime):
-            trip_datetime = PTA_LstOfObject.taxiTime
-        else:
-            trip_datetime = datetime.combine(now.date(), PTA_LstOfObject.taxiTime)
-            # Convert to aware datetime
-            trip_datetime = timezone.make_aware(trip_datetime)
-
-        # ✅ Now safe to compare
-        if trip_datetime < now:
-            trip_datetime += timedelta(days=1)
-
-        trip_timestamp = int(trip_datetime.timestamp() * 1000)
 
     else:
         messages.info(request, f"Can't show status for this ID {IdCodeNeed}, Detail in reported for now.")
         return redirect('taxi_app:pinTaxi')
 
-    context = { 'trip_timestamp': trip_timestamp, 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'dateAndTime' : str(PTA_LstOfObject.taxiDate) + '  ' + str(PTA_LstOfObject.taxiTime)[:5] + ' ' + localTime, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price }
+    # Suppose this is your stored string
+    taxi_str = PTA_LstOfObject.taxiDateAndTimeByUser  # e.g., "2025-06-19 04:30PM"
+
+    # Convert to datetime object using strptime
+    trip_dt = datetime.strptime(taxi_str, "%Y-%m-%d %I:%M%p")
+
+    # Convert to ISO string
+    trip_timestamp = trip_dt.isoformat()
+
+    context = { 'trip_timestamp': trip_timestamp, 'userName' : PTA_LstOfObject.customerId.UProfileName, 'statusCode' : PTA_LstOfObject.taxiAvaId, 'stLocation' : PTA_LstOfObject.currentLocation, 'lsLoction' : PTA_LstOfObject.toLocation, 'passenger' : PTA_LstOfObject.taxiPassenger, 'ShowMore' : showMoreDetailsInTemplete, 'DriverName' : driverData, 'price' : price, 'forntendDate' : PTA_LstOfObject.taxiDateAndTimeByUser }
     return render(request, 'main/checkStatus.html', context)
 
 # to delete the report but need to repost with same data
