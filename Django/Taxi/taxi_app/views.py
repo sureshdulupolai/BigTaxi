@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from taxi_app.models import TaxiBarCode, PinTaxiAvailable
+from taxi_app.models import TaxiBarCode, PinTaxiAvailable, TaxiOnRunning
 from django.contrib.auth.models import User
 from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete, ErrorWork
 from django.contrib import messages
@@ -522,3 +522,28 @@ def driverPinStart(request):
         'timeToRun' : timeToRun
     }
     return render(request, 'ava/status.html', context)
+
+def runningTaxi(request, idCode):
+    referrer = request.META.get('HTTP_REFERER')
+    if referrer:
+
+        PTA_ObjectReturn = PinTaxiAvailable.objects.get(taxiAvaId=idCode)
+        TaxiOnRunning(
+        statusCode = PTA_ObjectReturn.taxiAvaId,
+        taxiDriverName = PTA_ObjectReturn.driverCode,
+        taxiCustomerName = PTA_ObjectReturn.customerId.UserCode,
+        totalPassanger = PTA_ObjectReturn.taxiPassenger,
+        taxiRunningFrom = PTA_ObjectReturn.currentLocation,
+        taxiRunningTo = PTA_ObjectReturn.toLocation,
+        taxiStartTime = 1,
+        taxiFutureEndTime = 8,
+        taxiFairPrice = PTA_ObjectReturn.priceOfTravel,
+        cuponCode = 10
+        ).save()
+        
+    else:
+        messages.success(request, "Can't getting the page!, please click on delete button to access that page, data will fetch automatic.")
+        return redirect('taxi_app:pinTaxi')
+    
+    return render(request, 'ava/running-check.html')
+

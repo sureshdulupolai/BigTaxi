@@ -1,5 +1,6 @@
 from django.db import models
 from Users.models import usersDataModel
+from django.utils import timezone
 
 # Create your models here.
 class TaxiBarCode(models.Model):
@@ -89,9 +90,12 @@ class TaxiOnRunning(models.Model):
     taxiRunningFrom = models.CharField(max_length=4000)
     taxiRunningTo = models.CharField(max_length=4000)
     taxiStartTime = models.CharField(max_length=100)
+    datOfTripStart = models.DateField(default=timezone.now)
+    timeOfTripStart = models.TimeField(default=timezone.now)
     taxiFutureEndTime = models.CharField(max_length=100)
     taxiFairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
+    
 
     def __str__(self):
         return str((self.statusCode, self.taxiDriverName, self.taxiCustomerName))
