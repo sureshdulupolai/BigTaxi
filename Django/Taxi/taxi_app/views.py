@@ -509,7 +509,7 @@ def RePostPinTaxiFunctionBaseView(request, CodeNeed):
     
     return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})
 
-def driverPinStart(request):
+def driverPinStartFunctionBaseView(request):
     nav = navbar(request)
     userCode = nav.get('userBarCodeAccessis')
     PTA_Object_List = PinTaxiAvailable.objects.filter(driverCode = userCode)
@@ -523,27 +523,33 @@ def driverPinStart(request):
     }
     return render(request, 'ava/status.html', context)
 
-def runningTaxi(request, idCode):
+def readyToGoFunctionBaseView(request, idCode):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
-
         PTA_ObjectReturn = PinTaxiAvailable.objects.get(taxiAvaId=idCode)
-        TaxiOnRunning(
-        statusCode = PTA_ObjectReturn.taxiAvaId,
-        taxiDriverName = PTA_ObjectReturn.driverCode,
-        taxiCustomerName = PTA_ObjectReturn.customerId.UserCode,
-        totalPassanger = PTA_ObjectReturn.taxiPassenger,
-        taxiRunningFrom = PTA_ObjectReturn.currentLocation,
-        taxiRunningTo = PTA_ObjectReturn.toLocation,
-        taxiStartTime = 1,
-        taxiFutureEndTime = 8,
-        taxiFairPrice = PTA_ObjectReturn.priceOfTravel,
-        cuponCode = 10
-        ).save()
-        
+
+        if request.method == 'POST':
+            TaxiOnRunning(
+            statusCode = PTA_ObjectReturn.taxiAvaId,
+            taxiDriverName = PTA_ObjectReturn.driverCode,
+            taxiCustomerName = PTA_ObjectReturn.customerId.UserCode,
+            totalPassanger = PTA_ObjectReturn.taxiPassenger,
+            taxiRunningFrom = PTA_ObjectReturn.currentLocation,
+            taxiRunningTo = PTA_ObjectReturn.toLocation,
+            taxiStartTime = PTA_ObjectReturn.taxiDateAndTimeByUser,
+            taxiFutureEndTime = request.POST.get('FutureTime'),
+            taxiFairPrice = PTA_ObjectReturn.priceOfTravel,
+            cuponCode = 10
+            ).save()
+
     else:
-        messages.success(request, "Can't getting the page!, please click on delete button to access that page, data will fetch automatic.")
-        return redirect('taxi_app:pinTaxi')
+        nv = navbar(request)
+        userStatus = nv.get('userCategoryis')
+        if userStatus == 'Driver':
+            messages.warning(request, "Can't getting the page!, please click on accept trip button to access that page, data will fetch automatic.")
+        elif userStatus == 'Customer':
+            messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
+        return redirect('taxi_app:home')
     
-    return render(request, 'ava/running-check.html')
+    return render(request, 'ava/running-check.html', {'detail' : PTA_ObjectReturn.customerId.UProfileName})
 

@@ -20,7 +20,8 @@ urlpatterns = [
     path('pin-repost/<CodeNeed>/', views.RePostPinTaxiFunctionBaseView, name='repostPin'),
 
     #
-    path('status/', views.driverPinStart, name='statusDriverHere'),
+    path('status/', views.driverPinStartFunctionBaseView, name='statusDriverHere'),
+    path('ready-to-go/<idCode>', views.readyToGoFunctionBaseView, name='readyToGo'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),

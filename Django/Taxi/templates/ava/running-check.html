@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow p-4 rounded-4">
+        <h2 class="text-center mb-4">Accept Trip - {{ detail }}</h2>
+
+        <!-- Trip Acceptance Form -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Set Future Time to End Trip -->
+            <div class="mb-3">
+                <label for="FutureTime" class="form-label">Select Trip End Time</label>
+                <input type="time" class="form-control" id="FutureTime" name="FutureTime" required>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex justify-content-between">
+                <a href="#" class="btn btn-secondary">← Back</a>
+                <button type="submit" class="btn btn-success">Accept Trip</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

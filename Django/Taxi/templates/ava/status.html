@@ -30,7 +30,7 @@
                 <!-- Book Taxi Button -->
                 <div class="mt-3 mt-md-0">
                     <a href="{% url 'taxi_app:pinDetail' TR.taxiAvaId %}" class="btn btn-warning button-home" title="status"><i class="bi bi-check-circle"></i></a>
-                    <a href="#" class="btn btn-light button-home" title="accept">🚕</a>
+                    <a href="{% url 'taxi_app:readyToGo' TR.taxiAvaId %}" class="btn btn-light button-home" title="accept">🚕</a>
 
                 </div>
             </div>
