@@ -83,6 +83,7 @@ class FinishReviewByCustomer(models.Model):
         return self.statusCode
     
 class TaxiOnRunning(models.Model):
+    st = [('hide', 'hide'),('open', 'open')]
     statusCode = models.CharField(max_length=50)
     taxiDriverName = models.CharField(500)
     taxiCustomerName = models.CharField(max_length=500)
@@ -96,8 +97,8 @@ class TaxiOnRunning(models.Model):
     taxiFairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
     OTP_Here = models.CharField(max_length=6, default='NA')
+    statusHideOrOpen = models.CharField(max_length=100, default='hide', choices=st)
     
-
     def __str__(self):
         return str((self.statusCode, self.taxiDriverName, self.taxiCustomerName))
     

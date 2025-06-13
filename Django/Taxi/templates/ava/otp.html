@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    body {
+      background-color: #f9f9f9;
+    }
+    .otp-container {
+      max-width: 400px;
+      margin: 100px auto;
+      text-align: center;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      text-align: center;
+      margin: 0 5px;
+      border: none;
+      border-bottom: 2px solid #000;
+    }
+    .otp-input:focus {
+      outline: none;
+      border-bottom: 2px solid #0f766e !important;
+    }
+    .verify-btn {
+      background-color: #000;
+      color: #fff;
+      font-weight: bold;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      margin-top: 20px;
+    }
+    .resend-link {
+      margin-top: 15px;
+      display: block;
+      color: #0f766e !important;
+      text-decoration: none;
+    }
+    .resend-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+<div class="otp-container">
+  <p class="mb-1">Please enter the OTP sent to</p>
+  <p><strong>+91 XXXXXXXXXX</strong> <a href="#" class="ms-2 text-main-own">Change</a></p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="d-flex justify-content-center mb-3">
+      <input type="text" class="otp-input" name="digit1" maxlength="1" required>
+      <input type="text" class="otp-input" name="digit2" maxlength="1" required>
+      <input type="text" class="otp-input" name="digit3" maxlength="1" required>
+      <input type="text" class="otp-input" name="digit4" maxlength="1" required>
+      <input type="text" class="otp-input" name="digit5" maxlength="1" required>
+      <input type="text" class="otp-input" name="digit6" maxlength="1" required>
+    </div>
+
+    <button type="submit" class="verify-btn">VERIFY</button>
+    <a href="{% url 'taxi_app:resendOTP' IDCODE %}" class="resend-link">Not received your code? Resend code</a>
+  </form>
+</div>
+
+<script>
+  const inputs = document.querySelectorAll('.otp-input');
+
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+</script>
+{% endblock %}

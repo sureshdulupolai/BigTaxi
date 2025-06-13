@@ -510,6 +510,7 @@ def RePostPinTaxiFunctionBaseView(request, CodeNeed):
     
     return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})
 
+# login, or not login function to be build later
 def driverPinStartFunctionBaseView(request):
     nav = navbar(request)
     userCode = nav.get('userBarCodeAccessis')
@@ -535,6 +536,7 @@ def readyToGoFunctionBaseView(request, idCode):
             RandomNumber = str(random.randint(100000, 999999)); request.session['OTP_Code_BT'] = RandomNumber
             TaxiOnRunning(statusCode = PTA_ObjectReturn.taxiAvaId, taxiDriverName = PTA_ObjectReturn.driverCode, taxiCustomerName = PTA_ObjectReturn.customerId.UserCode, totalPassanger = PTA_ObjectReturn.taxiPassenger, taxiRunningFrom = PTA_ObjectReturn.currentLocation, taxiRunningTo = PTA_ObjectReturn.toLocation, taxiStartTime = PTA_ObjectReturn.taxiDateAndTimeByUser, taxiFutureEndTime = request.POST.get('FutureTime'), taxiFairPrice = PTA_ObjectReturn.priceOfTravel, cuponCode = request.POST.get('uCouponCodeRTG') or PTA_ObjectReturn.couponCodeWas, OTP_Here = RandomNumber).save()
             PTA_ObjectReturn.delete()
+            return redirect('taxi_app:OTP', TaxiId = idCode)
 
     else:
         nv = navbar(request)
@@ -545,7 +547,46 @@ def readyToGoFunctionBaseView(request, idCode):
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
         return redirect('taxi_app:home')
     
-    return render(request, 'ava/running-check.html', {'detail' : PTA_ObjectReturn.customerId.UProfileName, 'Otp' : 'TAXIIDHERE109'})
+    context =  {'detail' : PTA_ObjectReturn.customerId.UProfileName}
+    return render(request, 'ava/running-check.html', context)
 
 def OtpPageFunctionBaseView(request, TaxiId):
+    referrer = request.META.get('HTTP_REFERER')
+    if referrer:
+        
+        print(referrer, ' - referrer code here')
+        if request.method == 'POST':
+            PTA_OTP = TaxiOnRunning.objects.get(statusCode = TaxiId)
+            driverGetOTP = request.POST.get('otp_data')
+
+            # if need then add session for access -> OTP_Code_BT
+            if str(PTA_OTP.OTP_Here) == str(driverGetOTP):
+                PTA_OTP.datOfTripStart = timezone.now().date()
+                PTA_OTP.timeOfTripStart = timezone.now().time()
+                PTA_OTP.statusHideOrOpen = 'open'
+                PTA_OTP.save()
+                ...
+    else:
+        nv = navbar(request)
+        userStatus = nv.get('userCategoryis')
+        if userStatus == 'Driver':
+            messages.warning(request, "Can't getting the page!, please access your own details other wise your account will be freez.")
+        elif userStatus == 'Customer':
+            messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
+        return redirect('taxi_app:home')
+    return render(request, 'ava/otp.html', {'IDCODE' : TaxiId})
+
+def ResendOtpFunctionBaseView(request, idCode):
+    referrer = request.META.get('HTTP_REFERER')
+    if referrer:
+        TOR = TaxiOnRunning.objects.get(statusCode = idCode)
+        RandomNumber = str(random.randint(640000, 999999)); request.session['OTP_Code_BT'] = RandomNumber
+        TOR.OTP_Here = RandomNumber
+        TOR.save()
+        return redirect('taxi_app:OTP', TaxiId = idCode)
+
+def runningPageFunctionBaseView(request, id):
     return render(request, 'customer/running_status.html')
+
+def PageFunctionHereForDemoTesting(request):
+    return render(request, 'ava/otp.html')
