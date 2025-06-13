@@ -15,9 +15,19 @@
                 <input type="time" class="form-control" id="FutureTime" name="FutureTime" required>
             </div>
 
+            <div class="mb-3 text-start position-relative">
+                <label class="form-label">Coupon Code:</label>
+                <input
+                type="text"
+                class="form-control"
+                name="uCouponCodeRTG"
+                placeholder="Enter coupon code"
+                />
+            </div>
+
             <!-- Submit Button -->
             <div class="d-flex justify-content-between">
-                <a href="#" class="btn btn-secondary">← Back</a>
+                <a href="{% url 'taxi_app:OTP' Otp %}" class="btn btn-secondary">← Back</a>
                 <button type="submit" class="btn btn-success">Accept Trip</button>
             </div>
         </form>

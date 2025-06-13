@@ -9,6 +9,7 @@ from django.urls import reverse
 from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
 from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePin
 from django.utils import timezone
+import random
 
 # from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 # import json
@@ -518,29 +519,22 @@ def driverPinStartFunctionBaseView(request):
         for checkStatus in PTA_Object_List:
             if checkStatus.runningStatus == 'yes':
                 timeToRun.append(checkStatus)
+
     context = {
         'timeToRun' : timeToRun
     }
     return render(request, 'ava/status.html', context)
 
+# developer can se the running taxi, but also customer and driver. to connect with other driver for any issues or problem
 def readyToGoFunctionBaseView(request, idCode):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
         PTA_ObjectReturn = PinTaxiAvailable.objects.get(taxiAvaId=idCode)
 
         if request.method == 'POST':
-            TaxiOnRunning(
-            statusCode = PTA_ObjectReturn.taxiAvaId,
-            taxiDriverName = PTA_ObjectReturn.driverCode,
-            taxiCustomerName = PTA_ObjectReturn.customerId.UserCode,
-            totalPassanger = PTA_ObjectReturn.taxiPassenger,
-            taxiRunningFrom = PTA_ObjectReturn.currentLocation,
-            taxiRunningTo = PTA_ObjectReturn.toLocation,
-            taxiStartTime = PTA_ObjectReturn.taxiDateAndTimeByUser,
-            taxiFutureEndTime = request.POST.get('FutureTime'),
-            taxiFairPrice = PTA_ObjectReturn.priceOfTravel,
-            cuponCode = 10
-            ).save()
+            RandomNumber = str(random.randint(100000, 999999)); request.session['OTP_Code_BT'] = RandomNumber
+            TaxiOnRunning(statusCode = PTA_ObjectReturn.taxiAvaId, taxiDriverName = PTA_ObjectReturn.driverCode, taxiCustomerName = PTA_ObjectReturn.customerId.UserCode, totalPassanger = PTA_ObjectReturn.taxiPassenger, taxiRunningFrom = PTA_ObjectReturn.currentLocation, taxiRunningTo = PTA_ObjectReturn.toLocation, taxiStartTime = PTA_ObjectReturn.taxiDateAndTimeByUser, taxiFutureEndTime = request.POST.get('FutureTime'), taxiFairPrice = PTA_ObjectReturn.priceOfTravel, cuponCode = request.POST.get('uCouponCodeRTG') or PTA_ObjectReturn.couponCodeWas, OTP_Here = RandomNumber).save()
+            PTA_ObjectReturn.delete()
 
     else:
         nv = navbar(request)
@@ -551,5 +545,7 @@ def readyToGoFunctionBaseView(request, idCode):
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
         return redirect('taxi_app:home')
     
-    return render(request, 'ava/running-check.html', {'detail' : PTA_ObjectReturn.customerId.UProfileName})
+    return render(request, 'ava/running-check.html', {'detail' : PTA_ObjectReturn.customerId.UProfileName, 'Otp' : 'TAXIIDHERE109'})
 
+def OtpPageFunctionBaseView(request, TaxiId):
+    return render(request, 'customer/running_status.html')

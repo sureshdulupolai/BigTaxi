@@ -23,6 +23,9 @@ urlpatterns = [
     path('status/', views.driverPinStartFunctionBaseView, name='statusDriverHere'),
     path('ready-to-go/<idCode>', views.readyToGoFunctionBaseView, name='readyToGo'),
 
+    # Customer
+    path('running-status-information/<TaxiId>/', views.OtpPageFunctionBaseView, name='OTP'),
+
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),

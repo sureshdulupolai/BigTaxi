@@ -95,6 +95,7 @@ class TaxiOnRunning(models.Model):
     taxiFutureEndTime = models.CharField(max_length=100)
     taxiFairPrice = models.CharField(max_length=40)
     cuponCode = models.CharField(max_length=100, default='none')
+    OTP_Here = models.CharField(max_length=6, default='NA')
     
 
     def __str__(self):
