@@ -581,7 +581,8 @@ def OtpPageFunctionBaseView(request, TaxiId):
     if not UserData:
         # login to profile complete
         ...
-    context = {'contact' : UserData[8:], 'IDCODE' : TaxiId}
+    
+    context = {'Contact' : UserData[6:], 'IDCODE' : TaxiId}
     return render(request, 'ava/otp.html', context)
 
 def ResendOtpFunctionBaseView(request, idCode):
@@ -614,4 +615,5 @@ def PageFunctionHereForDemoTesting(request):
             messages.success(request, 'Verify Mr. Suresh')
         else:
             messages.error(request, 'Wrong OTP')
-    return render(request, 'ava/otp.html', {'IDCODE' : 'TAXI123'})
+    UserData = '9820646838'
+    return render(request, 'ava/otp.html', {'IDCODE' : 'TAXI123', 'Contact' : UserData[6:]})
