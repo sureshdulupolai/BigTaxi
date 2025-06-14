@@ -521,6 +521,8 @@ def driverPinStartFunctionBaseView(request):
             if checkStatus.runningStatus == 'yes':
                 timeToRun.append(checkStatus)
 
+    # upcomming booking
+
     context = {
         'timeToRun' : timeToRun
     }
@@ -553,18 +555,18 @@ def readyToGoFunctionBaseView(request, idCode):
 def OtpPageFunctionBaseView(request, TaxiId):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
-        
-        print(referrer, ' - referrer code here')
+        PTA_OTP = TaxiOnRunning.objects.get(statusCode = TaxiId)
         if request.method == 'POST':
-            PTA_OTP = TaxiOnRunning.objects.get(statusCode = TaxiId)
-            driverGetOTP = request.POST.get('otp_data')
+            first = str(request.POST.get('digit1')); second = str(request.POST.get('digit2')); third = str(request.POST.get('digit3')); fourth = str(request.POST.get('digit4')); fifth = str(request.POST.get('digit5')); sixth = str(request.POST.get('digit6')); finallyOTPSentByAgent = first + second + third + fourth + fifth + sixth
 
             # if need then add session for access -> OTP_Code_BT
-            if str(PTA_OTP.OTP_Here) == str(driverGetOTP):
-                PTA_OTP.datOfTripStart = timezone.now().date()
-                PTA_OTP.timeOfTripStart = timezone.now().time()
-                PTA_OTP.statusHideOrOpen = 'open'
-                PTA_OTP.save()
+            if str(PTA_OTP.OTP_Here) == str(finallyOTPSentByAgent):
+                PTA_OTP.datOfTripStart = timezone.now().date(); PTA_OTP.timeOfTripStart = timezone.now().time()
+                PTA_OTP.statusHideOrOpen = 'open'; PTA_OTP.save()
+                return redirect('taxi_app:')
+
+            else:
+                messages.error(request, f'OTP NOT MATCHED : {finallyOTPSentByAgent}, Try Again!..')
                 ...
     else:
         nv = navbar(request)
@@ -574,7 +576,13 @@ def OtpPageFunctionBaseView(request, TaxiId):
         elif userStatus == 'Customer':
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
         return redirect('taxi_app:home')
-    return render(request, 'ava/otp.html', {'IDCODE' : TaxiId})
+    
+    UserData = str(usersDataModel.objects.get(UserCode = PTA_OTP.taxiCustomerName).UserMobileNo)
+    if not UserData:
+        # login to profile complete
+        ...
+    context = {'contact' : UserData[8:], 'IDCODE' : TaxiId}
+    return render(request, 'ava/otp.html', context)
 
 def ResendOtpFunctionBaseView(request, idCode):
     referrer = request.META.get('HTTP_REFERER')
@@ -584,9 +592,26 @@ def ResendOtpFunctionBaseView(request, idCode):
         TOR.OTP_Here = RandomNumber
         TOR.save()
         return redirect('taxi_app:OTP', TaxiId = idCode)
+    
+    else:
+        nv = navbar(request)
+        userStatus = nv.get('userCategoryis')
+        if userStatus == 'Driver':
+            messages.warning(request, "Can't getting the page!, if you try to resend other's otp account will be freez.")
+        elif userStatus == 'Customer':
+            messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
+        return redirect('taxi_app:home')
 
 def runningPageFunctionBaseView(request, id):
     return render(request, 'customer/running_status.html')
 
+# ----------------------------------------------------------------------------------------------------------------------
+# testing function
 def PageFunctionHereForDemoTesting(request):
-    return render(request, 'ava/otp.html')
+    if request.method == 'POST':
+        first = str(request.POST.get('digit1')); second = str(request.POST.get('digit2')); third = str(request.POST.get('digit3')); fourth = str(request.POST.get('digit4')); fifth = str(request.POST.get('digit5')); sixth = str(request.POST.get('digit6')); finallyOTPSentByAgent = first + second + third + fourth + fifth + sixth
+        if finallyOTPSentByAgent == '111111':
+            messages.success(request, 'Verify Mr. Suresh')
+        else:
+            messages.error(request, 'Wrong OTP')
+    return render(request, 'ava/otp.html', {'IDCODE' : 'TAXI123'})

@@ -27,6 +27,15 @@
   position: relative;
 }
 
+.flash-red {
+  animation: flash 1s infinite;
+}
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+
 /* .nav-link::after {
   content: "";
   position: absolute;
@@ -76,9 +85,18 @@
   {% if userCategoryis == 'Customer' %}
 
     <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
-    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}">Home</a></div>
-    <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link">PinTaxi</a></div>
-    <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}" title="Home">
+      <i class="bi bi-house-door-fill"></i> <!-- home -->
+    </a></div>
+    <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link" title="Booking Taxi"><!-- Booking Taxi -->
+      <i class="bi bi-car-front-fill"></i>
+    </a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="#" title="Argent Booking">
+      <!-- Argent Booking -->
+       <!-- <i class="bi bi-info-circle-fill text-info"></i> -->
+      <!-- <i class="bi bi-lightning-fill text-danger flash-red"></i> -->
+      <i class="bi bi-speedometer"></i>
+    </a></div>
 
   {% elif userCategoryis == 'Driver' %}
 

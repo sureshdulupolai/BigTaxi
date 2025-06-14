@@ -25,12 +25,12 @@ urlpatterns = [
 
     # Customer
     path('ready-to-go-otp/<TaxiId>/', views.OtpPageFunctionBaseView, name='OTP'),
-    path('ready-to-go-otp/<idCode>/', views.ResendOtpFunctionBaseView, name='resendOTP'),
+    path('ready-to-go-otpr/<idCode>/', views.ResendOtpFunctionBaseView, name='resendOTP'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),
     path('delete-review/', views.deleteReviewFunctionBaseView, name='deleteReview'),
 
     # testing code
-    path('otp-testing/', views.PageFunctionHereForDemoTesting),
+    path('otp-testing/', views.PageFunctionHereForDemoTesting, name='tesing'),
 ]
