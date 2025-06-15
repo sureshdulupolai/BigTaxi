@@ -8,9 +8,11 @@
 {% if timeToRun %}
     {% for TR in timeToRun %}
         <div class="container-xxl my-3">
-            <div
-            class="bg-color-own shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap"
-            >
+            {% if TR.statusHideOrOpen == 'hide' %}
+                <div class="bg-white shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap"></div>
+            {% elif TR.statusHideOrOpen == 'open' %}
+                <div class="bg-color-own shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap">
+            {% endif %}
             <!-- Profile Image -->
             <div class="me-4 mb-3 mb-md-0">
                 <img
@@ -23,15 +25,23 @@
 
             <!-- User Info -->
             <div class="me-auto">
-                <h4 class="mb-1 text-white">{{ TR.customerId.UProfileName }}</h4>
-                <p class="text-muted mb-0" style="margin-left: 1px !important;"><span class="text-white"><strong>Pickup From:</strong> {{ TR.currentLocation|truncatewords:17 }}</span></p>
+                {% if TR.statusHideOrOpen == 'hide' %}
+                    <h4 class="mb-1">{{ TR.customerId.UProfileName }}</h4>
+                    <p class="text-muted mb-0" style="margin-left: 1px !important;"><span><strong>Pickup From:</strong> {{ TR.currentLocation|truncatewords:12 }}</span></p>
+                {% elif TR.statusHideOrOpen == 'open' %}
+                    <h4 class="mb-1 text-white">{{ TR.customerId.UProfileName }}</h4>
+                    <p class="text-muted mb-0" style="margin-left: 1px !important;"><span class="text-white"><strong>Pickup From:</strong> {{ TR.currentLocation|truncatewords:12 }}</span></p>
+                {% endif %}
             </div>
 
                 <!-- Book Taxi Button -->
                 <div class="mt-3 mt-md-0">
                     <a href="{% url 'taxi_app:pinDetail' TR.taxiAvaId %}" class="btn btn-warning button-home" title="status"><i class="bi bi-check-circle"></i></a>
-                    <a href="{% url 'taxi_app:readyToGo' TR.taxiAvaId %}" class="btn btn-light button-home" title="accept">🚕</a>
-
+                    {% if TR.statusHideOrOpen == 'hide' %}
+                        <a href="{% url 'taxi_app:readyToGo' TR.taxiAvaId %}" class="btn btn-light button-home" title="accept">🚕</a>
+                    {% elif TR.statusHideOrOpen == 'open' %}
+                        <a href="#" class="btn btn-light button-home" title="accept">Accepted</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

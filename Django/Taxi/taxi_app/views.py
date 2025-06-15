@@ -563,7 +563,7 @@ def OtpPageFunctionBaseView(request, TaxiId):
             if str(PTA_OTP.OTP_Here) == str(finallyOTPSentByAgent):
                 PTA_OTP.datOfTripStart = timezone.now().date(); PTA_OTP.timeOfTripStart = timezone.now().time()
                 PTA_OTP.statusHideOrOpen = 'open'; PTA_OTP.save()
-                return redirect('taxi_app:')
+                return redirect('taxi_app:home')
 
             else:
                 messages.error(request, f'OTP NOT MATCHED : {finallyOTPSentByAgent}, Try Again!..')
@@ -607,7 +607,7 @@ def runningPageFunctionBaseView(request, idCode):
     TOR = TaxiOnRunning.objects.get(statusCode = idCode)
     UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
     context = {
-        'OTP' : TaxiOnRunning.OTP_Here,
+        'OTP' : TOR.OTP_Here,
         'Name' : UDM.UProfileName,
         'PNR' : idCode,
         'CL' : TOR.taxiRunningFrom,
