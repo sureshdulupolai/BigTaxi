@@ -603,8 +603,20 @@ def ResendOtpFunctionBaseView(request, idCode):
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
         return redirect('taxi_app:home')
 
-def runningPageFunctionBaseView(request, id):
-    return render(request, 'customer/running_status.html')
+def runningPageFunctionBaseView(request, idCode):
+    TOR = TaxiOnRunning.objects.get(statusCode = idCode)
+    UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
+    context = {
+        'OTP' : TaxiOnRunning.OTP_Here,
+        'Name' : UDM.UProfileName,
+        'PNR' : idCode,
+        'CL' : TOR.taxiRunningFrom,
+        'EL' : TOR.taxiRunningTo,
+        'TS' : str(TOR.datOfTripStart) + ' ' + str(TOR.timeOfTripStart),
+        'TE' : TOR.taxiFutureEndTime,
+        'TP' : TOR.totalPassanger
+    }
+    return render(request, 'customer/running_status.html', context)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # testing function

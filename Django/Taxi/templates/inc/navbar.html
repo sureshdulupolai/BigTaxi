@@ -86,17 +86,23 @@
 
     <!-- <div class="nav-item-wrapper"><a class="nav-link" href="#">Profile</a></div> -->
     <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}" title="Home">
-      <i class="bi bi-house-door-fill"></i> <!-- home -->
+      <!-- <i class="bi bi-house-door-fill"></i> -->
+      Home
     </a></div>
-    <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link" title="Booking Taxi"><!-- Booking Taxi -->
-      <i class="bi bi-car-front-fill"></i>
+    <div class="nav-item-wrapper"><a href="{% url 'taxi_app:pinTaxi' %}" class="nav-link" title="Booking Taxi">
+      Booking Taxi
+      <!-- <i class="bi bi-car-front-fill"></i> -->
     </a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#" title="Argent Booking">
-      <!-- Argent Booking -->
+      Argent Booking
        <!-- <i class="bi bi-info-circle-fill text-info"></i> -->
       <!-- <i class="bi bi-lightning-fill text-danger flash-red"></i> -->
-      <i class="bi bi-speedometer"></i>
+      <!-- <i class="bi bi-speedometer"></i> -->
     </a></div>
+    <div class="nav-item-wrapper">
+      <a class="nav-link" href="#">Run Status</a>
+    </div>
+    
 
   {% elif userCategoryis == 'Driver' %}
 

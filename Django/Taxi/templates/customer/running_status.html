@@ -19,14 +19,14 @@
       <h3 class="text-center mb-4">Travel Information</h3>
 
       <ul class="list-group list-group-flush">
-        <li class="list-group-item"><strong>Otp: <span class="text-main-own">00000</span></strong></li>
-        <li class="list-group-item"><strong>User Name:</strong> Suresh Polai</li>
-        <li class="list-group-item"><strong>PNR Code:</strong> TAXICODEHERE109</li>
-        <li class="list-group-item"><strong>Current Location:</strong> Sakinaka, Mumbai - 400072</li>
-        <li class="list-group-item"><strong>To Location:</strong> Andheri, Mumbai - 400092</li>
-        <li class="list-group-item"><strong>Trip Start:</strong> 19-06-2025 4:30 PM</li>
-        <li class="list-group-item"><strong>Trip End:</strong> 19-06-2025 4:50 PM</li>
-        <li class="list-group-item"><strong>Total Passengers:</strong> 3</li>
+        <li class="list-group-item"><strong>Otp: <span class="text-main-own">{{ OTP }}</span></strong></li>
+        <li class="list-group-item"><strong>User Name:</strong> {{ Name }}</li>
+        <li class="list-group-item"><strong>PNR Code:</strong> {{ PNR }}</li>
+        <li class="list-group-item"><strong>Current Location:</strong> {{ CL }}</li>
+        <li class="list-group-item"><strong>To Location:</strong> {{ EL }}</li>
+        <li class="list-group-item"><strong>Trip Start:</strong> {{ TS }}</li>
+        <li class="list-group-item"><strong>Trip End:</strong> {{ TE }}</li>
+        <li class="list-group-item"><strong>Total Passengers:</strong> {{ TP }}</li>
         <!-- {% if ShowMore %}
             <li class="list-group-item"><strong>Status:<span class="text-success"> {{ DriverName }}</span></strong></li>
             <li class="list-group-item"><strong>Price:<span class="text-success"> {{ price }}rs</span></strong></li>
