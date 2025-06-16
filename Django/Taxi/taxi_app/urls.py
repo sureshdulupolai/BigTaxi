@@ -21,12 +21,13 @@ urlpatterns = [
 
     #
     path('status/', views.driverPinStartFunctionBaseView, name='statusDriverHere'),
-    path('ready-to-go/<idCode>', views.readyToGoFunctionBaseView, name='readyToGo'),
+    path('ready-to-go/<idCode>/', views.readyToGoFunctionBaseView, name='readyToGo'),
 
     # Customer
     path('ready-to-go-otp/<TaxiId>/', views.OtpPageFunctionBaseView, name='OTP'),
     path('ready-to-go-otpr/<idCode>/', views.ResendOtpFunctionBaseView, name='resendOTP'),
     path('status-verify/<idCode>/', views.runningPageFunctionBaseView, name='runningStatusVerify'),
+    path('status-customer/', views.RunningStatusWithOTPCheckByCustomer, name='statusCustomer'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),

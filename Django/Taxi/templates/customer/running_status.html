@@ -36,7 +36,7 @@
       </ul>
 
       <div class="text-center mt-4">
-        <a href="{% url 'taxi_app:pinTaxi' %}" class="btn btn-info">← Back</a>
+        <a href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'taxi_app:autoRedirect' %}{% endif %}" class="btn btn-info">← Back</a>
       </div>
     </div>
   </div>

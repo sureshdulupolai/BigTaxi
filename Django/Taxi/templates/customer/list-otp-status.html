@@ -5,14 +5,14 @@
         background-color: #0f766e !important;
     }
 </style>
-{% if timeToRun %}
-    {% for TR in timeToRun %}
+{% if TR_List %}
+    {% for TR in TR_List %}
         <div class="container-xxl my-3">
                 <div class="bg-color-own shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap">
             <!-- Profile Image -->
             <div class="me-4 mb-3 mb-md-0">
                 <img
-                src="/media/{{ TR.customerId.UProfileImage }}"
+                src="..."
                 alt="User Profile"
                 class="rounded-circle"
                 style="width: 50px; height: 50px; object-fit: cover; background-color: white;"
@@ -21,14 +21,13 @@
 
             <!-- User Info -->
             <div class="me-auto">
-                <h4 class="mb-1 text-white">{{ TR.customerId.UProfileName }}</h4>
-                <p class="text-muted mb-0" style="margin-left: 1px !important;"><span class="text-white"><strong>Pickup From:</strong> {{ TR.currentLocation|truncatewords:12 }}</span></p>
+                <h4 class="mb-1 text-white"></h4>
+                <p class="text-muted mb-0" style="margin-left: 1px !important;"><span class="text-white"><strong>Pickup From:</strong> {{ TR.taxiRunningFrom|truncatewords:12 }}</span></p>
             </div>
 
                 <!-- Book Taxi Button -->
                 <div class="mt-3 mt-md-0">
-                    <a href="{% url 'taxi_app:pinDetail' TR.taxiAvaId %}" class="btn btn-warning button-home" title="status"><i class="bi bi-check-circle"></i></a>
-                    <a href="{% url 'taxi_app:readyToGo' TR.taxiAvaId %}" class="btn btn-light button-home" title="accept">🚕</a>
+                    <a href="{% url 'taxi_app:runningStatusVerify' TR.statusCode %}" class="btn btn-warning button-home" title="status"><i class="bi bi-check-circle"></i></a>
                 </div>
             </div>
         </div>

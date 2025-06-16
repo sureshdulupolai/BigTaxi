@@ -556,18 +556,22 @@ def OtpPageFunctionBaseView(request, TaxiId):
     referrer = request.META.get('HTTP_REFERER')
     if referrer:
         PTA_OTP = TaxiOnRunning.objects.get(statusCode = TaxiId)
-        if request.method == 'POST':
-            first = str(request.POST.get('digit1')); second = str(request.POST.get('digit2')); third = str(request.POST.get('digit3')); fourth = str(request.POST.get('digit4')); fifth = str(request.POST.get('digit5')); sixth = str(request.POST.get('digit6')); finallyOTPSentByAgent = first + second + third + fourth + fifth + sixth
+        if PTA_OTP.OTP_Here != 'NA':
+            if request.method == 'POST':
+                first = str(request.POST.get('digit1')); second = str(request.POST.get('digit2')); third = str(request.POST.get('digit3')); fourth = str(request.POST.get('digit4')); fifth = str(request.POST.get('digit5')); sixth = str(request.POST.get('digit6')); finallyOTPSentByAgent = first + second + third + fourth + fifth + sixth
 
-            # if need then add session for access -> OTP_Code_BT
-            if str(PTA_OTP.OTP_Here) == str(finallyOTPSentByAgent):
-                PTA_OTP.datOfTripStart = timezone.now().date(); PTA_OTP.timeOfTripStart = timezone.now().time()
-                PTA_OTP.statusHideOrOpen = 'open'; PTA_OTP.save()
-                return redirect('taxi_app:home')
+                # if need then add session for access -> OTP_Code_BT
+                if str(PTA_OTP.OTP_Here) == str(finallyOTPSentByAgent):
+                    PTA_OTP.datOfTripStart = timezone.now().date(); PTA_OTP.timeOfTripStart = timezone.now().time()
+                    PTA_OTP.statusHideOrOpen = 'open'; PTA_OTP.save()
+                    return redirect('taxi_app:home')
 
-            else:
-                messages.error(request, f'OTP NOT MATCHED : {finallyOTPSentByAgent}, Try Again!..')
-                ...
+                else:
+                    messages.error(request, f'OTP NOT MATCHED : {finallyOTPSentByAgent}, Try Again!..')
+                    ...
+        else:
+            messages.success(request, 'Trip Already Started, OTP Submited SuccessFully!!')
+            return redirect('taxi_app:autoRedirect')
     else:
         nv = navbar(request)
         userStatus = nv.get('userCategoryis')
@@ -575,7 +579,7 @@ def OtpPageFunctionBaseView(request, TaxiId):
             messages.warning(request, "Can't getting the page!, please access your own details other wise your account will be freez.")
         elif userStatus == 'Customer':
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
-        return redirect('taxi_app:home')
+        return redirect('taxi_app:autoRedirect')
     
     UserData = str(usersDataModel.objects.get(UserCode = PTA_OTP.taxiCustomerName).UserMobileNo)
     if not UserData:
@@ -601,22 +605,27 @@ def ResendOtpFunctionBaseView(request, idCode):
             messages.warning(request, "Can't getting the page!, if you try to resend other's otp account will be freez.")
         elif userStatus == 'Customer':
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
-        return redirect('taxi_app:home')
+        return redirect('taxi_app:autoRedirect')
 
 def runningPageFunctionBaseView(request, idCode):
     TOR = TaxiOnRunning.objects.get(statusCode = idCode)
     UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
-    context = {
-        'OTP' : TOR.OTP_Here,
-        'Name' : UDM.UProfileName,
-        'PNR' : idCode,
-        'CL' : TOR.taxiRunningFrom,
-        'EL' : TOR.taxiRunningTo,
-        'TS' : str(TOR.datOfTripStart) + ' ' + str(TOR.timeOfTripStart),
-        'TE' : TOR.taxiFutureEndTime,
-        'TP' : TOR.totalPassanger
-    }
+    context = { 'OTP' : TOR.OTP_Here, 'Name' : UDM.UProfileName, 'PNR' : idCode, 'CL' : TOR.taxiRunningFrom, 'EL' : TOR.taxiRunningTo, 'TS' : str(TOR.datOfTripStart) + ' ' + str(TOR.timeOfTripStart), 'TE' : TOR.taxiFutureEndTime, 'TP' : TOR.totalPassanger }
     return render(request, 'customer/running_status.html', context)
+
+def RunningStatusWithOTPCheckByCustomer(request):
+    if request.user.is_authenticated:
+        messages_access = 1; nv = navbar(request); userCodeHere = nv.get('userBarCodeAccessis')
+        TR_List = TaxiOnRunning.objects.filter(taxiCustomerName = userCodeHere)
+        if not TR_List:
+            messages_access = 1
+
+    else:
+        messages.info(request, f'Login Into System, To Access {request.path}')
+        return redirect('taxi_app:autoRedirect')
+    
+    context = {'msg' : messages_access, 'TR_List' : TR_List}
+    return render(request, 'customer/list-otp-status.html', context)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # testing function

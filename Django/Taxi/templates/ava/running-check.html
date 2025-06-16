@@ -27,7 +27,7 @@
 
             <!-- Submit Button -->
             <div class="d-flex justify-content-between">
-                <a href="#" class="btn btn-secondary">← Back</a>
+                <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">← Back</a>
                 <button type="submit" class="btn btn-success">Accept Trip</button>
             </div>
         </form>
