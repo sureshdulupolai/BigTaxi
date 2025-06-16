@@ -607,6 +607,7 @@ def ResendOtpFunctionBaseView(request, idCode):
             messages.info(request, f"Oops!, page does not getting.. for : '{request.path}'")
         return redirect('taxi_app:autoRedirect')
 
+# if user login and customer id is matched then show the otp else, dont show the otp only
 def runningPageFunctionBaseView(request, idCode):
     TOR = TaxiOnRunning.objects.get(statusCode = idCode)
     UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
@@ -615,17 +616,31 @@ def runningPageFunctionBaseView(request, idCode):
 
 def RunningStatusWithOTPCheckByCustomer(request):
     if request.user.is_authenticated:
-        messages_access = 1; nv = navbar(request); userCodeHere = nv.get('userBarCodeAccessis')
-        TR_List = TaxiOnRunning.objects.filter(taxiCustomerName = userCodeHere)
-        if not TR_List:
-            messages_access = 1
+        nv = navbar(request); userCodeHere = nv.get('userBarCodeAccessis'); imageList = []; nameList = []
+        TR_List_Normal = TaxiOnRunning.objects.filter(taxiCustomerName = userCodeHere)
+        if TR_List_Normal:
+            for DataOfTR in TR_List_Normal:
+                UDM_Data = usersDataModel.objects.get(UserCode = DataOfTR.taxiDriverName)
+                imageList.append(UDM_Data.UProfileImage); nameList.append(UDM_Data.UProfileName)
+            TR_List = zip(TR_List_Normal, imageList, nameList)
 
     else:
         messages.info(request, f'Login Into System, To Access {request.path}')
         return redirect('taxi_app:autoRedirect')
     
-    context = {'msg' : messages_access, 'TR_List' : TR_List}
+    context = {'TR_List' : TR_List}
     return render(request, 'customer/list-otp-status.html', context)
+
+def liveRunningStatus(request, IdCodeHere):
+    try:
+        TaxLiveData = TaxiOnRunning.objects.get(statusCode = IdCodeHere);nvCall = navbar(request); userCategory = nvCall.get('userCategoryis')
+        if userCategory == 'Driver': UnameHere = usersDataModel.objects.get(UserCode = TaxLiveData.taxiCustomerName).UProfileName
+        elif (userCategory == 'Customer') or (userCategory == 'Developer'): UnameHere = usersDataModel.objects.get(UserCode = TaxLiveData.taxiDriverName).UProfileName
+
+    except Exception or e:
+        ...
+    
+    return render(request, 'ava/main-running.html', {'TaxLiveData' : TaxLiveData, 'UnameHere' : UnameHere})
 
 # ----------------------------------------------------------------------------------------------------------------------
 # testing function

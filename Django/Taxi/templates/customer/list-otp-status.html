@@ -4,16 +4,45 @@
     .bg-color-own{
         background-color: #0f766e !important;
     }
+
+    .live-tag {
+    display: inline-block;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    background-color: crimson;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+    position: relative;
+    top: 2px !important;
+
+    /* Blink animation on background only */
+    animation: blink-bg 1.2s infinite;
+}
+
+@keyframes blink-bg {
+    0%, 100% {
+        background-color: crimson;
+    }
+    50% {
+        background-color: #b30000;
+    }
+}
+
 </style>
 {% if TR_List %}
-    {% for TR in TR_List %}
+    {% for TR, IMG, NM in TR_List %}
         <div class="container-xxl my-3">
                 <div class="bg-color-own shadow-sm rounded p-3 d-flex align-items-center flex-wrap flex-md-nowrap">
             <!-- Profile Image -->
             <div class="me-4 mb-3 mb-md-0">
                 <img
-                src="..."
-                alt="User Profile"
+                src="/media/{{ IMG }}"
+                alt="{{ NM }}"
                 class="rounded-circle"
                 style="width: 50px; height: 50px; object-fit: cover; background-color: white;"
                 />
@@ -21,13 +50,16 @@
 
             <!-- User Info -->
             <div class="me-auto">
-                <h4 class="mb-1 text-white"></h4>
+                <h4 class="mb-1 text-white">{{ NM }}</h4>
                 <p class="text-muted mb-0" style="margin-left: 1px !important;"><span class="text-white"><strong>Pickup From:</strong> {{ TR.taxiRunningFrom|truncatewords:12 }}</span></p>
             </div>
 
                 <!-- Book Taxi Button -->
                 <div class="mt-3 mt-md-0">
-                    <a href="{% url 'taxi_app:runningStatusVerify' TR.statusCode %}" class="btn btn-warning button-home" title="status"><i class="bi bi-check-circle"></i></a>
+                    <a href="{% url 'taxi_app:liveTaxiRunning' TR.statusCode %}">
+                        <span class="live-tag">LIVE</span>
+                    </a>
+                    <a href="{% url 'taxi_app:runningStatusVerify' TR.statusCode %}" class="btn btn-warning button-home" title="check-status"><i class="bi bi-check-circle"></i></a>
                 </div>
             </div>
         </div>

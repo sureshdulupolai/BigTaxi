@@ -28,6 +28,7 @@ urlpatterns = [
     path('ready-to-go-otpr/<idCode>/', views.ResendOtpFunctionBaseView, name='resendOTP'),
     path('status-verify/<idCode>/', views.runningPageFunctionBaseView, name='runningStatusVerify'),
     path('status-customer/', views.RunningStatusWithOTPCheckByCustomer, name='statusCustomer'),
+    path('trip-continue/<IdCodeHere>/', views.liveRunningStatus, name='liveTaxiRunning'),
 
     # review page
     path('review/', views.reviewPageFunctionBaseView, name='review'),

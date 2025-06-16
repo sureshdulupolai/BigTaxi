@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trip Status</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .map-container {
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .pad-mr-html{
+      padding: 6px 15px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+  <!-- Driver & Trip Info -->
+  <div class="card shadow p-4 mb-4">
+    <h4 class="mb-3">Driver Name: <strong>{{ UnameHere }}</strong></h4>
+    <p>Traveling from <strong>{{ TaxLiveData.taxiRunningFrom }}</strong> to <strong>{{ TaxLiveData.taxiRunningFrom }}</strong></p>
+    <p>Status: <span class="badge bg-success pad-mr-html">Trip On Going</span></p>
+    <p>Time Left: <span id="countdown" class="text-danger fw-bold">{{ TaxLiveData.timeOfTripStart }} | {{ TaxLiveData.taxiFutureEndTime }}</span></p>
+    <p><span id="countdownTimer" class="text-success fw-bold"></span></p> 
+
+    <div class="d-flex gap-3 mt-3">
+      <a href="" class="btn btn-outline-primary">Play Game</a>
+      <button class="btn btn-success">Accept Friend Request</button>
+      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-dark">Back</a>
+    </div>
+  </div>
+
+  <!-- Live Map -->
+  <div class="card p-3 shadow">
+    <h5>Live Trip Location</h5>
+    <div class="map-container mt-2">
+      <!-- Embed Google Map or use Leaflet -->
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.1160991833!2d72.74110165000001!3d19.082197799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b63a9d3052b1%3A0x60c14b10d3e48e64!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1652520539334!5m2!1sen!2sin" 
+        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Countdown Script -->
+<script>
+  const startTimeStr = "{{ TaxLiveData.timeOfTripStart }}";  // "4:45 p.m."
+    const endTimeStr = "{{ TaxLiveData.taxiFutureEndTime }}";  // "12:50"
+
+    function parseTime12(str) {
+        const now = new Date();
+        const [time, modifier] = str.toLowerCase().replace('.', '').split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        if (modifier === 'pm' && hours !== 12) hours += 12;
+        if (modifier === 'am' && hours === 12) hours = 0;
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+    }
+
+    function parseTime24(str, baseDate) {
+        const [hours, minutes] = str.split(':').map(Number);
+        const end = new Date(baseDate);
+        end.setHours(hours);
+        end.setMinutes(minutes);
+        end.setSeconds(0);
+
+        // If end is before start (means it's on the next day)
+        if (end <= baseDate) {
+            end.setDate(end.getDate() + 1);
+        }
+
+        return end;
+    }
+
+    const tripStart = parseTime12(startTimeStr);
+    const tripEnd = parseTime24(endTimeStr, tripStart);
+
+    function updateCountdown() {
+        const now = new Date();
+        const remaining = tripEnd - now;
+
+        if (remaining <= 0) {
+            document.getElementById("countdownTimer").textContent = "✅ Trip Ended";
+            clearInterval(timerInterval);
+            return;
+        }
+
+        const totalMinutes = Math.floor(remaining / 1000 / 60);
+        const seconds = Math.floor((remaining / 1000) % 60);
+
+        document.getElementById("countdownTimer").textContent =
+            `⏳ Time left: ${totalMinutes} min ${seconds} sec`;
+    }
+
+    const timerInterval = setInterval(updateCountdown, 1000);
+    updateCountdown(); // run instantly 
+</script>
+
+</body>
+</html>
