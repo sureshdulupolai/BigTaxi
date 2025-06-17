@@ -48,55 +48,57 @@
 
 <!-- Countdown Script -->
 <script>
-  const startTimeStr = "{{ TaxLiveData.timeOfTripStart }}";  // "4:45 p.m."
-    const endTimeStr = "{{ TaxLiveData.taxiFutureEndTime }}";  // "12:50"
+  // testing code for js - countdown reverse for trip end
+  // -----------------------------------------------------------------------------------------------
+  // const startTimeStr = "{{ TaxLiveData.timeOfTripStart }}";  // "4:45 p.m."
+  //   const endTimeStr = "{{ TaxLiveData.taxiFutureEndTime }}";  // "12:50"
 
-    function parseTime12(str) {
-        const now = new Date();
-        const [time, modifier] = str.toLowerCase().replace('.', '').split(' ');
-        let [hours, minutes] = time.split(':').map(Number);
-        if (modifier === 'pm' && hours !== 12) hours += 12;
-        if (modifier === 'am' && hours === 12) hours = 0;
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-    }
+  //   function parseTime12(str) {
+  //       const now = new Date();
+  //       const [time, modifier] = str.toLowerCase().replace('.', '').split(' ');
+  //       let [hours, minutes] = time.split(':').map(Number);
+  //       if (modifier === 'pm' && hours !== 12) hours += 12;
+  //       if (modifier === 'am' && hours === 12) hours = 0;
+  //       return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+  //   }
 
-    function parseTime24(str, baseDate) {
-        const [hours, minutes] = str.split(':').map(Number);
-        const end = new Date(baseDate);
-        end.setHours(hours);
-        end.setMinutes(minutes);
-        end.setSeconds(0);
+  //   function parseTime24(str, baseDate) {
+  //       const [hours, minutes] = str.split(':').map(Number);
+  //       const end = new Date(baseDate);
+  //       end.setHours(hours);
+  //       end.setMinutes(minutes);
+  //       end.setSeconds(0);
 
-        // If end is before start (means it's on the next day)
-        if (end <= baseDate) {
-            end.setDate(end.getDate() + 1);
-        }
+  //       // If end is before start (means it's on the next day)
+  //       if (end <= baseDate) {
+  //           end.setDate(end.getDate() + 1);
+  //       }
 
-        return end;
-    }
+  //       return end;
+  //   }
 
-    const tripStart = parseTime12(startTimeStr);
-    const tripEnd = parseTime24(endTimeStr, tripStart);
+  //   const tripStart = parseTime12(startTimeStr);
+  //   const tripEnd = parseTime24(endTimeStr, tripStart);
 
-    function updateCountdown() {
-        const now = new Date();
-        const remaining = tripEnd - now;
+  //   function updateCountdown() {
+  //       const now = new Date();
+  //       const remaining = tripEnd - now;
 
-        if (remaining <= 0) {
-            document.getElementById("countdownTimer").textContent = "✅ Trip Ended";
-            clearInterval(timerInterval);
-            return;
-        }
+  //       if (remaining <= 0) {
+  //           document.getElementById("countdownTimer").textContent = "✅ Trip Ended";
+  //           clearInterval(timerInterval);
+  //           return;
+  //       }
 
-        const totalMinutes = Math.floor(remaining / 1000 / 60);
-        const seconds = Math.floor((remaining / 1000) % 60);
+  //       const totalMinutes = Math.floor(remaining / 1000 / 60);
+  //       const seconds = Math.floor((remaining / 1000) % 60);
 
-        document.getElementById("countdownTimer").textContent =
-            `⏳ Time left: ${totalMinutes} min ${seconds} sec`;
-    }
+  //       document.getElementById("countdownTimer").textContent =
+  //           `⏳ Time left: ${totalMinutes} min ${seconds} sec`;
+  //   }
 
-    const timerInterval = setInterval(updateCountdown, 1000);
-    updateCountdown(); // run instantly 
+  //   const timerInterval = setInterval(updateCountdown, 1000);
+  //   updateCountdown(); // run instantly 
 </script>
 
 </body>
