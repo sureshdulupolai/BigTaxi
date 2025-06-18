@@ -609,26 +609,48 @@ def ResendOtpFunctionBaseView(request, idCode):
 
 # if user login and customer id is matched then show the otp else, dont show the otp only
 def runningPageFunctionBaseView(request, idCode):
-    TOR = TaxiOnRunning.objects.get(statusCode = idCode)
-    UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
-    context = { 'OTP' : TOR.OTP_Here, 'Name' : UDM.UProfileName, 'PNR' : idCode, 'CL' : TOR.taxiRunningFrom, 'EL' : TOR.taxiRunningTo, 'TS' : str(TOR.datOfTripStart) + ' ' + str(TOR.timeOfTripStart), 'TE' : TOR.taxiFutureEndTime, 'TP' : TOR.totalPassanger }
+    if request.user.is_authenticated:
+        nv = navbar(request)
+        uCat = nv.get('userCategoryis')
+        if uCat == 'Driver':
+            TOR = TaxiOnRunning.objects.get(statusCode = idCode)
+            UDM = usersDataModel.objects.get(UserCode = TOR.taxiCustomerName)
+        else:
+            try:
+                TOR = TaxiOnRunning.objects.get(statusCode = idCode)
+                UDM = usersDataModel.objects.get(UserCode = TOR.taxiDriverName)
+                
+            except Exception as e:
+                # messages.error(request, '')
+                # print(e, ' - error is here!!!!!!!!')\
+                return redirect('taxi_app:autoRedirect')
+    context = { 'Cat' : uCat, 'OTP' : TOR.OTP_Here, 'Name' : UDM.UProfileName, 'PNR' : idCode, 'CL' : TOR.taxiRunningFrom, 'EL' : TOR.taxiRunningTo, 'TS' : str(TOR.datOfTripStart) + ' ' + str(TOR.timeOfTripStart), 'TE' : TOR.taxiFutureEndTime, 'TP' : TOR.totalPassanger }
     return render(request, 'customer/running_status.html', context)
 
 def RunningStatusWithOTPCheckByCustomer(request):
     if request.user.is_authenticated:
-        nv = navbar(request); userCodeHere = nv.get('userBarCodeAccessis'); imageList = []; nameList = []
-        TR_List_Normal = TaxiOnRunning.objects.filter(taxiCustomerName = userCodeHere)
+        nv = navbar(request); userCodeHere = nv.get('userBarCodeAccessis'); imageList = []; nameList = []; userCat = nv.get('userCategoryis'); Cat = userCat
+        if userCat == 'Customer':
+            TR_List_Normal = TaxiOnRunning.objects.filter(taxiCustomerName = userCodeHere)
+        elif userCat == 'Driver':
+            TR_List_Normal = TaxiOnRunning.objects.filter(taxiDriverName = userCodeHere)
+
         if TR_List_Normal:
-            for DataOfTR in TR_List_Normal:
-                UDM_Data = usersDataModel.objects.get(UserCode = DataOfTR.taxiDriverName)
-                imageList.append(UDM_Data.UProfileImage); nameList.append(UDM_Data.UProfileName)
+            if userCat == 'Customer':
+                for DataOfTR in TR_List_Normal:
+                    UDM_Data = usersDataModel.objects.get(UserCode = DataOfTR.taxiDriverName)
+                    imageList.append(UDM_Data.UProfileImage); nameList.append(UDM_Data.UProfileName)
+            elif userCat == 'Driver':
+                for DataOfTR in TR_List_Normal:
+                    UDM_Data = usersDataModel.objects.get(UserCode = DataOfTR.taxiCustomerName)
+                    imageList.append(UDM_Data.UProfileImage); nameList.append(UDM_Data.UProfileName)
             TR_List = zip(TR_List_Normal, imageList, nameList)
 
     else:
         messages.info(request, f'Login Into System, To Access {request.path}')
         return redirect('taxi_app:autoRedirect')
     
-    context = {'TR_List' : TR_List}
+    context = {'TR_List' : TR_List, 'Cat' : Cat}
     return render(request, 'customer/list-otp-status.html', context)
 
 def liveRunningStatus(request, IdCodeHere):

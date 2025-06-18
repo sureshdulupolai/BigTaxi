@@ -1,18 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Travel Info</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-
+<body>
   <div id="countdown-display" class="alert alert-light text-center" role="alert">
     <!-- ⏳ Next Trip Countdown :  -->
   </div>
-
   
   <div class="container py-5" style="margin-top: -30px !important;">
     <div class="card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 600px;">
@@ -20,7 +11,11 @@
 
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><strong>Otp: <span class="text-main-own">{{ OTP }}</span></strong></li>
-        <li class="list-group-item"><strong>User Name:</strong> {{ Name }}</li>
+        {% if Cat == 'Driver' %}
+          <li class="list-group-item"><strong>Customer Name:</strong> {{ Name }}</li>
+        {% else %}
+          <li class="list-group-item"><strong>Driver Name:</strong> {{ Name }}</li>
+        {% endif %}
         <li class="list-group-item"><strong>PNR Code:</strong> {{ PNR }}</li>
         <li class="list-group-item"><strong>Current Location:</strong> {{ CL }}</li>
         <li class="list-group-item"><strong>To Location:</strong> {{ EL }}</li>
@@ -42,36 +37,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script>
-    // This should be a date string like: "2025-06-19 16:30:00"
-    const tripTimeStr = "{{ trip_timestamp }}";
-
-    // Convert string to Date object
-    const tripTime = new Date(tripTimeStr).getTime();
-
-    const countdownEl = document.getElementById('countdown-display');
-
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const distance = tripTime - now;
-
-        if (distance > 0) {
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            countdownEl.textContent = `⏳ Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-        } else {
-            countdownEl.textContent = "✅ Trip Started!";
-            clearInterval(timerInterval);
-        }
-    }
-
-    const timerInterval = setInterval(updateCountdown, 1000);
-    updateCountdown(); // First run immediately
-</script> -->
 
 </body>
-</html>
 {% endblock %}
