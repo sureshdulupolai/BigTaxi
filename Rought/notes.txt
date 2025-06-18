@@ -14,3 +14,25 @@
 - get chat with us on query(AI) : take user statusCode and give data according to customer need
 
 - review to our app page
+
+
+// ------------------------------------------------------------------------
+
+# but, check for <id>
+python -> http://localhost:8000/home/otp-testing/
+referrer = request.META.get('HTTP_REFERER')
+print(referrer, ' - referrer code here')
+
+get previous path
+
+def checkOldPath(referrer):
+    oldPathUrl = referrer[20:]
+    if oldPathUrl == '/home/otp-testing/':
+        return 'tesing'
+
+mainFunction(req):
+    ... 
+    pathToGo = checkOldPath(referrer)
+    return redirect(f'taxi_app:{pathToGo}')
+
+# https://www.crazygames.com/game/squid-game-online <- game
