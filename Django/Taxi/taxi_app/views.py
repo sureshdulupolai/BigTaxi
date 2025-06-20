@@ -656,13 +656,25 @@ def RunningStatusWithOTPCheckByCustomer(request):
 def liveRunningStatus(request, IdCodeHere):
     try:
         TaxLiveData = TaxiOnRunning.objects.get(statusCode = IdCodeHere);nvCall = navbar(request); userCategory = nvCall.get('userCategoryis')
-        if userCategory == 'Driver': UnameHere = usersDataModel.objects.get(UserCode = TaxLiveData.taxiCustomerName).UProfileName
-        elif (userCategory == 'Customer') or (userCategory == 'Developer'): UnameHere = usersDataModel.objects.get(UserCode = TaxLiveData.taxiDriverName).UProfileName
+        checkStatusOnTemplate = ''
+
+        if userCategory == 'Driver': 
+            UDM = usersDataModel.objects.get(UserCode = TaxLiveData.taxiCustomerName)
+            UnameHere = UDM.UProfileName
+            MobileNo = UDM.UserMobileNo
+            checkStatusOnTemplate = 'Driver'
+
+        elif (userCategory == 'Customer') or (userCategory == 'Developer'): 
+            UDM = usersDataModel.objects.get(UserCode = TaxLiveData.taxiDriverName)
+            UnameHere = UDM.UProfileName
+            MobileNo = UDM.UserMobileNo
+            checkStatusOnTemplate = 'Customer'
 
     except Exception or e:
         ...
     
-    return render(request, 'ava/main-running.html', {'TaxLiveData' : TaxLiveData, 'UnameHere' : UnameHere})
+    context = {'TaxLiveData' : TaxLiveData, 'UnameHere' : UnameHere, 'MobileNo' : MobileNo, 'checkStatusOnTemplate' : checkStatusOnTemplate}
+    return render(request, 'ava/main-running.html', context)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # testing function

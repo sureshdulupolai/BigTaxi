@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <style>
   .bg-main-own{
     background-color: #0f766e !important;
@@ -14,32 +15,69 @@
 <body class="bg-light">
 
 <div class="container py-4">
-  <!-- Driver & Trip Info -->
-  <div class="card shadow p-4 mb-1">
-    <h4 class="mb-3">Driver Name: <strong>{{ UnameHere }}</strong></h4>
-    <p>Traveling from <strong>{{ TaxLiveData.taxiRunningFrom }}</strong> to <strong>{{ TaxLiveData.taxiRunningFrom }}</strong></p>
-    <p>Status: <span class="badge bg-main-own pad-mr-html">Trip On Going</span></p>
-    <p>Start Date & Time: <span id="countdown" class="text-main-own fw-bold">{{ TaxLiveData.datOfTripStart }} {{ TaxLiveData.timeOfTripStart }}</span></p>
-    <p>Time Left: <span id="countdown" class="text-main-own fw-bold">{{ TaxLiveData.taxiFutureEndTime }}</span></p>
-    <p><span id="countdownTimer" class="text-success fw-bold"></span></p> 
+  <h5 class="mb-3">My Trip / PNR Tracking</h5>
 
-    <div class="d-flex gap-3 mt-3">
-      <a href="" class="btn bg-second-play-game text-white">Play Game</a>
-      <button class="btn bg-main-own text-white">Accept Friend Request</button>
-      <a href="{{ request.META.HTTP_REFERER }}" class="btn bg-black-back text-white">Back</a>
+  <div class="card shadow p-4">
+    <!-- Top Info -->
+    <div class="row text-center mb-4">
+      <div class="col-md-3"><strong>PNR ID:</strong><br> {{ TaxLiveData.statusCode }}</div>
+      <div class="col-md-3"><strong>Trip Start:</strong><br> {{ TaxLiveData.datOfTripStart }}  {{ TaxLiveData.timeOfTripStart }}</div>
+      <div class="col-md-3"><strong>Contact No:</strong><br> +91-{{ MobileNo }}</div>
+      <div class="col-md-3"><strong>Trip End:</strong><br> {{ TaxLiveData.taxiFutureEndTime }}</div>
     </div>
-  </div>
 
-  <!-- Live Map -->
-  <div class="card p-3 shadow">
-    <h5>Live Trip Location</h5>
-    <div class="map-container mt-2">
-      <!-- Embed Google Map or use Leaflet -->
-      <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.1160991833!2d72.74110165000001!3d19.082197799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b63a9d3052b1%3A0x60c14b10d3e48e64!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1652520539334!5m2!1sen!2sin" 
-        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
-      </iframe>
+    <!-- Progress Tracker -->
+    <div class="d-flex justify-content-between align-items-center position-relative mb-4 px-3">
+      <!-- Red Progress Line -->
+      <div class="position-absolute top-50 start-0 w-100 translate-middle-y" style="height: 4px; background-color: #991b1b; z-index: 0;"></div>
+
+      <!-- Step 1 -->
+      <div class="text-center" style="z-index: 1;">
+        <div class="rounded-circle bg-main-own text-white p-3 mx-auto">
+          <i class="bi bi-check-lg fs-5"></i>
+        </div>
+        <small class="d-block mt-2 fw-bold">Trip Started</small>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="text-center" style="z-index: 1;">
+        <div class="rounded-circle bg-main-own text-white p-3 mx-auto">
+          <i class="bi bi-truck fs-5"></i>
+        </div>
+        <small class="d-block mt-2 fw-bold">On the way</small>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="text-center" style="z-index: 1;">
+        <div class="rounded-circle bg-light border border-dark text-dark p-3 mx-auto">
+          <i class="bi bi-geo-alt fs-5"></i>
+        </div>
+        <small class="d-block mt-2 fw-bold">Trip End</small>
+      </div>
     </div>
+
+    <!-- Trip Details / Cards -->
+      <div class="row text-center mt-4">
+        <div class="col-md-4">
+          {% if checkStatusOnTemplate == 'Customer' %}
+            <img src="https://via.placeholder.com/80" class="img-fluid mb-2">
+            <p><strong>Driver:</strong> {{ UnameHere }}</p>
+          {% elif checkStatusOnTemplate == 'Driver' %}
+            <img src="https://via.placeholder.com/80" class="img-fluid mb-2">
+            <p><strong>Customer:</strong> {{ UnameHere }}</p>
+          {% endif %}
+        </div>
+        <div class="col-md-4">
+          <img src="https://via.placeholder.com/80" class="img-fluid mb-2">
+          <p><strong>Vehicle:</strong> Innova</p>
+        </div>
+        <div class="col-md-4">
+          <img src="https://via.placeholder.com/80" class="img-fluid mb-2">
+          <p><strong>Fare:</strong> ₹{{ TaxLiveData.taxiFairPrice }}</p>
+        </div>
+      </div>
+
+    <a href="#" class="btn btn-danger mt-4"><i class="bi bi-arrow-left"></i> Back to Trips</a>
   </div>
 </div>
 
