@@ -36,4 +36,6 @@ urlpatterns = [
 
     # testing code
     path('otp-testing/', views.PageFunctionHereForDemoTesting, name='tesing'),
+
+    #
 ]

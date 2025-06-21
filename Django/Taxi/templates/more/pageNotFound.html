@@ -1,17 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>404 Page Not Found - BigTaxi</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>404 - Page Not Found</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap 5 CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f3fafa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .img-div-pnf {
+      height: 60vh;
+    }
+
+    .img-class-for-pnf {
+      width: 80%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center right; /* car right side face kare */
+    }
+  </style>
 </head>
 <body>
-  <div class="vh-100 d-flex justify-content-center align-items-center bg-light">
-    <div class="p-5 rounded shadow text-center bg-white w-75">
-      <h1 class="display-1 text-danger fw-bold">404</h1>
-      <p class="h5 text-muted">Page not found — maybe it moved?</p>
-      <a href="#" class="btn btn-danger mt-3">Go Home</a>
+  <div class="container text-center py-5">
+    <div class="image-wrapper mb-4 img-div-pnf">
+      <img src="/media/More/car-pnf.png" alt="Taxi" class="img-class-for-pnf" />
     </div>
+    <h2 class="fw-bold mb-2">404 – Page Not Found</h2>
+    <p class="text-muted mb-4">Oops! The page you're looking for is not available.</p>
+    <a href="{% url 'taxi_app:autoRedirect' %}" class="btn btn-success px-4">Back to Home</a>
   </div>
 </body>
 </html>
+
