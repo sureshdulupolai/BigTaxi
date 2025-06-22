@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    body {
+      background-color: #f9fafb;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .profile-container {
+      max-width: 850px;
+      margin: auto;
+      background-color: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      margin-top: 30px !important;
+      margin-bottom: 30px !important;
+    }
+    .profile-img {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    .info-row {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+    .info-label {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .info-value {
+      font-size: 15px;
+    }
+    .edit-btn {
+      background-color: #f3f4f6;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    a.change-link {
+      font-size: 14px;
+      color: #4b5563;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="profile-container">
+  <div class="d-flex justify-content-between align-items-start">
+    <div class="d-flex align-items-center">
+      <img src="/media/{{ UDM.UProfileImage }}" alt="Profile" class="profile-img me-3">
+      <div>
+        <h5 class="mb-0">{{ UDM.UProfileName }}</h5>
+        <div class="text-muted">{{ userCat }}</div>
+        <div class="text-muted">{{ UDM.UserCity }}, {{ UDM.UserState }}</div>
+      </div>
+    </div>
+    <button class="edit-btn">Edit Profile</button>
+  </div>
+
+  <div class="section-title">Personal Information</div>
+
+  <div class="info-row d-flex justify-content-between">
+    <div class="info-label">User Code</div>
+    <div class="info-value">{{ userC }}</div>
+  </div>
+  <div class="info-row d-flex justify-content-between">
+    <div class="info-label">Phone</div>
+    <div class="info-value">{{ UDM.UserMobileNo }}</div>
+  </div>
+  {% if UDM.UserCategory == 'Driver' %}
+    <div class="info-row d-flex justify-content-between">
+        <div class="info-label">Coupon Code</div>
+        <div class="info-value">{{ UDM.CouponCode }}</div>
+    </div>
+  {% endif %}
+  <div class="info-row d-flex justify-content-between">
+    <div class="info-label">Total Trips</div>
+    <div class="info-value">{{ UDM.totalTripCount }}</div>
+  </div>
+  <div class="info-row d-flex justify-content-between">
+    <div class="info-label">Danger Trips</div>
+    <div class="info-value">{{ UDM.dangerTripCount }}</div>
+  </div>
+
+  <div class="pt-3">
+    <a href="#" class="change-link">Change Password</a>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

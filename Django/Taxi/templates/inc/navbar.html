@@ -63,15 +63,37 @@
   transform-origin: right;
 } */
 
+.form-control.custom-focus:focus {
+    box-sizing: border-box;
+    border-color: #0f766e;
+    /* box-shadow: 0 0 0 0.25rem rgba(15, 118, 110, 0.25); Light teal glow */
+    box-shadow: none !important;
+
+    border: 1px solid #0f766e !important;
+  }
+
 </style>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container-fluid">
     <a class="navbar-brand text-primary text-main-own fw-bold fs-4" href="{% url 'taxi_app:autoRedirect' %}">BigTaxi</a>
+    
     <div class="ms-auto d-flex align-items-center">
-      <!-- search bar -->
-      {% if not user.is_authenticated %}
+      
+      {% if user.is_authenticated %}
+        <!-- Search Bar -->
+        <form class="d-flex me-3" method="GET" action="">
+          <input class="form-control me-2 custom-focus" type="search" name="q" placeholder="Current City Loc." aria-label="Search">
+          <button class="btn btn-main bg-main-own text-white" type="submit">Search</button>
+        </form>
+
+        <!-- Profile Image as Direct Link -->
+        <a href="{% url 'taxi_app:profile' %}" class="d-flex align-items-center text-decoration-none">
+          <img src="/media/{{ profile }}" alt="Profile" width="36" height="36" class="rounded-circle shadow-sm" style="object-fit: cover;">
+        </a>
+      
+      {% else %}
         <a href="{% url 'driver:customerLogin' %}" class="btn btn-outline-main me-2">Login</a>
         <a href="{% url 'driver:customerSignup' %}" class="btn btn-outline-main me-2">Signup</a>
       {% endif %}
@@ -79,6 +101,8 @@
     </div>
   </div>
 </nav>
+
+
 
 <div class="bg-light border-bottom scrolling-navbar d-flex">
 {% if user.is_authenticated %}
@@ -100,7 +124,7 @@
       <!-- <i class="bi bi-speedometer"></i> -->
     </a></div>
     <div class="nav-item-wrapper">
-      <a class="nav-link" href="{% url 'taxi_app:statusCustomer' %}">Run Status</a>
+      <a class="nav-link" href="{% url 'taxi_app:statusCustomer' %}">Ride</a>
     </div>
     
 
@@ -110,7 +134,7 @@
     <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}">Driver</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:pinTaxi' %}">PinTaxi</a></div>
     <div class="nav-item-wrapper"><a class="nav-link" href="#">ArgentTaxi</a></div>
-    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:statusCustomer' %}">Run Status</a></div>
+    <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:statusCustomer' %}">Ride</a></div>
 
   {% elif userCategoryis == 'Developer' %}
     <div class="nav-item-wrapper"><a class="nav-link" href="{% url 'taxi_app:autoRedirect' %}"></a>Home</div>

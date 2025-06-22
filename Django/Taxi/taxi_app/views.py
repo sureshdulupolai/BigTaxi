@@ -676,6 +676,24 @@ def liveRunningStatus(request, IdCodeHere):
     context = {'TaxLiveData' : TaxLiveData, 'UnameHere' : UnameHere, 'MobileNo' : MobileNo, 'checkStatusOnTemplate' : checkStatusOnTemplate}
     return render(request, 'ava/main-running.html', context)
 
+def ProfileFunctionBaseView(request):
+    if request.user.is_authenticated:
+        nv = navbar(request)
+        userCode = nv.get('userBarCodeAccessis')
+        userCat = nv.get('userCategoryis')
+        UDM = usersDataModel.objects.get(UserCode = userCode)
+
+        context = {
+            'userC' : userCode,
+            'userCat' : userCat,
+            'UDM' : UDM
+        }
+        return render(request, 'main/profile.html', context)
+
+    else:
+        messages.info(request, f'{request.path} is access, when you are login')
+        return redirect('taxi_app:autoRedirect')
+
 # ----------------------------------------------------------------------------------------------------------------------
 # testing function
 def PageFunctionHereForDemoTesting(request):

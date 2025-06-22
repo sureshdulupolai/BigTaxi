@@ -38,4 +38,5 @@ urlpatterns = [
     path('otp-testing/', views.PageFunctionHereForDemoTesting, name='tesing'),
 
     #
+    path('profile/', views.ProfileFunctionBaseView, name='profile'),
 ]

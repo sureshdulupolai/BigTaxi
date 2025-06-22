@@ -12,6 +12,7 @@ def navbar(request):
             try:
                 checkUser = User.objects.get(username = request.user.username); UDM = usersDataModel.objects.get(ULink = checkUser); 
                 userCategoryis = UDM.UserCategory; userBarCodeAccessis = UDM.UserCode; userModelDataCityis = UDM.UserCity; userModelDataStateis = UDM.UserState
+                
 
                 city_results = PinTaxiAvailable.objects.filter(taxiCity__icontains=UDM.UserCity)
                 if city_results.exists(): results = city_results
@@ -51,8 +52,8 @@ def navbar(request):
                             ErrorWork(userType = 'LOGIN_USER', uNamesAre = request.user.username, barCode = userBarCodeAccessis, errorAre = e, urls = request).save()
                             messages.info(request, 'Oops!, Something Went Wrong in date and time, Please Try Again Later We Will Solve Your Problem Soon!.')
                             return redirect('taxi_app:autoRedirect')
-
-                return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis, 'userModelDataCityis' : userModelDataCityis, 'userModelDataStateis' : userModelDataStateis}
+                
+                return {'userCategoryis' : userCategoryis, 'userBarCodeAccessis' : userBarCodeAccessis, 'userModelDataCityis' : userModelDataCityis, 'userModelDataStateis' : userModelDataStateis, "profile" : UDM.UProfileImage}
             
             except Exception as e:
 
