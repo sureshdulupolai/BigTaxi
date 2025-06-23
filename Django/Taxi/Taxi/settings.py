@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-rviilm68c!6l#1%43cx6jbhqz2jj^2ebxf0u(7i2@cde=yj*_n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+# settings.py
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.104']
+ALLOWED_HOSTS = ['*']
+
+
 
 
 # Application definition
@@ -39,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'Users',
     'Driver',
     'Customer',
@@ -73,6 +79,13 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+}
 
 WSGI_APPLICATION = 'Taxi.wsgi.application'
 

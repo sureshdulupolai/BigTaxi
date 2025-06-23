@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', include('taxi_app.urls')),
     path('ls/', include('Driver.urls')),
+    path('dev/', include('Customer.urls')),
 
     # if path not match then it will direct goes to bigtaxi.com = home page (localhost:8000) = (localhost:8000/bigtaxi.com)
     path('', lambda request: redirect('home/', permanent=False)),  # 👈 keep this

@@ -1,0 +1,13 @@
+to live on wifi
+
+add in setting.py
+-- ALLOWED_HOSTS = ['*']
+
+run in cmd, any where
+-- ipconfig
+
+dont user python manage.py runserver
+-- python manage.py runserver 0.0.0.0:8000
+
+// check your api in another device
+-- http://192.168.1.5:8000/dev/api/barcodes/

@@ -39,7 +39,7 @@ class TaxiTimeOver(models.Model):
     toDate = models.DateField(auto_now_add=True)
     toTime = models.TimeField(auto_now_add=True)
     toDriverName = models.CharField(max_length=500)
-    toStatus = models.CharField(choices=statusOfTaxiData, default='Failed')
+    toStatus = models.CharField(choices=statusOfTaxiData, default='Failed', max_length=20)
 
     def __str__(self):
         return str((self.toDriverName, self.toTaxiAvaId, self.toStatus))
@@ -85,7 +85,7 @@ class FinishReviewByCustomer(models.Model):
 class TaxiOnRunning(models.Model):
     st = [('hide', 'hide'),('open', 'open')]
     statusCode = models.CharField(max_length=50)
-    taxiDriverName = models.CharField(500)
+    taxiDriverName = models.CharField(max_length=200)
     taxiCustomerName = models.CharField(max_length=500)
     totalPassanger = models.CharField(max_length=10)
     taxiRunningFrom = models.CharField(max_length=4000)
