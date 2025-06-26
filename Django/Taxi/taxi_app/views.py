@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from taxi_app.models import TaxiBarCode, PinTaxiAvailable, TaxiOnRunning
+from taxi_app.serializers import TaxiBarCodeSerializer, PinTaxiAvailableSerializer, TaxiOnRunningSerializer
 from django.contrib.auth.models import User
 from Users.models import usersDataModel, ReviewAndRating, ReviewBarcode, ReviewDelete, ErrorWork
 from django.contrib import messages
@@ -10,6 +11,8 @@ from Driver.models import DriverAcceptedPin, ReportDriverInPinTaxi
 from Customer.models import PinDeleteReview, repostData, SaveNotificaionDeletePin
 from django.utils import timezone
 import random
+from Users.serializers import ReviewBarcodeSerializer, ReviewAndRatingSerializer
+from Customer.serializers import repostDataSerializer, PinDeleteReviewSerializer, SaveNotificaionDeletePinSerializer
 
 # from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 # import json
@@ -164,17 +167,21 @@ def PointCount(RarLst, values = 1):
 
 # review of BigTaxi
 def reviewPageFunctionBaseView(request):
-    showData = False; buttonData = []; RarLst = ReviewAndRating.objects.all(); operationUser = []
+    showData = True; buttonData = []; RarLst = ReviewAndRating.objects.all(); operationUser = []
     if request.user.is_authenticated:
-        uNameData = request.user.username; BarCodeOfRating = []; newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
+        uNameData = request.user.username; BarCodeOfRating = []; 
+        newRar = [DataInRar for DataInRar in RarLst if str(uNameData) == str(DataInRar.username)]
+        # print(newRar, ' !!- Here NewRar')
         # U = User.objects.get(username = uNameData); data = usersDataModel.objects.get(ULink = U)
-        if newRar: showData = False; buttonData += [1]; BarCodeOfRating = [DataInNewRar.ratingBarCode for DataInNewRar in newRar][0]
-    
+        if newRar: 
+            showData = False; buttonData += [1]; BarCodeOfRating = [DataInNewRar.ratingBarCode for DataInNewRar in newRar][0]
+        
         if request.method == 'POST':
             typeOfForm = request.POST.get("formData")
 
             if typeOfForm == "formToNextPage":
-                barCode = request.POST.get('dataInHid'); request.session['userRatingCode'] = barCode
+                barCode = request.POST.get('dataInHid'); 
+                request.session['userRatingCode'] = barCode
                 return redirect('taxi_app:deleteReview')
 
             elif typeOfForm == "valueformForSamePage":
@@ -188,8 +195,12 @@ def reviewPageFunctionBaseView(request):
 
                 else: noCode = 1064; barCodeCreate = CodeName + str(noCode)
 
-                ReviewAndRating(username = uNameData, userCode = userCodeEnter, ratingBarCode = barCodeCreate, userReview = userReviewEnter or 'Good Service Support', userStar = userStarEnter, userCategoryForRating = str(userCategoryForRatingEnter)).save()
-                ReviewBarcode(barCode = barCodeCreate).save()
+                RARdata = { "username": uNameData, "userCode": userCodeEnter, "ratingBarCode": barCodeCreate, "userReview": userReviewEnter or "Good Service Support", "userStar": userStarEnter, "userCategoryForRating": str(userCategoryForRatingEnter) }
+                RBdata = { "barCode" : barCodeCreate }
+                serializerRAR = ReviewAndRatingSerializer(data = RARdata); serializerRB = ReviewBarcodeSerializer(data = RBdata)
+
+                if serializerRAR.is_valid() and serializerRB.is_valid(): 
+                    serializerRAR.save(); serializerRB.save()
 
                 return redirect('taxi_app:review')
         
@@ -321,7 +332,16 @@ def pinTaxiFunctionBaseView(request):
 
                     else: newBarCode = CodeNameTaxiAva + str(CodeNo)
                     
-                    PinTaxiAvailable(taxiAvaId = newBarCode, taxiCity = uCityEnter, customerId = UDM, currentLocation = uCurrentLocationEnter, pincode = uPincodeEnter, taxiPassenger = uTaxiPassengerEnter, couponCodeWas = uCouponCodeEnter, toLocation = uLastLocationEnter, taxiDateAndTimeByUser = formatted_datetime).save(); TaxiBarCode(barCode = newBarCode).save()
+                    PTAdata = { "taxiAvaId" : newBarCode, "taxiCity" : uCityEnter, "customerId" : UDM.id, "currentLocation" : uCurrentLocationEnter, "pincode" : uPincodeEnter, "taxiPassenger" : uTaxiPassengerEnter, "couponCodeWas" : uCouponCodeEnter, "toLocation" : uLastLocationEnter, "taxiDateAndTimeByUser" : formatted_datetime }
+                    TBCdata = { "barCode" : newBarCode }
+                    
+                    serializerOne = PinTaxiAvailableSerializer(data = PTAdata)
+                    serializerTwo = TaxiBarCodeSerializer(data = TBCdata)
+
+                    if serializerOne.is_valid() and serializerTwo.is_valid():
+                        serializerOne.save()
+                        serializerTwo.save()
+
                     return redirect('taxi_app:pinTaxi')
                 
                 else: messages.warning(request, 'Passenger Limit is Zero. Then why you need to pin taxi'); showMessage = True; return render(request, 'main/pinTaxi.html')
@@ -365,25 +385,17 @@ def deletePinTaxiReport(request, codeNeed):
         try:
             if request.method == 'POST':
             
-                PinDeleteReview(
-                        deleteType = 'report',
-                        pinBarCode = PTA_Object.taxiAvaId,
-                        userBarCode = PTA_Object.customerId.UserCode,
-                        driverCode = PTA_Object.driverCode,
-                        addressFrom = PTA_Object.currentLocation,
-                        addressTo = PTA_Object.toLocation,
-                        date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
-                        passenger = str(PTA_Object.taxiPassenger),
-                        review = ReviewObject.reportData,
-                        price = str(PTA_Object.priceOfTravel),
-                        discountCoupon = PTA_Object.couponCodeWas
-                ).save()
+                PDRdata = { "deleteType": "report", "pinBarCode": PTA_Object.taxiAvaId, "userBarCode": PTA_Object.customerId.UserCode, "driverCode": PTA_Object.driverCode, "addressFrom": PTA_Object.currentLocation, "addressTo": PTA_Object.toLocation, "date_Time": str(PTA_Object.taxiDate) + " " + str(PTA_Object.taxiTime), "passenger": str(PTA_Object.taxiPassenger), "review": ReviewObject.reportData, "price": str(PTA_Object.priceOfTravel), "discountCoupon": PTA_Object.couponCodeWas }
 
-                PTA_Object.delete(); ReviewObject.delete()
-
-                messages.success(request, f'Pin Taxi Report Details Is Deleted SuccessFully, For Id {codeNeed}')
-                return redirect('taxi_app:pinTaxi')
-
+                serializerPDR = PinDeleteReviewSerializer(data = PDRdata)
+                if serializerPDR.is_valid():
+                    serializerPDR.save(); PTA_Object.delete(); ReviewObject.delete()
+                    messages.success(request, f'Pin Taxi Report Details Is Deleted SuccessFully, For Id {codeNeed}')
+                    return redirect('taxi_app:pinTaxi')
+                
+                else:
+                    messages.info(request, f'Pin Taxi Report Details Is Not Deleted, Try again. For Id {codeNeed}')
+                    return redirect('taxi_app:pinTaxi')
 
         except:
             messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
@@ -407,25 +419,18 @@ def deletePinTaxiDetailsNoReport(request, codeNeed):
         if request.method == 'POST':
             
             try:
-                PinDeleteReview(
-                    deleteType = 'normal',
-                    pinBarCode = PTA_Object.taxiAvaId,
-                    userBarCode = PTA_Object.customerId.UserCode,
-                    driverCode = PTA_Object.driverCode,
-                    addressFrom = PTA_Object.currentLocation,
-                    addressTo = PTA_Object.toLocation,
-                    date_Time = str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime),
-                    passenger = str(PTA_Object.taxiPassenger),
-                    price = str(PTA_Object.priceOfTravel),
-                    discountCoupon = PTA_Object.couponCodeWas,
-                    review = request.POST.get('report')
-                ).save()
+                PDRdata = { "deleteType": "normal", "pinBarCode": PTA_Object.taxiAvaId, "userBarCode": PTA_Object.customerId.UserCode, "driverCode": PTA_Object.driverCode, "addressFrom": PTA_Object.currentLocation, "addressTo": PTA_Object.toLocation, "date_Time": str(PTA_Object.taxiDate) + ' ' + str(PTA_Object.taxiTime), "passenger": str(PTA_Object.taxiPassenger), "price": str(PTA_Object.priceOfTravel), "discountCoupon": PTA_Object.couponCodeWas, "review": request.POST.get("report") }
 
-                PTA_Object.delete()
-
-                messages.success(request, f'Pin Taxi Details Is Deleted SuccessFully, For Id {codeNeed}')
-                return redirect('taxi_app:pinTaxi')
-            
+                serializerPDR = PinDeleteReviewSerializer(data = PDRdata)
+                if serializerPDR.is_valid():
+                    serializerPDR.save(); PTA_Object.delete()
+                    messages.success(request, f'Pin Taxi Details Is Deleted SuccessFully, For Id {codeNeed}')
+                    return redirect('taxi_app:pinTaxi')
+                
+                else:
+                    messages.info(request, f'Pin Taxi Details Is Not Deleted, Try again. For Id {codeNeed}')
+                    return redirect('taxi_app:pinTaxi')
+                
             except Exception as e:
                 # print('Error -  ', e)
                 messages.info(request, 'page not found, or Something Got Miss Matched Try Again!')
@@ -501,12 +506,15 @@ def RePostPinTaxiFunctionBaseView(request, CodeNeed):
     
     if request.method == 'POST':
 
-        repostData(PNRCode = PTAObject.taxiAvaId, userCode = PTAObject.customerId.UserCode, driverCode = PTAObject.driverCode, status = RDPTObject.driverReportFor, text = RDPTObject.reportData).save()
-        PTAObject.driverCode = 'DRIVERCODE'; PTAObject.priceOfTravel = 00; PTAObject.save()
-        RDPTObject.delete()
+        RDSdata = { "PNRCode": PTAObject.taxiAvaId, "userCode": PTAObject.customerId.UserCode, "driverCode": PTAObject.driverCode, "status": RDPTObject.driverReportFor, "text": RDPTObject.reportData }
+        serializerRDS = repostDataSerializer(data = RDSdata)
 
-        messages.success(request, 'SuccessFully Re-Submited the pin 😊🧳✈️')
-        return redirect('taxi_app:pinTaxi')
+        if serializerRDS.is_valid():
+            serializerRDS.save()
+            PTAObject.driverCode = 'DRIVERCODE'; PTAObject.priceOfTravel = 00; PTAObject.save()
+            RDPTObject.delete()
+            messages.success(request, 'SuccessFully Re-Submited the pin 😊🧳✈️')
+            return redirect('taxi_app:pinTaxi')
     
     return render(request, 'main/repostPin.html', {'CodeNeed' : CodeNeed})
 
@@ -536,8 +544,14 @@ def readyToGoFunctionBaseView(request, idCode):
 
         if request.method == 'POST':
             RandomNumber = str(random.randint(100000, 999999)); request.session['OTP_Code_BT'] = RandomNumber
-            TaxiOnRunning(statusCode = PTA_ObjectReturn.taxiAvaId, taxiDriverName = PTA_ObjectReturn.driverCode, taxiCustomerName = PTA_ObjectReturn.customerId.UserCode, totalPassanger = PTA_ObjectReturn.taxiPassenger, taxiRunningFrom = PTA_ObjectReturn.currentLocation, taxiRunningTo = PTA_ObjectReturn.toLocation, taxiStartTime = PTA_ObjectReturn.taxiDateAndTimeByUser, taxiFutureEndTime = request.POST.get('FutureTime'), taxiFairPrice = PTA_ObjectReturn.priceOfTravel, cuponCode = request.POST.get('uCouponCodeRTG') or PTA_ObjectReturn.couponCodeWas, OTP_Here = RandomNumber).save()
-            PTA_ObjectReturn.delete()
+            
+            TORdata = { "statusCode": PTA_ObjectReturn.taxiAvaId, "taxiDriverName": PTA_ObjectReturn.driverCode, "taxiCustomerName": PTA_ObjectReturn.customerId.UserCode, "totalPassanger": PTA_ObjectReturn.taxiPassenger, "taxiRunningFrom": PTA_ObjectReturn.currentLocation, "taxiRunningTo": PTA_ObjectReturn.toLocation, "taxiStartTime": PTA_ObjectReturn.taxiDateAndTimeByUser, "taxiFutureEndTime": request.POST.get('FutureTime'), "taxiFairPrice": PTA_ObjectReturn.priceOfTravel, "cuponCode": request.POST.get('uCouponCodeRTG') or PTA_ObjectReturn.couponCodeWas, "OTP_Here": RandomNumber }
+            serializerTOR = TaxiOnRunningSerializer(data = TORdata)
+            
+            if serializerTOR.is_valid():
+                serializerTOR.save()
+                PTA_ObjectReturn.delete()
+
             return redirect('taxi_app:OTP', TaxiId = idCode)
 
     else:
@@ -660,15 +674,11 @@ def liveRunningStatus(request, IdCodeHere):
 
         if userCategory == 'Driver': 
             UDM = usersDataModel.objects.get(UserCode = TaxLiveData.taxiCustomerName)
-            UnameHere = UDM.UProfileName
-            MobileNo = UDM.UserMobileNo
-            checkStatusOnTemplate = 'Driver'
+            UnameHere = UDM.UProfileName; MobileNo = UDM.UserMobileNo; checkStatusOnTemplate = 'Driver'
 
         elif (userCategory == 'Customer') or (userCategory == 'Developer'): 
             UDM = usersDataModel.objects.get(UserCode = TaxLiveData.taxiDriverName)
-            UnameHere = UDM.UProfileName
-            MobileNo = UDM.UserMobileNo
-            checkStatusOnTemplate = 'Customer'
+            UnameHere = UDM.UProfileName; MobileNo = UDM.UserMobileNo; checkStatusOnTemplate = 'Customer'
 
     except Exception or e:
         ...
@@ -679,15 +689,9 @@ def liveRunningStatus(request, IdCodeHere):
 def ProfileFunctionBaseView(request):
     if request.user.is_authenticated:
         nv = navbar(request)
-        userCode = nv.get('userBarCodeAccessis')
-        userCat = nv.get('userCategoryis')
-        UDM = usersDataModel.objects.get(UserCode = userCode)
+        userCode = nv.get('userBarCodeAccessis'); userCat = nv.get('userCategoryis'); UDM = usersDataModel.objects.get(UserCode = userCode)
 
-        context = {
-            'userC' : userCode,
-            'userCat' : userCat,
-            'UDM' : UDM
-        }
+        context = { 'userC' : userCode, 'userCat' : userCat, 'UDM' : UDM }
         return render(request, 'main/profile.html', context)
 
     else:

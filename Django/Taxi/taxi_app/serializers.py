@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TaxiBarCode, PinTaxiAvailable, TaxiTimeOver, TaxiOnFinish
+from .models import TaxiBarCode, PinTaxiAvailable, TaxiTimeOver, TaxiOnFinish, TaxiOnRunning
 
 class TaxiBarCodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,4 +19,9 @@ class TaxiTimeOverSerializer(serializers.ModelSerializer):
 class TaxiOnFinishSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaxiOnFinish
+        fields = '__all__'
+
+class TaxiOnRunningSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaxiOnRunning
         fields = '__all__'

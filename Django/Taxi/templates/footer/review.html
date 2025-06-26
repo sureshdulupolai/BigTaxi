@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Review Post Page</title>
   <link rel="stylesheet" href="../../static/css/review.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+  <style>
+    .rating-fill{
+      background-color: #0f766e !important;
+    }
+    .text-brown-own{
+      color: #991b1b !important;
+      font-weight: 550;
+    }
+  </style>
+
 <body>
 
   <!-- Review Form -->
@@ -61,7 +64,7 @@
         <h1 class="fw-bold">{{ totalOutOf }} <small class="fs-5">Out of 5 Stars</small></h1>
         <div id="star-rating" class="text-warning fs-4"></div>
 
-        <p>Overall rating <a href="#">8 1st-party reviews</a></p>
+        <p>Overall rating <a class="text-main-own" href="#">8 1st-party reviews</a></p>
 
         <!-- Rating Bars -->
         <div class="d-flex align-items-center">
@@ -144,12 +147,12 @@
                 <span class="short-text">{{ Rar.userReview|truncatewords:14 }}</span>
                 <span class="full-text d-none">{{ Rar.userReview }}</span>
                 <br class="toggle-break d-none">
-                <a href="#" class="toggle-text text-primary text-decoration-none">Read more</a>
+                <a href="#" class="toggle-text text-brown-own text-decoration-none">Read more</a>
               </p>
 
               <div class="d-flex justify-content-between align-items-center">
               <p class="text-muted mb-0">
-                Posted on <br><strong><a href="#">BigTaxi</a></strong>
+                Posted on <br><strong><a class="text-main-own" href="#">BigTaxi</a></strong>
               </p>
 
               {% if BT %}
